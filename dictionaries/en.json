@@ -1,0 +1,59 @@
+{
+    "navigation": {
+        "links": {
+            "home": "Home",
+            "whatWeDo": "What we do",
+            "services": "Services",
+            "team": "Team",
+            "contact": "Contact",
+            "store": "Store"
+        }
+    },
+    "buttons": {
+        "readMore": "Read More"
+    },
+    "ctaCard": {
+        "head": "Chasing the technology",
+        "title": "Contact us and subscribe with us",
+        "description": "In the dynamic realm of technology, innovations are the driving force that propels businesses into the future. From groundbreaking solutions that streamline operations to cutting-edge advancements that redefine industries, the commercial technology landscape is a constantly evolving tapestry of progress.",
+        "button": "Sign Up",
+        "placeholder": "write your email",
+        "subscriberText1": "Join Our",
+        "subscriberText2": "subscribers now!"
+    },
+    "footer": {
+        "description": "Located at: Avenida 13C Norte, Calle Nombre de Dios Panama",
+        "company": {
+            "title": "School",
+            "link1": "About Us",
+            "link2": "Board",
+            "link3": "Blogs"
+        },
+        "account": {
+            "title": "Accounts",
+            "link1": "Log In",
+            "link2": "Academica"
+        },
+        "legal": {
+            "title": "LEGAL",
+            "link1": "Official Register",
+            "link2": "DISCLAIMER"
+        },
+        "textRight": "Currently At",
+        "location": "Panama"
+    },
+    "metadata":{
+        "webDescription":"IT Services: outsourcing · desktop or desk support · smart hands · dispatch for tickets · bsales · local partners · certified cabling · IP camera CCTV · network installation and management · overall country scope · and more"
+    },
+    "contactForm":{
+        "title": "Contact Us",
+        "description": "Complete this form and we will get back to you in 24 hours.", 
+        "fname": "Full Name",
+        "email":"Email",
+        "message":"Message",
+        "button":"Send Message"
+    },
+    "postStatic":{
+        "static1": "IT services provided"
+    }
+}

@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Set global defaults */
+@layer base {
+  body {
+    @apply font-sans text-gray-900 bg-[#EBBE50] dark:bg-black dark:text-gray-100;
+  }
+}
+
+/* Default Light Mode */
+
+/* body {
+  background-color: #EBBE50;
+  color: black;
+} */
+
+/* Dark Mode */
+
+/* body.dark {
+  background-color: #121212;
+  color: white;
+} */
+
+:root {
+  --background: #EBAA20;
+  --foreground: #064396;
+  --color-text: #000000;
+  --color-bg: #EBAA20;
+  --color-brand: #EBAA20;
+}
+
+.dark {
+  --color-bg: #000000;
+  --color-text: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  animation: marquee 30s linear infinite;
+  width: calc(2 * 100%); /* The width should be twice the container size to accommodate both sets */
+}
+
+/* Faster scrolling for mobile screens */
+@media (max-width: 768px) {
+  .animate-marquee {
+    animation-duration: 10s; /* Faster speed for mobile */
+  }
+}
+

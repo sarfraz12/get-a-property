@@ -1,0 +1,59 @@
+{
+    "navigation": {
+        "links": {
+            "home": "Inicio",
+            "whatWeDo": "Qué hacemos",
+            "services": "Servicios",
+            "team": "Equipo",
+            "contact": "Contacto",
+            "store": "Tienda"
+        }
+    },
+    "buttons": {
+        "readMore": "Leer más"
+    },
+    "ctaCard": {
+        "head": "Desafiando la tecnología",
+        "title": "Contáctenos y suscríbase",
+        "description": "En el dinámico ámbito de la tecnología, las innovaciones son la fuerza impulsora que impulsa a las empresas hacia el futuro. Desde soluciones revolucionarias que simplifican las operaciones hasta avances de vanguardia que redefinen industrias, el panorama tecnológico comercial es un tapiz constantemente evolutivo de progreso.",
+        "button": "Registrarse",
+        "placeholder": "escriba su correo electrónico",
+        "subscriberText1": "Únase a nuestros",
+        "subscriberText2": "suscriptores ahora"
+    },
+    "footer": {
+        "description": "Ubicado en: Avenida 13C Norte, Calle Nombre de Dios Panamá.",
+        "company": {
+            "title": "Colegio",
+            "link1": "Acerca de nosotros",
+            "link2": "Junta Directiva",
+            "link3": "Blogs"
+        },
+        "account": {
+            "title": "CUENTA",
+            "link1": "Iniciar sesión",
+            "link2": "Academica"
+        },
+        "legal": {
+            "title": "LEGAL",
+            "link1": "Registro oficial",
+            "link2": "DESCARGO DE RESPONSABILIDAD"
+        },
+        "textRight": "Actualmente en",
+        "location": "Panamá"
+    },
+    "metadata":{
+        "webDescription":"Servicios de TI: tercerizados · soporte mesa de ayuda · soporte remoto · despacho de tickets · ventas · socios locales · cableado estructurado · CCTV con cámaras IP · instalación y gestión de redes · alcance a nivel nacional · y más"
+    },
+    "contactForm": {
+        "title": "Contáctenos",
+        "description": "Complete este formulario y nos pondremos en contacto con usted en 24 horas.",
+        "fname": "Nombre completo",
+        "email": "Correo electrónico",
+        "message": "Mensaje",
+        "button": "Enviar mensaje"
+      },
+      "postStatic":{
+        "static1": "Servicios IT realizados"
+    }
+}
