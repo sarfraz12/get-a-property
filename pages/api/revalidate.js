@@ -4,6 +4,7 @@
  * It is set up to receive a validated GROQ-powered Webhook from Sanity.io:
  * https://www.sanity.io/docs/webhooks
  *
+ * 0. Create a Token with editor role
  * 1. Go to the API section of your Sanity project on sanity.io/manage or run `npx sanity hook create`
  * 2. Click "Create webhook"
  * 3. Set the Name & Description
@@ -86,8 +87,7 @@ export default async function revalidate(req, res) {
             staleRoutes.push(`/${lang}/aboutUs`);
             staleRoutes.push(`/${lang}/search`);
             staleRoutes.push(`/${lang}/all`);
-            staleRoutes.push(`/${lang}/services/desktopSupport`);
-            staleRoutes.push(`/${lang}/services/webdevelopment`);
+            
 
             // Add category slugs if they exist
             categorySlugs.map(categorySlug => {
@@ -106,8 +106,7 @@ export default async function revalidate(req, res) {
             staleRoutes.push(`/${lang}/search`);
             staleRoutes.push(`/${lang}/all`);
             staleRoutes.push(`/${lang}/aboutUs`);
-            staleRoutes.push(`/${lang}/services/desktopSupport`);
-            staleRoutes.push(`/${lang}/services/webdevelopment`);
+           
         });
     }
 
