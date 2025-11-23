@@ -1,3 +1,4 @@
+// edit with the client credentials 
 
 import emailjs from '@emailjs/browser';
 
