@@ -5,6 +5,7 @@
  * https://www.sanity.io/docs/webhooks
  *
  * 0. Create a Token with editor role
+ * 0. Temporarly add the vercel custom domain in the webhook url
  * 1. Go to the API section of your Sanity project on sanity.io/manage or run `npx sanity hook create`
  * 2. Click "Create webhook"
  * 3. Set the Name & Description

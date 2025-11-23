@@ -46,7 +46,7 @@ export default function Hero({
                     <h1 className="text-3xl md:text-5xl uppercase font-bold leading-tight mb-6 md:text-left text-center text-brand-black">
                         {title}
                     </h1>
-                    <p className="text-base text-justify md:text-lg font-semibold md:font-normal text-brand-black mb-8">{description}</p>
+                    <p className="text-base text-justify md:text-lg font-semibold text-brand-black mb-8">{description}</p>
                     {buttonText && (
                         <div className="w-full flex justify-center md:justify-normal md:p-0 p-4">
                             <a
