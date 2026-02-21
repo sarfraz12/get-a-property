@@ -205,7 +205,7 @@ export default async function RootLayout({
         <Analytics />
 
         <Providers>
-          <Navbar lang={params.lang} {...settings} data={navData} />
+          <Navbar lang={params.lang} {...settings} data={navData}/>
           <Suspense fallback={<Loading />}>
             {children}
             <Backlink linkValue={settings.url} />

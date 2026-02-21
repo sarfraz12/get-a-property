@@ -22,7 +22,7 @@ export default function Hero({
     productImage,
 }: HeroProps) {
     return (
-        <section className="relative w-full overflow-hidden">
+        <section className="relative w-full">
             {/* Background image as true background */}
             {backgroundImage && (
                 <div

@@ -18,7 +18,7 @@ export default function Navbar({ lang, data, logo, logoalt, title, shopLink, sho
   const isActive = (href: string) => pathname === `/${lang}${href}`;
   
   return (
-    <Disclosure as="nav" className="bg-brand/25 dark:bg-brand-dark/25 border-b border-brand-light sticky top-0 z-50 ">
+    <Disclosure as="nav" className="container-full bg-brand/25 dark:bg-brand-dark/25 border-b border-brand-light sticky top-0 z-50">
       {({ open }) => (
         <>
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

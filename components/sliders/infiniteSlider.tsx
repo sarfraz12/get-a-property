@@ -1,6 +1,8 @@
+"use client";
 import React from "react";
 import Image from "next/image";
 import { urlForImage } from "@/lib/sanity/image";
+import { useEffect, useRef } from "react";
 
 interface ClientImages {
   title?: string;
@@ -16,6 +18,31 @@ interface ClientSliderProps {
 
 export default function InfiniteSlider({ dataImage }: ClientSliderProps) {
   const images = [...dataImage, ...dataImage]; // duplicate
+
+  const sliderRef = useRef<HTMLDivElement>(null);
+  
+    useEffect(() => {
+      const slider = sliderRef.current;
+      if (!slider) return;
+  
+      let animation: number;
+      let position = 0;
+  
+      const animate = () => {
+        position -= 0.5;
+        slider.style.transform = `translateX(${position}px)`;
+  
+        if (Math.abs(position) > slider.scrollWidth / 2) {
+          position = 0;
+        }
+  
+        animation = requestAnimationFrame(animate);
+      };
+  
+      animation = requestAnimationFrame(animate);
+  
+      return () => cancelAnimationFrame(animation);
+    }, []);
 
   return (
     <section className="w-full bg-brand-dark dark:bg-brand py-5 overflow-hidden">

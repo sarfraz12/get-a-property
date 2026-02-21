@@ -3,6 +3,12 @@
 		{
 			"path": "."
 		},
+		{
+			"path": "../solutekpty-nextjs"
+		},
+		{
+			"path": "../../../Library/Mobile Documents/com~apple~CloudDocs/Documents-Sarfraz/Emprendimientos/11-e-learning/05-Next/00-Plantillas compradas/stablo-pro-v2.1.0/stablo-pro"
+		}
 	],
 	"settings": {}
 }

@@ -1,6 +1,5 @@
 "use client"
 import Container from "@/components/generalUse/container";
-import Carousel from "@/components/generalUse/courosel";
 import PostList from "@/components/posts/postlist";
 import ComparisonCard from "@/components/cards/ComparisonCard"
 import ClientSlider from "@/components/sliders/client"
@@ -9,22 +8,49 @@ import CardIcon from "@/components/cards/cardIcon";
 import ServiceDescription from "@/components/cards/serviceDescription";
 import SkeletonLoader from "@/components/generalUse/SkeletonLoader";//falback
 import Link from "next/link";
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { urlForImage } from "@/lib/sanity/image";
 import Hero from "@/components/generalUse/hero";
-import InfiniteSlider from "@/components/sliders/infiniteSlider";
 import Featured from "@/components/sliders/featured";
-import TestimonialSection from "@/components/generalUse/testimonialSection";
-import FormSlider from "@/components/sliders/formSlider"
+import ComparisonSection from "@/components/sections/ComparisonSection"
+
+import dynamic from "next/dynamic";
+
+const InfiniteSlider = dynamic(
+  () => import("@/components/sliders/infiniteSlider"),
+  { ssr: false }
+);
+
+const Carousel = dynamic(
+  () => import("@/components/generalUse/courosel"),
+  { ssr: false }
+);
+
+const FormSlider = dynamic(
+  () => import("@/components/sliders/formSlider"),
+  { ssr: false }
+);
+
+const TestimonialSection = dynamic(
+  () => import("@/components/generalUse/testimonialSection"),
+  { ssr: false }
+);
+
 
 export default function Home({ posts, landingData, lang }) {
 
+  const landing = landingData?.[0];
+
   // POSTS call
-  const mainPost = posts.find(post => post.productMain === true) || null;
-  const featuredPosts = posts.filter(
-    post => post.featured === true && post._id !== mainPost?._id
-  );
-  const postTitle = "post 2"; // the title you are looking for
+  const mainPost = useMemo(() =>
+    posts.find(post => post.productMain === true) || null,
+    [posts]);
+
+  const featuredPosts = useMemo(() =>
+    posts.filter(post => post.featured === true && post._id !== mainPost?._id),
+    [posts, mainPost]);
+
+  const postTitle = "post 2"; // the title for the slider to show
   const postByTitle = posts.find(post => post.title === postTitle) || null;
 
   // State to control how many cards are displayed
@@ -34,45 +60,105 @@ export default function Home({ posts, landingData, lang }) {
   const toggleShowAll = () => setShowAll(!showAll);
 
   // this is for Activities section, add dynamic columns
-  const itemCount = landingData[0]?.keyActivities?.length || 1;
+  const itemCount = landing?.keyActivities?.length || 1;
   const columnCount = Math.min(Math.max(itemCount, 1), 3);
 
-  if (!landingData?.[0]) {
+  if (!posts || !landingData) {
     return (
-      <div className="px-6 py-12">
-        <SkeletonLoader lines={6} />
-      </div>
+      <p>Content unavailable</p>
+
     );
   }
 
   return (
     <>
-      {/* A-HERO SECTION */}
+      {/* Top-level wrapper: allow horizontal hidden but don't clip vertical flow */}
+      <div className="w-full max-w-[1920px] mx-auto overflow-x-hidden">
 
-      {/* 02-HERO-Hero Slider */}
-      {landingData[0]?.hero?.[0] && (
-        < div className="@container mt-0.5">
-          <Hero {...landingData[0]?.hero?.[0]} />
-        </div>
-      )}
+        {/* ===== 01 - HERO SECTION ===== */}
+        {landing?.hero?.[0] && (
+          <section className="w-full">
+            <Hero {...landing?.hero?.[0]} />
+          </section>
+        )}
 
-      {/* 03-HERO- InfiniteSlider */}
-      {landingData[0]?.infinitSlider?.slice(0, 1).map((element, index) => (
-        <InfiniteSlider
+        {/* ===== 02 - Infinite Slider (top) ===== */}
+        {landing?.infinitSlider?.slice(0, 1).map((element, index) => (
+          <InfiniteSlider
+            lang={lang}
+            dataImage={element?.items}
+            key={element.id || `${element.title}-${index}`}
+          />
+
+        ))}
+
+        {/* ===== 03 - Comparison / Hook Section ===== */}
+        {landing?.comparisonCard && (
+        <ComparisonSection
+          data={landing?.comparisonCard?.[0]}
           lang={lang}
-          dataImage={element?.items}
-          key={element.id || `${element.title}-${index}`}
         />
+        )}
 
-      ))}
-      {/*  04--HERO- SERVICE AND HOOK SECTION  */}
-      {
-        landingData[0]?.comparisonCard?.slice(0, 1).map((item, index) => {
+        {/* ===== B - CONTENT SECTION (posts) ===== */}
+        <section className="px-4 py-10 md:px-10 md:py-16 lg:px-20 lg:py-20">
 
-          const cardsToShow = showAll ? item?.items : item?.items?.slice(0, 3);
+          {mainPost && (
+            <div>
+              {/* Main Post */}
+              <div className="grid ">
+                <PostList
+                  key={mainPost._id}
+                  post={mainPost}
+                  minimal={true}
+                  aspect="landscape"
+                  fontWeight="large"
+                  preloadImage={true}
+                  isMain={true} // 👈 this triggers the big version
+                />
+              </div>
+
+              {/* Featured Posts */}
+              {featuredPosts.length > 0 && (
+                <div className="grid gap-8 mt-12 md:grid-cols-2 xl:grid-cols-3">
+                  {featuredPosts.map(post => (
+                    <PostList key={post._id} post={post} aspect="square" />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+        </section>
+
+        {/* ===== FEATURED SPECIFIC POST (by title) ===== */}
+        {postByTitle &&
+          <Featured pathPrefix="all" post={postByTitle} />
+        }
+
+
+        {/* ===== CTA Card (first) ===== */}
+        {landing?.ctaContentCards?.slice(0, 1).map((item, index) => (
+          <div className="m-10" key={item.id || `${item.title}-${index}`}>
+            <CtaCard
+              title={item?.ctaCardTitle}
+              subTitle={item?.ctaCardSubtitle}
+              description={item?.ctaCardDescription}
+              buttonMessage={item?.ctaCardButtonMessage}
+              buttonLink={item?.ctaCardButtonLink}
+              imageAlt={item?.ctaCardImageAlt}
+              image={urlForImage(item?.ctaCardImage)}
+            />
+          </div>
+        ))}
+
+        {/* ===== Comparison Card (slice 1,2) ===== */}
+        {landing?.comparisonCard?.slice(1, 2).map((item, index) => {
+
+          const cardsToShow = showAll ? item?.items : item?.items?.slice(0, 5);
 
           return (
-            <section className="px-6 py-12 grid md:grid-cols-2" key={index}>
+            <section className="px-6 py-12 grid md:grid-cols-2" key={item.id || `${item.title}-${index}`}>
               {/* Comparison Card Title, Link and Description */}
               <div className="text-left max-w-3xl mx-10">
                 <h1 className="md:text-4xl text-2xl font-extrabold text-gray-900 dark:text-white mb-4">
@@ -86,11 +172,11 @@ export default function Home({ posts, landingData, lang }) {
                 </Link>
               </div>
 
-              {/* Comparison Items */}
+              {/* BODY-Comparison Items */}
               <div className="max-w-xl mx-auto space-y-4 w-full">
                 {cardsToShow?.map((item, index) => (
                   <ComparisonCard
-                    key={index}
+                    key={item.id || `${item.title}-${index}`}
                     title={item?.title}
                     category={item?.category}
                     color={item?.spanColor}
@@ -114,205 +200,94 @@ export default function Home({ posts, landingData, lang }) {
               </div>
             </section>
           );
-        })
-      }
+        })}
 
-      {/* B-SECTION OF CONTENT */}
-      <Container>
+        {/* ===== Service Cards (Left/Right description sections) ===== */}
 
-
-        {/* 01-POST SECTION */}
-
-        {mainPost && (
-          <div>
-            {/* Section title */}
-            {/* <div className="flex items-center justify-center m-5">
-              <h1 className="text-2xl dark:text-white text-black ">
-                <strong>{landingData[0].title}</strong>
-              </h1>
-            </div> */}
-
-            {/* Main Post */}
-            <div className="grid ">
-              <PostList
-                key={mainPost._id}
-                post={mainPost}
-                minimal={true}
-                aspect="landscape"
-                fontWeight="large"
-                preloadImage={true}
-                isMain={true} // 👈 this triggers the big version
-              />
-            </div>
-
-            {/* Featured Posts */}
-            {featuredPosts.length > 0 && (
-              <div className="grid gap-10 mt-20 lg:gap-10 md:grid-cols-2 xl:grid-cols-3 ">
-                {featuredPosts.map(post => (
-                  <PostList key={post._id} post={post} aspect="square" />
-                ))}
-              </div>
-            )}
+        {landing?.ServiceCards?.map((item, index) => (
+          <div key={item.id || `${item.title}-${index}`} className="  md:p-12 p-10">
+            <ServiceDescription
+              title={item?.serviceCardTitle}
+              description={item?.serviceCarddescription}
+              description2={item?.serviceCarddescription2}
+              imageSrc={urlForImage(item?.serviceCardImage)}
+              reverse={item?.serviceCardReverse}
+              points={item?.contentCardPoints}
+              animation={item?.serviceCardAnimation}
+            />
           </div>
+        ))}
+
+        {/* ===== Carousel Parallax (sliders) ===== */}
+        {landing?.sliders?.[0] && (
+          < div className="@container">
+            <Carousel images={landing?.sliders} />
+          </div >
         )}
 
-      </Container>
-
-      {/* 00-FEATURED POST  */}
-      {postByTitle &&
-        <Featured pathPrefix="all" post={postByTitle} />
-      }
-
-
-      {/* 00-BODY-CTA CARD */}
-
-      {landingData[0]?.ctaContentCards?.slice(0, 1).map((item, index) => (
-        <div className="m-10" key={item.id || `${item.title}-${index}`}>
-          <CtaCard
-            title={item?.ctaCardTitle}
-            subTitle={item?.ctaCardSubtitle}
-            description={item?.ctaCardDescription}
-            buttonMessage={item?.ctaCardButtonMessage}
-            buttonLink={item?.ctaCardButtonLink}
-            imageAlt={item?.ctaCardImageAlt}
-            image={urlForImage(item?.ctaCardImage)}
+        {/* ===== Brands logo slider (infinite) ===== */}
+        {landing?.infinitSlider?.slice(1, 2).map((element, index) => (
+          <InfiniteSlider
+            lang={lang}
+            dataImage={element?.items}
+            key={element.id || `${element.title}-${index}`}
           />
-        </div>
-      ))}
 
-      {/* 00-BODY - Comparison Card */}
-      {landingData[0]?.comparisonCard?.slice(1, 2).map((item, index) => {
-
-        const cardsToShow = showAll ? item?.items : item?.items?.slice(0, 5);
-
-        return (
-          <section className="px-6 py-12 grid md:grid-cols-2" key={item.id || `${item.title}-${index}`}>
-            {/* Comparison Card Title, Link and Description */}
-            <div className="text-left max-w-3xl mx-10">
-              <h1 className="md:text-4xl text-2xl font-extrabold text-gray-900 dark:text-white mb-4">
-                {item?.title}
-              </h1>
-              <p className="text-gray-500 mb-8 md:text-xl text-lg text-justify">
-                {item?.description}
-              </p>
-              <Link href={item?.linkPath} className="text-blue-600 font-medium mb-8 inline-block text-md">
-                {item?.linkText} &rarr;
-              </Link>
-            </div>
-
-            {/* BODY-Comparison Items */}
-            <div className="max-w-xl mx-auto space-y-4 w-full">
-              {cardsToShow?.map((item, index) => (
-                <ComparisonCard
-                  key={item.id || `${item.title}-${index}`}
-                  title={item?.title}
-                  category={item?.category}
-                  color={item?.spanColor}
-                  textColor={item?.textColor}
-                  link={`/${lang}/${item?.serviceLink}`}
-                />
-              ))}
-
-              {/* Toggle Button */}
-              <div className="text-left">
-                <button onClick={toggleShowAll} className="text-blue-600 font-medium mt-4">
-                  {showAll
-                    ? lang === "en"
-                      ? "Show Less"
-                      : "Mostrar Menos"
-                    : lang === "en"
-                      ? "See All Services"
-                      : "Mostrar Más"}
-                </button>
-              </div>
-            </div>
-          </section>
-        );
-      })}
-
-      {/* 01- Left / Right Descriptions with photos */}
-
-      {landingData[0]?.ServiceCards?.map((item, index) => (
-        <div key={item.id || `${item.title}-${index}`} className="  md:p-12 p-10">
-          <ServiceDescription
-            title={item?.serviceCardTitle}
-            description={item?.serviceCarddescription}
-            description2={item?.serviceCarddescription2}
-            imageSrc={urlForImage(item?.serviceCardImage)}
-            reverse={item?.serviceCardReverse}
-            points={item?.contentCardPoints}
-            animation={item?.serviceCardAnimation}
-          />
-        </div>
-      ))}
-
-      {/* 02-body Slider Images Parallax */}
-      {landingData[0]?.sliders?.[0] && (
-        < div className="@container">
-          <Carousel images={landingData[0]?.sliders} />
-        </div >
-      )}
-
-      {/* Brands logo slider */}
-      {landingData[0]?.infinitSlider?.slice(1, 2).map((element, index) => (
-
-        // {/* Title aligned to the left */ }
-        <InfiniteSlider
-          lang={lang}
-          dataImage={element?.items}
-          key={element.id || `${element.title}-${index}`}
-        />
-
-      ))}
-
-      {/* SECTION OF ACTIVITIES CARDS */}
-      <Container>
-        <div className={`h-full p-5`}>
-
-          <div className={`grid p-5 md:grid-cols-${columnCount} md:gap-4 gap-2`}>
-
-            {landingData[0]?.keyActivities && landingData[0]?.keyActivities.map((item, index) =>
-              <div key={item._key || item.id || index}>
-                <CardIcon data={item} key={item.id || `${item.title}-${index}`} lang={lang} />
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* CTA CARD */}
-        {landingData[0]?.ctaContentCards?.slice(0, 1).map((item, index) => (
-          <CtaCard
-            key={`cta-second-${index}`}
-            title={item?.ctaCardTitle}
-            subTitle={item?.ctaCardSubtitle}
-            description={item?.ctaCardDescription}
-            buttonMessage={item?.ctaCardButtonMessage}
-            buttonLink={item?.ctaCardButtonLink}
-            imageAlt={item?.ctaCardImageAlt}
-            image={urlForImage(item?.ctaCardImage)}
-          />
         ))}
-      </Container>
 
-      {/* BODY-Testimonials */}
-      {landingData[0]?.testimonialSection?.[0] && (
-        <TestimonialSection
-          title={landingData[0]?.testimonialSection[0]?.title}
-          backgroundImage={landingData[0]?.testimonialSection[0]?.backgroundImage}
-          testimonials={landingData[0]?.testimonialSection[0]?.testimonials}
-        />
-      )
-      }
+        {/* ===== Activities grid ===== */}
+        <Container>
+          <div className={`h-full p-5`}>
 
-      {/* BODY-FormSlider */}
-      {landingData[0]?.formSlider?.[0] && (
-        <FormSlider
-          {...landingData[0]?.formSlider?.[0]}
-        />
-      )
-      }
+            <div className={`grid p-5 md:gap-4 gap-2 ${columnCount === 1
+              ? "md:grid-cols-1"
+              : columnCount === 2
+                ? "md:grid-cols-2"
+                : "md:grid-cols-3"
+              }`}>
 
+              {landing?.keyActivities && landing?.keyActivities.map((item, index) =>
+                <div key={item._key || item.id || index}>
+                  <CardIcon data={item} key={item.id || `${item.title}-${index}`} lang={lang} />
+                </div>
+              )}
+            </div>
+          </div>
 
+          {/* ===== CTA Card (second) ===== */}
+          {landing?.ctaContentCards?.slice(0, 1).map((item, index) => (
+            <CtaCard
+              key={`cta-second-${index}`}
+              title={item?.ctaCardTitle}
+              subTitle={item?.ctaCardSubtitle}
+              description={item?.ctaCardDescription}
+              buttonMessage={item?.ctaCardButtonMessage}
+              buttonLink={item?.ctaCardButtonLink}
+              imageAlt={item?.ctaCardImageAlt}
+              image={urlForImage(item?.ctaCardImage)}
+            />
+          ))}
+        </Container>
+
+        {/* ===== Testimonials ===== */}
+        {landing?.testimonialSection?.[0] && (
+          <TestimonialSection
+            title={landing?.testimonialSection[0]?.title}
+            backgroundImage={landing?.testimonialSection[0]?.backgroundImage}
+            testimonials={landing?.testimonialSection[0]?.testimonials}
+          />
+        )
+        }
+
+        {/* ===== Form Slider ===== */}
+        {landing?.formSlider?.[0] && (
+          <FormSlider
+            {...landing?.formSlider?.[0]}
+          />
+        )
+        }
+
+      </div>
     </>
   );
 }
