@@ -39,7 +39,7 @@ const TestimonialSection = dynamic(
 );
 
 
-export default function Home({ posts, landingData, lang }) {
+export default function Home({ posts, landingData, lang, post }) {
 
   const landing = landingData?.[0];
 
@@ -51,9 +51,6 @@ export default function Home({ posts, landingData, lang }) {
   const featuredPosts = useMemo(() =>
     posts.filter(post => post.featured === true && post._id !== mainPost?._id),
     [posts, mainPost]);
-
-  const postTitle = "7 Years Crafting Authentic Ghee in Panama"; // the title for the slider to show
-  const postByTitle = posts.find(post => post.title === postTitle) || null;
 
   // State to control how many cards are displayed
   const [showAll, setShowAll] = useState(false);
@@ -136,8 +133,8 @@ export default function Home({ posts, landingData, lang }) {
         </section>
 
         {/* ===== FEATURED SPECIFIC POST (by title) ===== */}
-        {postByTitle &&
-          <Featured pathPrefix="all" post={postByTitle} />
+        {post &&
+          <Featured pathPrefix="all" post={post} />
         }
 
 
