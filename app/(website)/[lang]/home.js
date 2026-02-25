@@ -13,6 +13,8 @@ import { urlForImage } from "@/lib/sanity/image";
 import Hero from "@/components/generalUse/hero";
 import Featured from "@/components/sliders/featured";
 import ComparisonSection from "@/components/sections/ComparisonSection"
+import ComparisonServicesSection from "@/components/sections/ComparisonServicesSection";
+import CertificationLogosSection from "@/components/sections/CertificationLogosSection";
 
 import dynamic from "next/dynamic";
 
@@ -93,12 +95,14 @@ export default function Home({ posts, landingData, lang }) {
         ))}
 
         {/* ===== 03 - Comparison / Hook Section ===== */}
-        {landing?.comparisonCard && (
-        <ComparisonSection
-          data={landing?.comparisonCard?.[0]}
-          lang={lang}
-        />
-        )}
+        {landing?.comparisonCard?.slice(1, 2).map((element, index) => (
+          <ComparisonSection
+            data={element}
+            lang={lang}
+            key={index}
+          />
+        ))}
+
 
         {/* ===== B - CONTENT SECTION (posts) ===== */}
         <section className="px-4 py-10 md:px-10 md:py-16 lg:px-20 lg:py-20">
@@ -153,54 +157,13 @@ export default function Home({ posts, landingData, lang }) {
         ))}
 
         {/* ===== Comparison Card (slice 1,2) ===== */}
-        {landing?.comparisonCard?.slice(1, 2).map((item, index) => {
-
-          const cardsToShow = showAll ? item?.items : item?.items?.slice(0, 5);
-
-          return (
-            <section className="px-6 py-12 grid md:grid-cols-2" key={item.id || `${item.title}-${index}`}>
-              {/* Comparison Card Title, Link and Description */}
-              <div className="text-left max-w-3xl mx-10">
-                <h1 className="md:text-4xl text-2xl font-extrabold text-gray-900 dark:text-white mb-4">
-                  {item?.title}
-                </h1>
-                <p className="text-gray-500 mb-8 md:text-xl text-lg text-justify">
-                  {item?.description}
-                </p>
-                <Link href={item?.linkPath} className="text-blue-600 font-medium mb-8 inline-block text-md">
-                  {item?.linkText} &rarr;
-                </Link>
-              </div>
-
-              {/* BODY-Comparison Items */}
-              <div className="max-w-xl mx-auto space-y-4 w-full">
-                {cardsToShow?.map((item, index) => (
-                  <ComparisonCard
-                    key={item.id || `${item.title}-${index}`}
-                    title={item?.title}
-                    category={item?.category}
-                    color={item?.spanColor}
-                    textColor={item?.textColor}
-                    link={`/${lang}/${item?.serviceLink}`}
-                  />
-                ))}
-
-                {/* Toggle Button */}
-                <div className="text-left">
-                  <button onClick={toggleShowAll} className="text-blue-600 font-medium mt-4">
-                    {showAll
-                      ? lang === "en"
-                        ? "Show Less"
-                        : "Mostrar Menos"
-                      : lang === "en"
-                        ? "See All Services"
-                        : "Mostrar Más"}
-                  </button>
-                </div>
-              </div>
-            </section>
-          );
-        })}
+        {landing?.comparisonCard?.slice(1, 2).map((item, index) => (
+          <ComparisonServicesSection
+            key={item?._key || index}
+            data={item}
+            lang={lang}
+          />
+        ))}
 
         {/* ===== Service Cards (Left/Right description sections) ===== */}
 
@@ -234,6 +197,21 @@ export default function Home({ posts, landingData, lang }) {
           />
 
         ))}
+        {/* Certification Logo */}
+        <CertificationLogosSection
+          className="object-contain grayscale hover:grayscale-0 transition duration-300"
+          title={lang === "en" ? "Our Certifications" : "Nuestras Certificaciones"}
+          logos={[
+            {
+              image: "/images/Halal.jpeg",
+              alt: "Halal Certified Logo",
+            },
+            {
+              image: "/images/kosher.png",
+              alt: "Kosher Certified Logo",
+            },
+          ]}
+        />
 
         {/* ===== Activities grid ===== */}
         <Container>
