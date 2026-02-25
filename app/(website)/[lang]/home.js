@@ -200,13 +200,18 @@ export default function Home({ posts, landingData, lang, post }) {
           title={lang === "en" ? "Our Certifications" : "Nuestras Certificaciones"}
           logos={[
             {
-              image: "/images/Halal.jpeg",
+              image: "/images/sticker certificado halal.png",
               alt: "Halal Certified Logo",
             },
             {
               image: "/images/kosher.png",
               alt: "Kosher Certified Logo",
             },
+            {
+              image: "/images/Hecho en Panama.jpg",
+              alt: "Kosher Certified Logo",
+            },
+
           ]}
         />
 

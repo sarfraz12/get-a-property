@@ -18,7 +18,7 @@ export default function Navbar({ lang, data, logo, logoalt, title, shopLink, sho
   const isActive = (href: string) => pathname === `/${lang}${href}`;
   
   return (
-    <Disclosure as="nav" className="container-full bg-brand/25 dark:bg-brand-dark/25 border-b border-brand-light sticky top-0 z-50">
+    <Disclosure as="nav" className="top-0 z-50 container-full bg-brand/25 dark:bg-brand-dark/25 border-b border-brand-light dark:hover:text-brand-gold">
       {({ open }) => (
         <>
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -49,7 +49,7 @@ export default function Navbar({ lang, data, logo, logoalt, title, shopLink, sho
                       className="hidden dark:block h-12 w-auto sm:h-10 object-contain"
                     />
                   ) : (
-                    <h2 className="hidden dark:block md:text-5xl text-2xl font-bold text-brand-light hover:text-brand">{title}</h2>
+                    <h2 className="hidden dark:block md:text-5xl text-2xl font-bold text-brand-light hover:text-brand-gold">{title}</h2>
                   )}
                 </Link>
               </div>
@@ -67,7 +67,7 @@ export default function Navbar({ lang, data, logo, logoalt, title, shopLink, sho
                         "md:text-xl sm:text-lg font-bold tracking-wide",
                         isActive(item.href)
                           ? "dark:text-brand text-brand-dark "
-                          : "text-brand-black hover:text-brand-dark dark:text-brand-light  dark:hover:text-brand"
+                          : "text-brand-black hover:text-brand-dark dark:text-brand-light  dark:hover:text-brand-gold"
                       )}
                     >
                       {item.label}
@@ -82,7 +82,7 @@ export default function Navbar({ lang, data, logo, logoalt, title, shopLink, sho
                 <SmartLink
                   href={shopLink}
                   lang={lang}
-                  className="bg-brand-black px-4 py-2 text-sm uppercase text-brand-light hover:text-brand-dark dark:hover:text-brand"
+                  className="bg-brand-black px-4 py-2 text-sm uppercase text-brand-light hover:text-brand-dark dark:hover:text-brand-gold"
                 >
                   {shopText}
                 </SmartLink>
@@ -126,7 +126,7 @@ export default function Navbar({ lang, data, logo, logoalt, title, shopLink, sho
               <SmartLink
                 href={shopLink}
                 lang={lang}
-                className="mt-2 block w-full bg-brand-black px-4 py-2 text-center text-lg uppercase text-brand-light hover:text-brand-dark dark:hover:text-brand"
+                className="mt-2 block w-full bg-brand-black px-4 py-2 text-center text-lg uppercase text-brand-light hover:text-brand-dark dark:hover:text-brand-gold"
               >
                 {shopText}
               </SmartLink>

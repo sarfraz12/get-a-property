@@ -40,10 +40,10 @@ export default function Hero({
             />
 
             {/* Content */}
-            <div  style={{ whiteSpace: 'pre-line' }} className="relative container mx-auto flex flex-col md:flex-row justify-between gap-2 px-4 md:px-6 md:py-6 items-start md:items-center">
+            <div style={{ whiteSpace: 'pre-line' }} className="relative container mx-auto flex flex-col md:flex-row justify-between gap-2 px-4 md:px-6 md:py-6 items-start md:items-center">
                 {/* LEFT (text) */}
                 <div className="flex-1 text-left max-w-xl md:order-1 order-2 md:mx-20">
-                    <h1 className="text-3xl md:text-5xl uppercase font-bold leading-tight mb-6 md:text-left text-center text-brand-black">
+                    <h1 className="text-brand-gold text-3xl md:text-5xl uppercase font-bold leading-tight mb-6 md:text-left text-center dark:text-brand-dark">
                         {title}
                     </h1>
                     <p className="text-base text-justify md:text-lg font-semibold text-brand-black mb-8">{description}</p>
@@ -60,17 +60,22 @@ export default function Hero({
                 </div>
 
                 {/* RIGHT (product image) */}
-                <div className="flex-1 flex items-center justify-center md:pb-6 md:order-2 order-1">
-                    {productImage && (
-                        <div className="relative  md:h-[500px] z-20">
+                {productImage && (
+                    <div className="hidden lg:block absolute top-0 right-0 z-20 
+                  w-[60%] sm:w-[50%] md:w-[45%] lg:w-[40%] xl:w-[35%]
+                  h-full pointer-events-none">
+                        <div className="relative w-full h-full">
                             <Image
                                 {...(urlForImage(productImage) as ImageProps)}
                                 alt="Hero product"
-                                className="object-contain drop-shadow-sm"
+
+                                priority
+                                className="object-contain object-top-right 
+                   drop-shadow-2xl"
                             />
                         </div>
-                    )}
-                </div>
+                    </div>
+                )}
             </div>
         </section>
     );

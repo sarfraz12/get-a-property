@@ -16,7 +16,7 @@ const LangSwitcher = ({locale}: {locale: string} ) => {
 
     return (    
         <Link
-            className="font-semibold flex items-center gap-1 text-brand-black hover:text-brand-dark dark:text-brand-light dark:hover:text-brand "
+            className="font-semibold flex items-center gap-1 text-brand-black hover:text-brand-dark dark:text-brand-light dark:hover:text-brand-gold "
             href={redirectTarget()}
             locale={targetLanguage}>
             <span>{targetLanguage === 'es' ? '🇺🇸' : '🇵🇦'}</span>
