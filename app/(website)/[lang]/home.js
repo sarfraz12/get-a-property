@@ -52,7 +52,7 @@ export default function Home({ posts, landingData, lang }) {
     posts.filter(post => post.featured === true && post._id !== mainPost?._id),
     [posts, mainPost]);
 
-  const postTitle = "post 2"; // the title for the slider to show
+  const postTitle = "7 Years Crafting Authentic Ghee in Panama"; // the title for the slider to show
   const postByTitle = posts.find(post => post.title === postTitle) || null;
 
   // State to control how many cards are displayed
