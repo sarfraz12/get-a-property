@@ -61,7 +61,7 @@ const Carousel = ({ images = [] }) => {
           <div
             role="region"
             aria-label="Carousel Slide Content"
-            className="absolute left-1/2 top-0 z-20 transform -translate-x-1/2 w-full max-w-[90%] sm:max-w-4xl px-4 sm:px-6 py-16 sm:py-24 text-center animate-fade-in"
+            className="absolute left-1/2 top-0 z-20 transform -translate-x-1/2 w-full max-w-[90%] sm:max-w-4xl p-5 text-center animate-fade-in"
           >
             {currentImage?.sliderTitle && (
               <div

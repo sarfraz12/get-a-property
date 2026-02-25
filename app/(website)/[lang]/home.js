@@ -1,13 +1,13 @@
 "use client"
 import Container from "@/components/generalUse/container";
 import PostList from "@/components/posts/postlist";
-import ComparisonCard from "@/components/cards/ComparisonCard"
-import ClientSlider from "@/components/sliders/client"
+// import ComparisonCard from "@/components/cards/ComparisonCard"
+// import ClientSlider from "@/components/sliders/client"
 import CtaCard from "@/components/cards/ctaCard";
 import CardIcon from "@/components/cards/cardIcon";
 import ServiceDescription from "@/components/cards/serviceDescription";
-import SkeletonLoader from "@/components/generalUse/SkeletonLoader";//falback
-import Link from "next/link";
+// import SkeletonLoader from "@/components/generalUse/SkeletonLoader";//falback
+// import Link from "next/link";
 import { useState, useMemo } from 'react';
 import { urlForImage } from "@/lib/sanity/image";
 import Hero from "@/components/generalUse/hero";
@@ -52,11 +52,6 @@ export default function Home({ posts, landingData, lang, post }) {
     posts.filter(post => post.featured === true && post._id !== mainPost?._id),
     [posts, mainPost]);
 
-  // State to control how many cards are displayed
-  const [showAll, setShowAll] = useState(false);
-
-  // Function to toggle between showing the first 3 and all cards
-  const toggleShowAll = () => setShowAll(!showAll);
 
   // this is for Activities section, add dynamic columns
   const itemCount = landing?.keyActivities?.length || 1;
@@ -180,9 +175,9 @@ export default function Home({ posts, landingData, lang, post }) {
 
         {/* ===== Carousel Parallax (sliders) ===== */}
         {landing?.sliders?.[0] && (
-          < div className="@container">
+          
             <Carousel images={landing?.sliders} />
-          </div >
+          
         )}
 
         {/* ===== Brands logo slider (infinite) ===== */}
