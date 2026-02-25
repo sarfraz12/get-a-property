@@ -45,7 +45,7 @@ export default function InfiniteSlider({ dataImage }: ClientSliderProps) {
     }, []);
 
   return (
-    <section className="w-full bg-brand-dark dark:bg-brand py-5 overflow-hidden">
+    <section className="w-full bg-brand-dark dark:bg-brand-gold py-5 overflow-hidden">
       <div className="flex whitespace-nowrap animate-marquee">
         {images.map((item: ClientImages, index: number) => (
           <div

@@ -39,10 +39,11 @@ const config: Config = {
 
       colors: {
         brand: {
-          DEFAULT: "#EBAA20", // your gold
+          DEFAULT: "#FFFFFF", // your gold #EBAA20
           dark: "#064396",    // dark backgrounds
           light: "#F2F1EC",   // light backgrounds
           black: "#000000",
+          gold: "#EBAA20",
         },
       },
       fontFamily: {
