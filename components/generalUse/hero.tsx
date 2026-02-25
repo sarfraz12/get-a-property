@@ -46,7 +46,20 @@ export default function Hero({
                     <h1 className="text-brand-gold text-3xl md:text-5xl uppercase font-bold leading-tight mb-6 md:text-left text-center dark:text-brand-dark">
                         {title}
                     </h1>
-                    <p className="text-base text-justify md:text-lg font-semibold text-brand-black mb-8">{description}</p>
+                    {/* <p className="text-base text-justify md:text-lg font-semibold text-brand-black mb-8">{description}</p> */}
+                    <div className="mb-8">
+                        <div className=" inline-block bg-white/75 backdrop-blur-sm rounded-2xl px-6 py-5 shadow-lg max-w-full">
+                            <p className="
+                            text-base md:text-lg
+                            font-normal
+                        text-brand-black
+                            text-justify
+                            "
+                            >
+                                {description}
+                            </p>
+                        </div>
+                    </div>
                     {buttonText && (
                         <div className="w-full flex justify-center md:justify-normal md:p-0 p-4">
                             <a
