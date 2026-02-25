@@ -42,10 +42,11 @@ const Carousel = ({ images = [] }) => {
   }
 
   return (
-    <div className="relative rounded-md overflow-hidden w-full h-[80vh] md:h-[70vh] lg:h-[80vh]">
+    <div className="relative rounded-xl overflow-hidden w-full 
+                    h-[100vh] sm:h-[65vh] md:h-[70vh] lg:h-[80vh]">
 
       <div
-        className="relative w-full h-full bg-center bg-cover bg-fixed"
+        className="relative w-full h-full bg-center bg-cover md:bg-fixed"
         style={{
           backgroundImage: `url(${
             currentImage?.sliderImage
@@ -56,50 +57,57 @@ const Carousel = ({ images = [] }) => {
       >
         <div className={`absolute inset-0 ${getOverlayClass(currentImage?.overlay)}`} />
 
-        {/* Content */}
+        {/* Content Wrapper */}
         {currentImage && (
           <div
             role="region"
             aria-label="Carousel Slide Content"
-            className="absolute left-1/2 top-0 z-20 transform -translate-x-1/2 w-full max-w-[90%] sm:max-w-4xl p-5 text-center animate-fade-in"
+            className="absolute inset-0 z-20 
+                       flex flex-col justify-center items-center 
+                       px-4 sm:px-6"
           >
+            {/* Title */}
             {currentImage?.sliderTitle && (
               <div
                 className={cx(
-                  "inline-block w-full sm:w-auto px-4 sm:px-6",
-                  "p-5 sm:py-4 rounded-lg mb-4 transition-all duration-700 ease-in-out animate-slide-up",
+                  "w-full max-w-full sm:max-w-3xl",
+                  "px-6 py-5 rounded-xl mb-4",
+                  "transition-all duration-700 ease-in-out animate-slide-up",
                   currentImage?.titleOverlayColor === 'white'
-                    ? 'bg-white/80 text-black'
+                    ? 'bg-white/85 text-black'
                     : currentImage?.titleOverlayColor === 'black'
-                    ? 'bg-black/70 text-white'
+                    ? 'bg-black/75 text-white'
                     : currentImage?.titleTextColor === 'black'
                     ? 'text-black'
                     : 'text-white'
                 )}
               >
-                <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-5xl font-semibold tracking-tight leading-tight">
+                <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-5xl 
+                               font-semibold tracking-tight leading-tight text-center break-words">
                   {currentImage.sliderTitle}
                 </h2>
               </div>
             )}
 
+            {/* Description */}
             {currentImage?.sliderDescription && (
               <div
                 style={{ whiteSpace: 'pre-line' }}
                 className={cx(
-                  "inline-block px-4 sm:px-6 py-5 sm:py-4 rounded-lg w-full",
-                  "sm:w-auto max-w-[90%] sm:max-w-2xl mx-auto transition-all duration-700 ease-in-out",
-                  "animate-slide-up delay-150",
+                  "w-full max-w-full sm:max-w-2xl",
+                  "px-6 py-5 rounded-xl",
+                  "transition-all duration-700 ease-in-out animate-slide-up delay-150",
                   currentImage?.descriptionOverlayColor === 'white'
-                    ? 'bg-white/70 text-black'
+                    ? 'bg-white/85 text-black'
                     : currentImage?.descriptionOverlayColor === 'black'
-                    ? 'bg-black/60 text-white'
+                    ? 'bg-black/70 text-white'
                     : currentImage?.overlay === 'white'
                     ? 'text-black'
                     : 'text-white'
                 )}
               >
-                <p className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed">
+                <p className="text-sm sm:text-base md:text-lg lg:text-xl 
+                              leading-relaxed text-center break-words">
                   {currentImage.sliderDescription}
                 </p>
               </div>
@@ -108,26 +116,34 @@ const Carousel = ({ images = [] }) => {
         )}
       </div>
 
-      {/* Only show navigation if more than 1 image */}
+      {/* Navigation */}
       {hasMultiple && (
         <>
           {/* Arrows */}
           <button
             onClick={prevSlide}
-            className="absolute z-20 top-1/2 left-4 transform -translate-y-1/2 bg-black/50 text-white p-4 rounded-full hover:bg-black/75 transition"
+            className="absolute z-20 top-1/2 left-3 sm:left-4 
+                       transform -translate-y-1/2 
+                       bg-black/50 text-white p-3 sm:p-4 
+                       rounded-full hover:bg-black/75 transition"
           >
             &#10094;
           </button>
 
           <button
             onClick={nextSlide}
-            className="absolute z-20 top-1/2 right-4 transform -translate-y-1/2 bg-black/50 text-white p-4 rounded-full hover:bg-black/75 transition"
+            className="absolute z-20 top-1/2 right-3 sm:right-4 
+                       transform -translate-y-1/2 
+                       bg-black/50 text-white p-3 sm:p-4 
+                       rounded-full hover:bg-black/75 transition"
           >
             &#10095;
           </button>
 
           {/* Dots */}
-          <div className="absolute z-20 bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+          <div className="absolute z-20 bottom-4 left-1/2 
+                          transform -translate-x-1/2 
+                          flex space-x-2">
             {images.map((_, index) => (
               <div
                 key={index}

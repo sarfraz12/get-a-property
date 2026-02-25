@@ -135,7 +135,7 @@ export default function Home({ posts, landingData, lang, post }) {
 
         {/* ===== CTA Card (first) ===== */}
         {landing?.ctaContentCards?.slice(0, 1).map((item, index) => (
-          <div className="m-10" key={item.id || `${item.title}-${index}`}>
+          <div className="m-5" key={item.id || `${item.title}-${index}`}>
             <CtaCard
               title={item?.ctaCardTitle}
               subTitle={item?.ctaCardSubtitle}
@@ -175,9 +175,9 @@ export default function Home({ posts, landingData, lang, post }) {
 
         {/* ===== Carousel Parallax (sliders) ===== */}
         {landing?.sliders?.[0] && (
-          
-            <Carousel images={landing?.sliders} />
-          
+
+          <Carousel images={landing?.sliders} />
+
         )}
 
         {/* ===== Brands logo slider (infinite) ===== */}
@@ -212,22 +212,24 @@ export default function Home({ posts, landingData, lang, post }) {
 
         {/* ===== Activities grid ===== */}
         <Container>
-          <div className={`h-full p-5`}>
+          {landing?.keyActivities && (
+            <div className={`h-full p-5`}>
 
-            <div className={`grid p-5 md:gap-4 gap-2 ${columnCount === 1
-              ? "md:grid-cols-1"
-              : columnCount === 2
-                ? "md:grid-cols-2"
-                : "md:grid-cols-3"
-              }`}>
+              <div className={`grid p-5 md:gap-4 gap-2 ${columnCount === 1
+                ? "md:grid-cols-1"
+                : columnCount === 2
+                  ? "md:grid-cols-2"
+                  : "md:grid-cols-3"
+                }`}>
 
-              {landing?.keyActivities && landing?.keyActivities.map((item, index) =>
-                <div key={item._key || item.id || index}>
-                  <CardIcon data={item} key={item.id || `${item.title}-${index}`} lang={lang} />
-                </div>
-              )}
+                {landing?.keyActivities && landing?.keyActivities.map((item, index) =>
+                  <div key={item._key || item.id || index}>
+                    <CardIcon data={item} key={item.id || `${item.title}-${index}`} lang={lang} />
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* ===== CTA Card (second) ===== */}
           {landing?.ctaContentCards?.slice(0, 1).map((item, index) => (
