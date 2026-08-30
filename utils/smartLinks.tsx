@@ -8,7 +8,7 @@ type SmartLinkProps = {
 };
 
 export default function SmartLink({ href, children, className, lang }: SmartLinkProps) {
-  const isExternal = href.startsWith("http") || href.startsWith("www");
+  const isExternal = href?.startsWith("http") || href?.startsWith("www");
 
   if (isExternal) {
     return (

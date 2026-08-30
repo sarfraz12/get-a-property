@@ -1,3 +1,11 @@
+// components/generalUse/socialIcons.tsx
+//
+// Ícono SVG de una red social (Facebook/Instagram/Google/YouTube/
+// Twitter) envuelto en un link que abre esa red en una pestaña nueva.
+// Se usa en el pie de página (components/navigation/footer.js) y en la
+// página de Contacto (app/(website)/[lang]/contact/contact.js) para
+// los links a las redes reales de Get a Property (Instagram/Facebook).
+
 import Link from "next/link";
 
 const socialIcons = ({ platform, link }: { platform: string, link: string }) => {

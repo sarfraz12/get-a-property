@@ -13,11 +13,15 @@ import {
   catpathquery,
   catquery,
   allcatquery,
+  categorybyslugquery,
   allaboutpagequery,
   categoryidquery,
   allnavbarquery,
   allfooterquery,
-  landingdataallquery2,
+  landingdataallquery,
+  featuredCategoriesQuery,
+  contactpagequery,
+  searchpagequery,
 } from "./groq";
 import {createClient } from "next-sanity";
 
@@ -82,9 +86,13 @@ export async function getAuthorPostsBySlug(slug: string, lang: string) {
   return {};
 }
 
-export async function getAllAuthors() {
+export async function getAllAuthors(lang: string) {
+  // Antes no se pasaba `lang` acá, así que `role[$lang]` en la query
+  // (ver allauthorsquery en groq.js) siempre habría quedado undefined.
+  // Se corrige para que el nuevo campo "role" del autor sí se resuelva
+  // en el idioma activo, igual que el resto de los campos bilingües.
   if (client) {
-    return (await client.fetch(allauthorsquery)) || [];
+    return (await client.fetch(allauthorsquery, { lang })) || [];
   }
   return [];
 }
@@ -104,6 +112,19 @@ export async function getPostsByCategory(slug: string, lang: string) {
     return (await client.fetch(postsbycatquery, { slug, lang })) || {};
   }
   return {};
+}
+
+// SEO opcional de una categoría puntual (documento category -> grupo
+// "SEO" -- ver lib/sanity/schemas/category.js). Devuelve null si no
+// existe una categoría con ese slug (ej. "all", que no es una
+// categoría real en Sanity), para que
+// app/(website)/[lang]/[category]/page.js siga usando su SEO
+// automático sin romperse.
+export async function getCategoryBySlug(slug: string, lang: string) {
+  if (client) {
+    return (await client.fetch(categorybyslugquery, { slug, lang })) || null;
+  }
+  return null;
 }
 
 export async function getTopCategories(lang: string) {
@@ -164,6 +185,15 @@ export async function getAllCategoriesCount(lang: string) {
   return [];
 }
 
+// Categorías marcadas "featured" (ver lib/sanity/schemas/category.js),
+// para la sección de categorías del landing page.
+export async function getFeaturedCategories(lang: string) {
+  if (client) {
+    return (await client.fetch(featuredCategoriesQuery, { lang })) || [];
+  }
+  return [];
+}
+
 export async function getNavbarData(lang: string) {
   if (client) {
     return (await client.fetch(allnavbarquery, {lang})) || [];
@@ -187,9 +217,31 @@ export async function getAboutPage(lang: string) {
   return [];
 };
 
-export async function getLandingData2(lang: string) {
+// SEO editable desde Sanity para la página "Contacto" (documento
+// contactPage -- ver lib/sanity/schemas/contactPage.js). Devuelve un
+// objeto vacío (no un array) si todavía no se creó el documento en
+// Studio, para que app/(website)/[lang]/contact/page.js pueda seguir
+// usando "?." con su texto de respaldo sin romperse.
+export async function getContactPage(lang: string) {
   if (client) {
-    return (await client.fetch(landingdataallquery2, {lang})) || [];
+    return (await client.fetch(contactpagequery, { lang })) || {};
+  }
+  return {};
+};
+
+// SEO editable desde Sanity para la página "Búsqueda" (documento
+// searchPage -- ver lib/sanity/schemas/searchPage.js). Mismo criterio
+// que getContactPage: objeto vacío si aún no existe el documento.
+export async function getSearchPage(lang: string) {
+  if (client) {
+    return (await client.fetch(searchpagequery, { lang })) || {};
+  }
+  return {};
+};
+
+export async function getLandingData(lang: string) {
+  if (client) {
+    return (await client.fetch(landingdataallquery, {lang})) || [];
   }
   return [];
 

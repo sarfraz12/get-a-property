@@ -15,15 +15,27 @@ import {
 import { unsplashImageAsset } from "sanity-plugin-asset-source-unsplash";
 import { table } from "@sanity/table";
 import { codeInput } from "@sanity/code-input";
+import { StudioLogo } from "./lib/sanity/components/StudioLogo";
 
 export const PREVIEWABLE_DOCUMENT_TYPES: string[] = ["post"];
 
 export default defineConfig({
-  name: "Goldghee",
-  title: "Gold Ghee",
+  name: "GetAProperty",
+  // "title" es sólo el respaldo estático (pestaña del navegador antes
+  // de que cargue JS, y demás usos internos de Sanity que no pueden
+  // usar un componente). El nombre que se VE en la barra superior del
+  // Studio lo reemplaza StudioLogo, que lo sigue en vivo desde
+  // Settings -> "Site title" (ver ese archivo).
+  title: "Get a Property",
   basePath: "/studio",
   projectId: projectId,
   dataset: dataset,
+
+  studio: {
+    components: {
+      logo: StudioLogo
+    }
+  },
 
   plugins: [
     deskTool({

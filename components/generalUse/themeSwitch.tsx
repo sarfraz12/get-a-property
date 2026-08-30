@@ -1,3 +1,11 @@
+// components/generalUse/themeSwitch.tsx
+//
+// Selector de tema claro/oscuro (usa next-themes). Se usa en el pie de
+// página (components/navigation/footer.js). El bloque comentado de
+// abajo es el patrón típico para evitar el "flash" de tema incorrecto
+// durante la hidratación -- se dejó documentado por si se necesita
+// reactivar, pero hoy no está en uso.
+
 "use client";
 
 import { useTheme } from "next-themes";

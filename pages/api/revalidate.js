@@ -65,7 +65,10 @@ export default async function revalidate(req, res) {
     if (jsonBody._type == "post") {
 
         // categories slug to revalidate the path
-        const categoryIds = jsonBody.categories.map(category => category?._ref);
+        // (jsonBody.categories puede venir undefined si el post no tiene
+        // categorías cargadas -- antes esto tiraba un error sin capturar
+        // y el webhook entero fallaba, incluida la revalidación de "/{lang}")
+        const categoryIds = (jsonBody.categories || []).map(category => category?._ref);
 
         // Fetch category slugs from Sanity based on categoryIds
         const categoryPromises = categoryIds.map(async categoryId => {
@@ -120,30 +123,36 @@ export default async function revalidate(req, res) {
 
     console.log("paths to revalidate", staleRoutes)
 
-    try {
-        const revalidatedPaths = [];
-        for (const path of staleRoutes) {
-            console.log(`Revalidating path: ${path}`);
-            try {
-                await res.revalidate(path);
-                revalidatedPaths.push(path);
-            } catch (err) {
-                console.error(`Error revalidating path: ${path}`, err.message);
-                return null; // return null for failed revalidations
-            }
+    // OJO -- bug real que había acá: si UNA sola ruta fallaba al
+    // revalidar (por ejemplo una categoría que ya no existe, o un slug
+    // viejo), el "return null" de abajo cortaba toda la función sin
+    // llamar nunca a res.status()/res.json(). Next.js se queda sin
+    // respuesta y el webhook de Sanity ve un timeout, aunque el resto
+    // de las rutas (incluida la home, "/{lang}") sí se hubieran
+    // revalidado bien. Ahora una ruta que falla se guarda en
+    // "failedPaths" y se sigue con las demás, así el home/landing page
+    // se refresca igual aunque, por ejemplo, un slug de categoría ya no
+    // exista.
+    const revalidatedPaths = [];
+    const failedPaths = [];
+    for (const path of staleRoutes) {
+        console.log(`Revalidating path: ${path}`);
+        try {
+            await res.revalidate(path);
+            revalidatedPaths.push(path);
+        } catch (err) {
+            console.error(`Error revalidating path: ${path}`, err.message);
+            failedPaths.push({ path, error: err.message });
         }
-
-        if (revalidatedPaths.length === 0) {
-            throw new Error('No paths revalidated');
-        }
-
-        console.log('Revalidation successful for paths:', revalidatedPaths);
-
-        return res.json({ revalidated: true, revalidatedPaths });
-    } catch (err) {
-        console.error('Error during revalidation', err.message);
-        return res.status(500).json({ message: 'Error revalidating at end' }, err.message);
     }
+
+    console.log('Revalidation finished. Ok:', revalidatedPaths, 'Failed:', failedPaths);
+
+    if (revalidatedPaths.length === 0) {
+        return res.status(500).json({ revalidated: false, message: 'No paths revalidated', failedPaths });
+    }
+
+    return res.json({ revalidated: true, revalidatedPaths, failedPaths });
 
 
 }

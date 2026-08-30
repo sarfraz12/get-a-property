@@ -4,68 +4,69 @@ import Navbar from "@/components/navigation/navbar";
 import Footer from "@/components/navigation/footer";
 import { Backlink } from "@/components/navigation/backlink";
 import { Providers } from "./providers";
-import { getSettings, getNavbarData, getFooterData } from "@/lib/sanity/client";
+import CookieNotice from "@/components/legal/CookieNotice";
+import { getSettings, getNavbarData, getFooterData, getLandingData } from "@/lib/sanity/client";
+import { getSiteKey } from "@/lib/siteContext";
+import { getSiteProfile } from "@/lib/siteConfig";
 import { urlForImage } from "@/lib/sanity/image";
+import { getFaviconIcons } from "@/lib/sanity/favicon";
 import { Suspense } from "react";
 import Loading from "./loading";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
 // fonts
-import localFont from "next/font/local";
+import { Poppins } from "next/font/google";
 import { cx } from "@/utils/all";
 
-// declare local fonts
-const garet = localFont({
-  src: [
-    {
-      path: "../../../public/fonts/garet/Garet-Book.woff2",
-      weight: "400",
-      style: "normal",
-    },
-    {
-      path: "../../../public/fonts/garet/Garet-Heavy.woff2",
-      weight: "700",
-      style: "normal",
-    },
-  ],
-  variable: "--font-garet",
+// Poppins: geométrica redondeada, varios pesos para poder usar
+// font-semibold / font-bold / font-extrabold en todo el sitio igual
+// que en la referencia (títulos muy bold, texto normal en 400-500).
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800", "900"],
+  variable: "--font-poppins",
+  display: "swap",
 });
 
 
-export const metadataBase = new URL("https://www.goldgheepty.com.pa");
+// Next sólo usa metadataBase para resolver URLs relativas de imágenes
+// cuando openGraph.url ya es absoluta (como acá), así que no importa
+// demasiado -- se deja apuntando al dominio de Get a Property.
+export const metadataBase = new URL("https://www.getaproperty.com.pa");
 
 export async function sharedMetaData(lang: string) {
-  const settings = await getSettings();
-  const baseUrl = "https://www.goldgheepty.com.pa"; // ✅ your new domain
+  const [settings, landingData] = await Promise.all([getSettings(), getLandingData(lang)]);
+  const siteKey = getSiteKey(landingData?.[0]);
+  const profile = getSiteProfile(siteKey);
+  const baseUrl = profile.baseUrl;
 
-  const title =
-    lang === "es"
-      ? settings?.title || "Gold Ghee | Ghee Artesanal y Orgánico en Panamá"
-      : settings?.title || "Gold Ghee | Artisanal & Organic Ghee in Panama";
+  const title = settings?.title || profile.defaultTitle[lang as "es" | "en"] || profile.defaultTitle.es;
 
   const description =
-    lang === "es"
-      ? settings?.description ||
-        "Descubre Gold Ghee, el ghee artesanal y orgánico elaborado en Panamá. Ideal para una vida saludable, cocina gourmet y nutrición consciente."
-      : settings?.description ||
-        "Discover Gold Ghee, artisanal and organic ghee made in Panama. Perfect for healthy living, gourmet cooking, and mindful nutrition.";
+    settings?.description || profile.defaultDescription[lang as "es" | "en"] || profile.defaultDescription.es;
 
   const image = settings?.openGraphImage
     ? urlForImage(settings.openGraphImage)?.src
-    : `${baseUrl}/images/ghee-banner.jpg`; // ✅ update with your ghee image
+    : `${baseUrl}${profile.defaultOgImagePath}`;
+
+  const sameAs = [profile.instagramUrl].filter(Boolean) as string[];
+
+  // Favicon claro/oscuro (Settings -> fieldset "Favicon"): se arma
+  // acá con la misma función que ahora usan TODAS las páginas del
+  // sitio (ver lib/sanity/favicon.js) -- antes esta lógica vivía sólo
+  // acá, y cada página de contenido tenía su propio favicon fijo que
+  // pisaba éste.
+  const iconsMeta = getFaviconIcons(settings);
 
   return {
     metadataBase,
     title: {
       default: title,
-      template: `%s | Gold Ghee`,
+      template: profile.titleTemplate,
     },
     description,
-    keywords:
-      lang === "es"
-        ? "ghee, ghee artesanal, ghee orgánico, mantequilla clarificada, Panamá, vida saludable, Gold Ghee"
-        : "ghee, artisanal ghee, organic ghee, clarified butter, Panama, healthy living, Gold Ghee",
-    authors: [{ name: "Gold Ghee Panama" }],
+    keywords: profile.defaultKeywords[lang as "es" | "en"] || profile.defaultKeywords.es,
+    authors: [{ name: profile.organizationName }],
     alternates: {
       canonical: `${baseUrl}/${lang}`,
       languages: {
@@ -77,7 +78,7 @@ export async function sharedMetaData(lang: string) {
       title,
       description,
       url: `${baseUrl}/${lang}`,
-      siteName: "Gold Ghee",
+      siteName: profile.siteName,
       type: "website",
       locale: lang === "es" ? "es_PA" : "en_US",
       images: [
@@ -85,7 +86,7 @@ export async function sharedMetaData(lang: string) {
           url: image,
           width: 1200,
           height: 630,
-          alt: "Gold Ghee Panama",
+          alt: profile.organizationName,
         },
       ],
     },
@@ -93,7 +94,7 @@ export async function sharedMetaData(lang: string) {
       card: "summary_large_image",
       title,
       description,
-      site: "@goldgheepty", // ✅ update if you create Twitter
+      ...(profile.twitterHandle ? { site: profile.twitterHandle } : {}),
       images: [image],
     },
     robots: {
@@ -107,41 +108,48 @@ export async function sharedMetaData(lang: string) {
         "max-video-preview": -1,
       },
     },
-    icons: {
-      icon: "/favicon.ico",
-      apple: "/apple-touch-icon.png",
-    },
-    category: "Food & Beverages",
+    icons: iconsMeta,
+    category: "Real Estate",
     generator: "Next.js 14 + Sanity CMS",
     other: {
-      "theme-color": "#fff7e6", // warm goldish theme
+      "theme-color": "#0b1220",
       "format-detection": "telephone=no",
       "apple-mobile-web-app-capable": "yes",
-      "apple-mobile-web-app-title": "Gold Ghee",
+      "apple-mobile-web-app-title": profile.appleMobileWebAppTitle,
       "script:ld+json": JSON.stringify({
         "@context": "https://schema.org",
-        "@type": "LocalBusiness",
-        name: "Gold Ghee",
+        "@type": "RealEstateAgent",
+        name: profile.organizationName,
         url: baseUrl,
-        logo: `${baseUrl}/images/logo.jpg`, // ✅ your logo
-        image: `${baseUrl}/images/ghee-banner.jpg`,
+        image,
         description,
         address: {
           "@type": "PostalAddress",
           addressLocality: "Panamá",
           addressCountry: "PA",
         },
-        telephone: "+507 6000-0000", // ✅ update
-        sameAs: [
-          "https://www.instagram.com/goldgheepty/",
-          "https://www.facebook.com/people/Gold-Ghee/100063788131167/", // if available
-        ],
+        // TODO: número de teléfono real -- no lo tengo para ninguno de
+        // los dos sitios, se deja sin inventar en vez de un placeholder
+        // falso (a diferencia de un número inventado, omitir el campo
+        // no genera datos incorrectos en el JSON-LD).
+        ...(sameAs.length ? { sameAs } : {}),
       }),
     },
   };
 }
 
-export async function generateMetadata(params: { lang: string }) {
+// BUG preexistente que este cambio dejó al descubierto: esta función
+// tomaba el primer argumento como si fuera directamente "{ lang }",
+// pero Next.js en realidad llama a generateMetadata con
+// "{ params, searchParams }" -- entonces "params.lang" siempre fue
+// undefined acá adentro. Antes no se notaba porque sharedMetaData()
+// solo usaba lang para ternarios de texto (con respaldo en español),
+// nunca para consultar Sanity. Ahora que sharedMetaData() sí llama a
+// getLandingData(lang) para saber a cuál sitio pertenece la página,
+// un lang=undefined rompe la consulta GROQ ("Unable to parse value of
+// $lang=undefined"). Se corrige desestructurando "params" del objeto
+// real que entrega Next.
+export async function generateMetadata({ params }: { params: { lang: string } }) {
   return await sharedMetaData(params.lang);
 }
 
@@ -160,7 +168,7 @@ export default async function RootLayout({
     <html
       suppressHydrationWarning
       lang={params.lang}
-      className={garet.variable}
+      className={poppins.variable}
     >
       <head>
         {/* Google Tag Manager */}
@@ -171,7 +179,6 @@ export default async function RootLayout({
           'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
           })(window,document,'script','dataLayer','GTM-T2XGGLLP');`}
         </Script>
-        <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" sizes="180x180" href="/images/appletouchicon.png" />
         <meta name="theme-color" content="#ffffff" />
         <meta charSet="UTF-8" />
@@ -211,6 +218,7 @@ export default async function RootLayout({
             <Backlink linkValue={settings.url} />
           </Suspense>
           <Footer lang={params.lang} data={footData} {...settings} />
+          <CookieNotice lang={params.lang} />
         </Providers>
       </body>
     </html>

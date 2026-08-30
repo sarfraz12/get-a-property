@@ -1,116 +1,124 @@
+// components/cards/serviceDescription.tsx
+//
+// Bloque alterno imagen/texto ("ServiceCards" en Sanity). Se mantiene
+// la animación de aparición al hacer scroll y el prop `reverse` que
+// invierte el orden imagen/texto. Cambia la forma: imagen con esquinas
+// grandes y sombra, checklist con ícono en color de marca, y el texto
+// alineado a la izquierda (el "text-justify" de antes se ve anticuado
+// y es menos legible que un párrafo alineado a la izquierda).
 "use client";
-import React, { useState, useEffect, useRef } from 'react';
-import Image from 'next/image';
-import { CheckCircleIcon } from '@heroicons/react/24/solid';
-import { PortableText } from '@portabletext/react';
+import React, { useState, useEffect, useRef } from "react";
+import Image from "next/image";
+import { CheckCircleIcon } from "@heroicons/react/24/solid";
 
-// Define the props for the Section component
 interface Point {
   contentCardItemDescription: string;
 }
 
 interface SectionProps {
-  title: string;
-  description: string;
-  description2: string;
-  imageSrc: string | any;
-  reverse?: boolean; // Optional prop to reverse the image and text layout
+  title?: string;
+  description?: string;
+  description2?: string;
+  imageSrc?: string | any;
+  reverse?: boolean;
   animation?: string;
-  points?: Point[],
+  points?: Point[];
+  lang?: string;
 }
 
+// Copy y foto de respaldo si Sanity trae el bloque sin título/
+// descripción/imagen (antes se veía un título en blanco y, sin
+// imagen, la columna de foto simplemente desaparecía).
+const DEFAULT_COPY: Record<string, { title: string; description: string }> = {
+  es: {
+    title: "Calidad y confianza en cada propiedad",
+    description: "Cada propiedad de nuestro catálogo se verifica cuidadosamente en Panamá, con información clara y sin atajos.",
+  },
+  en: {
+    title: "Quality and trust in every property",
+    description: "Every property in our catalog is carefully vetted in Panama, with clear information and no shortcuts.",
+  },
+};
+// Objeto con la misma forma que devuelve urlForImage() ({src,width,height}),
+// para que next/image pueda inferir el tamaño sin necesitar la prop
+// "fill" (este componente no la usa). Dimensiones reales del archivo.
+const DEFAULT_IMAGE = { src: "/images/placeholder-hero-3.jpg", width: 1080, height: 1080 };
 
-
-// Functional Component with TypeScript types
 export default function ServiceDescription({
   title,
   description,
   description2,
   imageSrc,
   reverse = false,
-  animation = 'animate-slideInLeft',
+  animation = "animate-slideInLeft",
   points,
+  lang = "es",
 }: SectionProps) {
-
-  // animation handler
-  const section1Ref = useRef<HTMLDivElement | null>(null) || {};;
-  const [isVisible, setIsVisible] = useState(false) || {};;
+  const defaults = DEFAULT_COPY[lang] || DEFAULT_COPY.es;
+  const finalTitle = title || defaults.title;
+  const finalDescription = description || defaults.description;
+  const finalImageSrc = imageSrc || DEFAULT_IMAGE;
+  // Animación al entrar en pantalla (misma lógica de antes)
+  const sectionRef = useRef<HTMLDivElement | null>(null);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    const observerOptions = {
-      threshold: 0.3, // Adjust threshold as needed
-    };
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !isVisible) setIsVisible(true);
+        });
+      },
+      { threshold: 0.3 }
+    );
 
-    const handleObserver = (entries: IntersectionObserverEntry[]) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting && !isVisible) {
-          // Only set visible if it's currently not visible
-          setIsVisible(true);
-        }
-      });
-    };
-
-    const observer = new IntersectionObserver(handleObserver, observerOptions) || {};;
-    const section1 = section1Ref.current;
-
-    if (section1) {
-      observer.observe(section1);
-    }
-
+    const node = sectionRef.current;
+    if (node) observer.observe(node);
     return () => {
-      if (section1) observer.unobserve(section1);
+      if (node) observer.unobserve(node);
     };
-  }, [isVisible]); // Added isVisible as a dependency
+  }, [isVisible]);
 
   return (
     <section
-      ref={section1Ref}
-      className={`transition-opacity duration-2000 ${isVisible ? `opacity-100 ${animation}` : 'opacity-0'
-        }`}
+      ref={sectionRef}
+      className={`transition-opacity duration-700 ${isVisible ? `opacity-100 ${animation}` : "opacity-0"}`}
     >
-      <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div
-          className={`grid grid-cols-1 ${imageSrc ? 'lg:grid-cols-2' : ''} gap-8 ${reverse ? 'lg:flex-row-reverse' : ''
-            }`}
-        >
-          {/* Text */}
-          <div className={`space-y-4 ${reverse ? 'lg:order-2' : 'lg:order-1'}`}>
-            <h1 className="text-5xl font-bold  ">{title}</h1>
-            <div style={{ whiteSpace: 'pre-line' }}>
-              <p className="text-justify text-xl mb-2">{description}</p>
+      <div className="mx-auto max-w-7xl">
+        <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2">
+          {/* Texto */}
+          <div className={`space-y-4 ${reverse ? "lg:order-2" : "lg:order-1"}`}>
+            <h2 className="text-3xl font-extrabold sm:text-4xl">{finalTitle}</h2>
 
-              <hr />
-              <ul className="list-disc text-justify pl-5 space-y-2">
+            <div style={{ whiteSpace: "pre-line" }} className="space-y-4">
+              <p className="text-lg leading-relaxed text-black/60">{finalDescription}</p>
 
-                {points?.map((item: Point, index: number) => (
-                  <li key={index} className="flex items-center text-justify ">
-                    <CheckCircleIcon className="h-5 w-5 text-blue-600 mr-2" />
-                    {item?.contentCardItemDescription}
-                  </li>
-                ))}
+              {points && points.length > 0 && (
+                <ul className="space-y-3 border-t border-black/10 pt-4">
+                  {points.map((item: Point, index: number) => (
+                    <li key={index} className="flex items-start gap-3">
+                      <CheckCircleIcon className="mt-0.5 h-5 w-5 flex-shrink-0 text-brand-gold" />
+                      <span className="text-black/70">{item?.contentCardItemDescription}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
 
-              </ul>
-              <p className=" text-justify text-xl mb-2">
-                {description2}
-              </p>
+              {description2 && <p className="text-lg leading-relaxed text-black/60">{description2}</p>}
             </div>
           </div>
-          {/* Image */}
 
-          <div className={`relative ${reverse ? 'lg:order-1' : 'lg:order-2'}`}>
-            {imageSrc && (
-              <div className="max-h-[600px] h-full overflow-hidden rounded-lg shadow-lg">
-                <Image
-                  src={imageSrc}
-                  alt={title}
-                  className="rounded-lg shadow-lg hover-grow object-cover"
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                // Ensures the image maintains responsive behavior
-                />
-              </div>
-            )}
+          {/* Imagen (siempre presente: real de Sanity, o placeholder por defecto) */}
+          <div className={`relative ${reverse ? "lg:order-1" : "lg:order-2"}`}>
+            <div className="h-full max-h-[600px] overflow-hidden rounded-3xl shadow-lg">
+              <Image
+                src={finalImageSrc}
+                alt={finalTitle}
+                className="hover-grow rounded-3xl object-cover shadow-lg"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+              />
+            </div>
           </div>
-
         </div>
       </div>
     </section>

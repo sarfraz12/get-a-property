@@ -13,6 +13,12 @@ export const projectId =
   process.env.NEXT_PUBLIC_SANITY_PROJECT_ID ||
   (process.env.SANITY_STUDIO_PROJECT_ID as string);
 
+// Id de la organización de Sanity dueña de este proyecto (manage.sanity.io).
+// Sólo lo usa sanity.cli.ts (para que el CLI/Studio sepan a qué
+// organización pertenece el proyecto) -- el frontend de Next.js no lo
+// necesita para consultar datos, así que no hace falta un NEXT_PUBLIC_.
+export const organizationId = process.env.SANITY_STUDIO_ORGANIZATION_ID as string;
+
 export const dataset =
   process.env.NEXT_PUBLIC_SANITY_DATASET || ("production" as string);
 

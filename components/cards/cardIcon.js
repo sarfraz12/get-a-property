@@ -1,72 +1,76 @@
-import { BanknotesIcon, FolderMinusIcon, PresentationChartLineIcon } from "@heroicons/react/24/solid"
+// components/cards/cardIcon.js
+//
+// Tarjeta de ícono, usada en la grilla "keyActivities" de la home
+// (ej: documentos, información de precios, gráficos). Forma tipo
+// "feature card" de real estate: ícono dentro de un círculo de color
+// de marca, título, descripción y botones como píldoras con flecha.
+//
+// Placeholders agregados esta sesión: si el editor deja el título o
+// la descripción vacíos en Sanity, o elige un ícono que no está en la
+// lista (o no elige ninguno), antes se veía un círculo vacío y texto
+// en blanco. Ahora cae en un ícono genérico (una estrella) y un texto
+// de respaldo bilingüe.
+import { BanknotesIcon, FolderMinusIcon, PresentationChartLineIcon, SparklesIcon } from "@heroicons/react/24/solid";
 
-
-export default function CardIcon(props) {
-  const { data } = props || {};
-
-  const iconsChange = (icon) => {
-
-    switch (icon) {
-      case "folderMinus":
-        return <FolderMinusIcon className="w-12 h-12 mb-4 text-gray-900 dark:text-white" />;
-      case "banknotes":
-        return <BanknotesIcon className="w-12 h-12 mb-4 text-gray-900 dark:text-white" />;
-      case "presentationChartLine":
-        return <PresentationChartLineIcon className="w-12 h-12 mb-4 text-gray-900 dark:text-white" />
-      default:
-        return "";
-    }
-
+function CardIconGraphic({ icon }) {
+  switch (icon) {
+    case "folderMinus":
+      return <FolderMinusIcon className="h-6 w-6 text-brand-dark" />;
+    case "banknotes":
+      return <BanknotesIcon className="h-6 w-6 text-brand-dark" />;
+    case "presentationChartLine":
+      return <PresentationChartLineIcon className="h-6 w-6 text-brand-dark" />;
+    default:
+      // Ícono genérico de respaldo, para que el círculo nunca quede vacío.
+      return <SparklesIcon className="h-6 w-6 text-brand-dark" />;
   }
+}
 
+const DEFAULT_COPY = {
+  es: { title: "Get a Property", description: "Más información próximamente." },
+  en: { title: "Get a Property", description: "More information coming soon." },
+};
+
+export default function CardIcon({ data, lang }) {
+  const defaults = DEFAULT_COPY[lang] || DEFAULT_COPY.es;
+  const title = data?.title || defaults.title;
+  const description = data?.description || defaults.description;
 
   return (
-    <div className="group cursor-pointer relative  overflow-hidden transition-all hover:scale-105 
-      dark:bg-gray-80 mt-6 text-gray-700 dark:bg-slate-500 dark:text-white bg-white shadow-md
-       bg-clip-border rounded-xl ">
-      <div className="p-6">
-        {iconsChange(data.iconString)}
-
-        <h5 className="block mb-2 text-xl antialiased font-semibold leading-snug tracking-normal text-blue-gray-900">
-          {data.title}
-        </h5>
-        <p className="block text-base antialiased font-light leading-relaxed text-inherit">
-          {data.description}
-        </p>
+    <div className="group flex h-full flex-col rounded-2xl border border-black/5 bg-white p-6 shadow-sm transition-shadow duration-300 hover:shadow-lg dark:bg-slate-800">
+      {/* Ícono dentro de un círculo con el color de marca */}
+      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-brand-gold/15">
+        <CardIconGraphic icon={data?.iconString} />
       </div>
-      <div className="p-6 pt-0">
-        {data.link && (
-          <a href={data.link} className="inline-block" rel="noopener noreferrer">
-            <button
-              className="flex items-center gap-2 px-4 py-2 text-xs font-bold dark:text-white text-center text-gray-900 uppercase align-middle transition-all rounded-lg select-none disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none hover:bg-gray-900/10 active:bg-gray-900/20"
-              type="button"
-            >
-              {props.lang === "en" ? "Visit Link" : "Visitar Enlace"}
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2"
-                stroke="currentColor" className="w-4 h-4">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3"></path>
-              </svg>
-            </button>
+
+      <h5 className="mb-2 text-lg font-bold text-gray-900 dark:text-white">{title}</h5>
+      <p className="text-sm leading-relaxed text-gray-500 dark:text-gray-300">{description}</p>
+
+      {/* Enlaces opcionales (link externo / archivo adjunto) */}
+      <div className="mt-5 flex flex-wrap gap-3">
+        {data?.link && (
+          <a
+            href={data.link}
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-full bg-black/5 px-4 py-2 text-xs font-bold uppercase tracking-wide text-gray-900 transition-colors hover:bg-black/10 dark:text-white"
+          >
+            {lang === "en" ? "Visit link" : "Visitar enlace"}
+            <span aria-hidden>&rarr;</span>
           </a>
         )}
 
-        {data.attachmentUrl && (
-          <a href={data.attachmentUrl} className="inline-block" target="_blank" rel="noopener noreferrer">
-            <button
-              className="flex items-center gap-2 px-4 py-2 text-xs font-bold dark:text-white text-center text-gray-900 uppercase align-middle transition-all rounded-lg select-none disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none hover:bg-gray-900/10 active:bg-gray-900/20"
-              type="button"
-            >
-              {props.lang === "en" ? "Download File" : "Descargar Archivo"}
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2"
-                stroke="currentColor" className="w-4 h-4">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3"></path>
-              </svg>
-            </button>
+        {data?.attachmentUrl && (
+          <a
+            href={data.attachmentUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-full bg-black/5 px-4 py-2 text-xs font-bold uppercase tracking-wide text-gray-900 transition-colors hover:bg-black/10 dark:text-white"
+          >
+            {lang === "en" ? "Download file" : "Descargar archivo"}
+            <span aria-hidden>&rarr;</span>
           </a>
         )}
       </div>
     </div>
-  )
-  
+  );
 }
-

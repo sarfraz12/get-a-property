@@ -1,3 +1,10 @@
+// components/sliders/featured.js
+//
+// Banner del post/producto destacado (por título, no por flag), entre
+// el bloque de posts y las CTA cards. Se conserva la lógica (color de
+// fondo tomado de la paleta dominante de la imagen vía Sanity) y se le
+// da el mismo lenguaje visual del resto: bloque envuelto en el ancho
+// máximo del sitio, esquinas grandes y tipografía en línea con el Hero.
 import Image from "next/image";
 import { urlForImage } from "@/lib/sanity/image";
 import { parseISO, format } from "date-fns";
@@ -5,99 +12,85 @@ import { cx } from "@/utils/all";
 import Link from "next/link";
 
 export default function Featured({ post, pathPrefix }) {
-  const imageProps = post?.mainImage
-    ? urlForImage(post?.mainImage)
-    : null;
+  const imageProps = post?.mainImage ? urlForImage(post?.mainImage) : null;
+  const authorImageProps = post?.author?.image ? urlForImage(post.author.image) : null;
+  const postUrl = `/${pathPrefix ? `${pathPrefix}/post/` : ""}${post.slug.current}`;
 
-  const AuthorimageProps = post?.author?.image
-    ? urlForImage(post.author.image)
-    : null;
   return (
-    <div
-      className={cx(
-        "grid md:grid-cols-2 gap-5 md:gap-10 md:min-h-[calc(100vh-30vh)]"
-      )}
-      style={{
-        backgroundColor: post?.mainImage?.ImageColor || "black"
-      }}>
-      {imageProps && (
-        <div className="relative aspect-video md:aspect-auto">
-          <Link
-            href={`/${pathPrefix ? `${pathPrefix}/post/` : ""}${post.slug.current
-              }`}>
-            <div className="relative w-full h-full">
-              <Image
-                src={imageProps.src}
-                {...(post.mainImage.blurDataURL && {
-                  placeholder: "blur",
-                  blurDataURL: post.mainImage.blurDataURL
-                })}
-                alt={post.mainImage?.alt || "Thumbnail"}
-                priority
-                fill
-                sizes="(max-width: 768px) 100vw, 50vw"
-                className="object-cover"
-              />
-            </div>
-          </Link>
-        </div>
-      )}
+    <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
+      <div
+        className={cx("grid overflow-hidden rounded-3xl md:min-h-[560px] md:grid-cols-2")}
+        style={{ backgroundColor: post?.mainImage?.ImageColor || "black" }}
+      >
+        {imageProps && (
+          <div className="relative aspect-video md:aspect-auto">
+            <Link href={postUrl} className="block h-full w-full">
+              <div className="relative h-full w-full">
+                <Image
+                  src={imageProps.src}
+                  {...(post.mainImage.blurDataURL && {
+                    placeholder: "blur",
+                    blurDataURL: post.mainImage.blurDataURL,
+                  })}
+                  alt={post.mainImage?.alt || "Thumbnail"}
+                  priority
+                  fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  className="object-cover"
+                />
+              </div>
+            </Link>
 
-      <div className="self-center px-5 pb-10">
-        <Link
-          href={`/${pathPrefix ? `${pathPrefix}/post/` : ""}${post.slug.current
-            }`}>
-          <div className="max-w-2xl">
-            <h1 className="mt-2 mb-3 text-3xl font-semibold tracking-tight text-white lg:leading-tight text-brand-primary lg:text-5xl">
-              {post.title}
-            </h1>
-            <div style={{ whiteSpace: 'pre-line' }}>
-              <p className="text-white  lg:text-md">
+            {/* Precio, esquina superior derecha de la foto */}
+            {post?.price && (
+              <span className="absolute right-4 top-4 rounded-full bg-black px-4 py-2 text-xs font-bold text-white shadow-sm sm:text-sm">
+                {post.price}
+              </span>
+            )}
+          </div>
+        )}
+
+        <div className="self-center px-6 py-10 md:px-10">
+          <Link href={postUrl}>
+            <div className="max-w-2xl">
+              <h2 className="mb-3 mt-2 text-3xl font-extrabold leading-tight tracking-tight text-white lg:text-5xl">
+                {post.title}
+              </h2>
+              {post?.location && (
+                <p className="-mt-1 mb-3 truncate text-sm font-semibold text-white/60">{post.location}</p>
+              )}
+              <p style={{ whiteSpace: "pre-line" }} className="text-white/80 lg:text-lg">
                 {post.excerpt}
               </p>
-            </div>
 
-            <div className="flex mt-4 space-x-3 text-gray-500 md:mt-8 ">
-              <div className="flex flex-col gap-3 md:items-center md:flex-row">
-                <div className="flex items-center gap-3">
-                  <div className="relative flex-shrink-0 w-5 h-5">
-                    {AuthorimageProps && (
-                      <Image
-                        src={AuthorimageProps.src}
-                        alt={post?.author?.name}
-                        className="object-cover rounded-full"
-                        fill
-                        sizes="(max-width: 768px) 100vw, 50vw"
-                      />
-                    )}
-                  </div>
-                  <p className="text-gray-100 ">
-                    {post.author.name}{" "}
-                    <span className="hidden pl-2 md:inline"> ·</span>
-                  </p>
-                </div>
-
-                <div>
-                  <div className="flex space-x-2 text-sm md:flex-row md:items-center">
-                    <time
-                      className="text-white"
-                      dateTime={post?.publishedAt || post._createdAt}>
-                      {format(
-                        parseISO(
-                          post?.publishedAt || post._createdAt
-                        ),
-                        "MMMM dd, yyyy"
+              <div className="mt-6 flex flex-col gap-3 text-sm text-white/70 md:flex-row md:items-center md:gap-4">
+                {post.author?.name && (
+                  <div className="flex items-center gap-3">
+                    <div className="relative h-6 w-6 flex-shrink-0">
+                      {authorImageProps && (
+                        <Image
+                          src={authorImageProps.src}
+                          alt={post?.author?.name}
+                          className="rounded-full object-cover"
+                          fill
+                          sizes="24px"
+                        />
                       )}
-                    </time>
-                    <span className="text-white">
-                      · {post.estReadingTime || "5"} min read
-                    </span>
+                    </div>
+                    <span className="text-white/90">{post.author.name}</span>
                   </div>
+                )}
+
+                <div className="flex items-center gap-2">
+                  <time dateTime={post?.publishedAt || post._createdAt}>
+                    {format(parseISO(post?.publishedAt || post._createdAt), "MMMM dd, yyyy")}
+                  </time>
+                  <span>· {post.estReadingTime || "5"} min read</span>
                 </div>
               </div>
             </div>
-          </div>
-        </Link>
+          </Link>
+        </div>
       </div>
     </div>
   );

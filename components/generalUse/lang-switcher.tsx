@@ -1,3 +1,11 @@
+// components/generalUse/lang-switcher.tsx
+//
+// Botón de cambio de idioma de la navbar (bandera + "ES"/"EN"): toma
+// la ruta actual, reemplaza el segmento de idioma ("/es/..." <->
+// "/en/...") y arma el link al mismo contenido en el otro idioma. Se
+// usa dos veces en components/navigation/navbar.tsx (versión de
+// escritorio y versión del menú móvil).
+
 "use client"
 import Link from "next/link"
 import { usePathname } from "next/navigation";

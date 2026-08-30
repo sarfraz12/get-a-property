@@ -1,3 +1,11 @@
+// components/navigation/backlink.tsx
+//
+// Botón flotante fijo (abajo a la derecha) que abre WhatsApp en una
+// pestaña nueva -- el "Backlink" que se ve en todas las páginas del
+// sitio. Se monta una sola vez en
+// app/(website)/[lang]/layout.tsx, con el link real
+// (settings.url) que carga desde Sanity.
+
 import { ChatBubbleBottomCenterTextIcon } from "@heroicons/react/24/solid";
 
 export const Backlink = (props: {linkValue: string}) => {

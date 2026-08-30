@@ -1,3 +1,12 @@
+// components/cards/detailsCard.tsx
+//
+// Tarjeta genérica con imagen + título + descripción + botón opcional,
+// pensada para armar grids de tarjetas de distintos tamaños ("small" /
+// "medium" / "large") y orientación ("horizontal" / "vertical").
+// Actualmente NO se usa en ninguna página del sitio (no tiene ningún
+// import activo) -- se deja disponible como pieza reutilizable para
+// futuras secciones, pero no forma parte del flujo actual del sitio.
+
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import { ArrowRightIcon } from '@heroicons/react/24/solid';

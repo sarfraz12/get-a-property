@@ -1,6 +1,6 @@
 {
-  "name": "goldghee-nextjs",
-  "version": "0.1.0",
+  "name": "get-a-property-nextjs",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",

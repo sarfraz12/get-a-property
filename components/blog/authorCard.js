@@ -1,3 +1,11 @@
+// components/blog/authorCard.js
+//
+// Tarjeta con foto + bio corta de un autor/vendedor (nombre, imagen,
+// texto enriquecido). Actualmente NO se usa en ninguna página del
+// sitio (no tiene ningún import activo) -- se deja tal cual por si se
+// vuelve a necesitar (por ejemplo, una futura página de perfil de
+// vendedor), pero no forma parte del flujo actual del sitio.
+
 import Image from "next/image";
 import { PortableText } from "@/lib/sanity/plugins/portabletext";
 import { urlForImage } from "@/lib/sanity/image";

@@ -1,20 +1,35 @@
-const Pagination = ({ currentPage, totalPages, onPageChange }) => {
-    const pages = Array.from({ length: totalPages }, (_, index) => index + 1);
+// components/navigation/pagination.js
+//
+// Paginación del listado de posts (categoryPosts.js). Restyled a
+// píldoras redondas negro/blanco (misma paleta que el resto del sitio
+// nuevo) en vez de los cuadrados azul/gris de la plantilla original.
+// La lógica de páginas no cambió.
+import { cx } from "@/utils/all";
 
-    return (
-        <div className="flex justify-center space-x-2 mt-4">
-            {pages.map((page) => (
-                <button
-                    key={page}
-                    onClick={() => onPageChange(page)}
-                    className={`px-4 py-2 rounded ${page === currentPage ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-700'
-                        }`}
-                >
-                    {page}
-                </button>
-            ))}
-        </div>
-    );
+const Pagination = ({ currentPage, totalPages, onPageChange }) => {
+  if (totalPages <= 1) return null;
+
+  const pages = Array.from({ length: totalPages }, (_, index) => index + 1);
+
+  return (
+    <div className="mt-16 flex justify-center gap-2">
+      {pages.map((page) => (
+        <button
+          key={page}
+          onClick={() => onPageChange(page)}
+          aria-current={page === currentPage ? "page" : undefined}
+          className={cx(
+            "flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold transition-colors",
+            page === currentPage
+              ? "bg-black text-white"
+              : "bg-black/5 text-black hover:bg-black/10"
+          )}
+        >
+          {page}
+        </button>
+      ))}
+    </div>
+  );
 };
 
-export default Pagination
+export default Pagination;

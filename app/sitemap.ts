@@ -106,29 +106,47 @@ export default async function generateSitemap(): Promise<MetadataRoute.Sitemap> 
       changeFrequency: 'yearly',
       priority: 1,
     },
+    // BUG REAL corregido: este sitemap incluía "/services/desktopSupport"
+    // y "/services/webDevelopment" -- rutas que no existen en este
+    // proyecto (leftover de una plantilla/negocio anterior). Un
+    // sitemap con URLs que dan 404 es justo lo que Google penaliza al
+    // rastrear el sitio, así que se quitaron. En su lugar se agregan
+    // las 3 páginas legales reales (Términos, Privacidad, Cookies).
     {
-      url: `${baseURL}/es/services/desktopSupport`,
+      url: `${baseURL}/es/terms/`,
       lastModified: new Date(),
       changeFrequency: 'yearly',
-      priority: 1,
+      priority: 0.3,
     },
     {
-      url: `${baseURL}/en/services/desktopSupport`,
+      url: `${baseURL}/en/terms/`,
       lastModified: new Date(),
       changeFrequency: 'yearly',
-      priority: 1,
-    },
-       {
-      url: `${baseURL}/es/services/webDevelopment`,
-      lastModified: new Date(),
-      changeFrequency: 'yearly',
-      priority: 1,
+      priority: 0.3,
     },
     {
-      url: `${baseURL}/en/services/webDevelopment`,
+      url: `${baseURL}/es/privacy/`,
       lastModified: new Date(),
       changeFrequency: 'yearly',
-      priority: 1,
+      priority: 0.3,
+    },
+    {
+      url: `${baseURL}/en/privacy/`,
+      lastModified: new Date(),
+      changeFrequency: 'yearly',
+      priority: 0.3,
+    },
+    {
+      url: `${baseURL}/es/cookies/`,
+      lastModified: new Date(),
+      changeFrequency: 'yearly',
+      priority: 0.3,
+    },
+    {
+      url: `${baseURL}/en/cookies/`,
+      lastModified: new Date(),
+      changeFrequency: 'yearly',
+      priority: 0.3,
     },
     ...dynamicLinks,
   ];

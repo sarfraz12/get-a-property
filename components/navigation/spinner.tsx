@@ -1,3 +1,10 @@
+// components/navigation/spinner.tsx
+//
+// Spinner de carga a pantalla completa (círculo girando). Es el
+// "loading" global del sitio: se usa en
+// app/(website)/[lang]/loading.js, que Next.js muestra automáticamente
+// mientras carga cualquier página de la sección (website).
+
 
 
 export default function LoadingSpinner() {

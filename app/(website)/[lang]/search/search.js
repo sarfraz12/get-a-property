@@ -1,7 +1,7 @@
 "use client";
 
 import Container from "@/components/generalUse/container";
-import PostList from "@/components/posts/postlist";
+import PostCard from "@/components/posts/PostCard";
 import SearchInput from "@/components/ui/search";
 import { searchquery } from "@/lib/sanity/groq";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -82,10 +82,14 @@ export default function Search(props) {
             </svg>{" "}
           </div>
         )}
-        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
+        {/* Antes usaba <PostList>; ahora <PostCard> -- pedido del
+            usuario: "todos los post list" con la misma armonía y
+            estilo (precio/ubicación/puntos clave/categoría con color
+            real), sea cual sea la página donde se listen posts. */}
+        <div className="grid gap-x-12 gap-y-16 md:grid-cols-2">
           {data &&
             data.map((post, index) => (
-              <PostList key={index} post={post} aspect="square" lang={props.lang} />
+              <PostCard key={post._id || index} post={post} index={index} lang={props.lang} pathPrefix="all" />
             ))}
         </div>
       </Container>

@@ -1,7 +1,35 @@
-import { getSettings } from "@/lib/sanity/client";
+import { getSettings, getLandingData, getContactPage } from "@/lib/sanity/client";
+import { getSiteKey } from "@/lib/siteContext";
+import { getSiteProfile } from "@/lib/siteConfig";
+import { urlForImage } from "@/lib/sanity/image";
+import { getFaviconIcons } from "@/lib/sanity/favicon";
 import Contact from "./contact";
 import { Suspense } from "react";
 import Loading from "@/app/(website)/[lang]/loading";
+
+// Copy de esta página (único negocio: Get a Property -- ver
+// lib/siteConfig.ts para lo que se comparte entre páginas -- dominio,
+// nombre, imágenes, redes).
+const CONTACT_COPY = {
+  "get-a-property": {
+    es: {
+      title: "Contacto | Bienes Raíces en Panamá | Get a Property",
+      description:
+        "Contáctanos y conoce más sobre Get a Property: nuestro catálogo de casas, apartamentos y terrenos en Panamá, y cómo podemos ayudarte a encontrar tu próxima propiedad.",
+      keywords: "bienes raíces Panamá, contacto inmobiliaria, casas en venta, apartamentos en alquiler, Get a Property",
+      ogAlt: "Contacto Get a Property Panamá",
+      businessDescription: "Agencia de bienes raíces en Panamá: casas, apartamentos y terrenos en venta y alquiler.",
+    },
+    en: {
+      title: "Contact | Real Estate in Panama | Get a Property",
+      description:
+        "Contact us and learn more about Get a Property: our catalog of houses, apartments, and land in Panama, and how we can help you find your next property.",
+      keywords: "real estate Panama, real estate contact, houses for sale, apartments for rent, Get a Property",
+      ogAlt: "Contact Get a Property Panama",
+      businessDescription: "Real estate agency in Panama: houses, apartments, and land for sale and rent.",
+    },
+  },
+};
 
 export async function generateStaticParams() {
   const langs = ["en", "es"]; // Add your supported languages here
@@ -15,25 +43,30 @@ export async function generateStaticParams() {
 // ✅ Esta función define el <title>, <meta description> y <link rel="canonical">
 export async function generateMetadata({ params }) {
   const { lang } = params;
-  const baseUrl = "https://www.goldgheepty.com.pa";
-  const canonical = `${baseUrl}/${lang}/about`;
+  const [landingData, contactPageData, settings] = await Promise.all([
+    getLandingData(lang),
+    getContactPage(lang),
+    getSettings(),
+  ]);
+  const siteKey = getSiteKey(landingData?.[0]);
+  const profile = getSiteProfile(siteKey);
+  const copy = CONTACT_COPY[siteKey][lang] || CONTACT_COPY[siteKey].es;
+  const baseUrl = profile.baseUrl;
+  // BUG REAL preexistente (no de esta sesión): esta canonical apuntaba
+  // a "/about" en vez de "/contact" -- se deja corregido de paso, ya
+  // que se está tocando esta misma línea para el override de Sanity.
+  const canonical = contactPageData?.canonicalUrl || `${baseUrl}/${lang}/contact`;
 
-  const title =
-    lang === "es"
-      ? "Contacto | Ghee Artesanal y Orgánico en Panamá | Gold Ghee"
-      : "Contact | Artisanal & Organic Ghee in Panama | Gold Ghee";
-
-  const description =
-    lang === "es"
-      ? "Contáctanos y conoce la historia de Gold Ghee, nuestro proceso artesanal, nuestra filosofía saludable y el compromiso con ingredientes 100% naturales en Panamá."
-      : "Contact us and discover the story of Gold Ghee, our artisanal process, our healthy living philosophy, and our commitment to 100% natural ingredients made in Panama.";
-
-  const keywords =
-    lang === "es"
-      ? "ghee, ghee artesanal, ghee orgánico, Gold Ghee Panamá, mantequilla clarificada, vida saludable, productos naturales"
-      : "ghee, artisanal ghee, organic ghee, Gold Ghee Panama, clarified butter, healthy living, natural products";
-
-  const image = `${baseUrl}/images/ghee-banner.jpg`;
+  // SEO editable desde Sanity (documento contactPage -> grupo "SEO"):
+  // cae de vuelta al texto de respaldo (CONTACT_COPY) si se deja
+  // vacío o si el documento no existe todavía en Studio.
+  const { ogAlt, businessDescription } = copy;
+  const title = contactPageData?.metaTitle || copy.title;
+  const description = contactPageData?.metaDescription || copy.description;
+  const keywords = contactPageData?.seoKeywords || copy.keywords;
+  const image = contactPageData?.ogImage
+    ? urlForImage(contactPageData.ogImage)?.src
+    : `${baseUrl}${profile.defaultOgImagePath}`;
 
   // -------- JSON-LD for AboutPage + Brand/LocalBusiness -------
   const schemaLd = {
@@ -44,42 +77,36 @@ export async function generateMetadata({ params }) {
     url: canonical,
     image,
     mainEntity: {
-      "@type": "LocalBusiness",
-      name: "Gold Ghee Panama",
+      "@type": "RealEstateAgent",
+      name: profile.organizationName,
       url: baseUrl,
-      logo: `${baseUrl}/images/logo.jpg`,
-      image: image,
-      description: lang === "es"
-        ? "Productores de ghee artesanal y orgánico en Panamá."
-        : "Producers of artisanal and organic ghee in Panama.",
+      image,
+      description: businessDescription,
       address: {
         "@type": "PostalAddress",
         addressLocality: "Panamá",
         addressCountry: "PA",
       },
-      sameAs: [
-        "https://www.instagram.com/goldgheepty/",
-        "https://www.facebook.com/people/Gold-Ghee/100063788131167/"
-      ],
-      contactPoint: {
-        "@type": "ContactPoint",
-        telephone: "+507 6000-0000",
-        contactType: "Customer Service",
-        areaServed: "PA",
-        availableLanguage: ["Spanish", "English"]
-      }
+      ...(profile.instagramUrl ? { sameAs: [profile.instagramUrl] } : {}),
+      // TODO: sin teléfono/email de contacto real confirmados para
+      // este contactPoint -- se omite en vez de inventar uno (ver
+      // notas en lib/siteConfig.ts).
     }
   };
 
   return {
-    title,
+    // { absolute } evita que el template del layout padre
+    // ("%s | " + nombre del sitio) vuelva a agregar el nombre acá --
+    // este título ya viene completo (ver COPY arriba). Sin esto, el
+    // <title> quedaba duplicado: "... | Get a Property | Get a Property".
+    title: { absolute: title },
     description,
     metadataBase: new URL(baseUrl),
     alternates: {
       canonical,
       languages: {
-        en: `${baseUrl}/en/about`,
-        es: `${baseUrl}/es/about`,
+        en: `${baseUrl}/en/contact`,
+        es: `${baseUrl}/es/contact`,
       },
     },
     keywords,
@@ -87,7 +114,7 @@ export async function generateMetadata({ params }) {
       title,
       description,
       url: canonical,
-      siteName: "Gold Ghee",
+      siteName: profile.siteName,
       locale: lang === "es" ? "es_PA" : "en_US",
       type: "website",
       images: [
@@ -95,10 +122,7 @@ export async function generateMetadata({ params }) {
           url: image,
           width: 1200,
           height: 630,
-          alt:
-            lang === "es"
-              ? "Contacto Gold Ghee Panamá"
-              : "Contact Gold Ghee Panama",
+          alt: ogAlt,
         },
       ],
     },
@@ -106,33 +130,33 @@ export async function generateMetadata({ params }) {
       card: "summary_large_image",
       title,
       description,
-      site: "@goldgheepty",
+      ...(profile.twitterHandle ? { site: profile.twitterHandle } : {}),
       images: [image],
     },
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-        "max-image-preview": "large",
-        "max-snippet": -1,
-        "max-video-preview": -1,
-      },
-    },
-    icons: {
-      icon: "/favicon.ico",
-      apple: "/apple-touch-icon.png",
-      shortcut: "/favicon.ico",
-    },
-    category: "Food & Beverages",
+    // noIndex (Sanity, contactPage -> SEO): interruptor para sacar
+    // esta página de los resultados de Google sin borrar contenido.
+    robots: contactPageData?.noIndex
+      ? { index: false, follow: false }
+      : {
+          index: true,
+          follow: true,
+          googleBot: {
+            index: true,
+            follow: true,
+            "max-image-preview": "large",
+            "max-snippet": -1,
+            "max-video-preview": -1,
+          },
+        },
+    icons: getFaviconIcons(settings),
+    category: "Real Estate",
     generator: "Next.js 14 + Sanity CMS",
     other: {
       "script:ld+json": JSON.stringify(schemaLd),
-      "theme-color": "#fff7e6",
+      "theme-color": "#0b1220",
       "format-detection": "telephone=no",
       "apple-mobile-web-app-capable": "yes",
-      "apple-mobile-web-app-title": "Gold Ghee",
+      "apple-mobile-web-app-title": profile.appleMobileWebAppTitle,
     },
   };
 }

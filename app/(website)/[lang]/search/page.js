@@ -1,6 +1,11 @@
 import Search from "./search";
 import { Suspense } from "react";
 import  Loading from "@/app/(website)/[lang]/loading";
+import { getSiteKey } from "@/lib/siteContext";
+import { getSiteProfile } from "@/lib/siteConfig";
+import { getSearchPage, getSettings } from "@/lib/sanity/client";
+import { urlForImage } from "@/lib/sanity/image";
+import { getFaviconIcons } from "@/lib/sanity/favicon";
 
 export async function generateStaticParams() {
   const langs = ["en", "es"]; // Add your supported languages here
@@ -10,10 +15,17 @@ export async function generateStaticParams() {
   return params;
 }
 
+// BUG REAL corregido: esta función generaba metadata (title/OG/
+// Twitter/JSON-LD) 100% hardcodeada a "GoldGhee" para la página de
+// búsqueda -- a diferencia del resto de páginas del sitio, que ya
+// usaban lib/siteConfig.ts para esto. Ahora usa el mismo perfil de
+// marca (Get a Property) que el resto del sitio.
 export async function generateMetadata({ params }) {
   const { lang } = params;
-  const baseUrl = "https://www.goldghee.com";
-  const canonical = `${baseUrl}/${lang}/search`;
+  const profile = getSiteProfile(getSiteKey());
+  const baseUrl = profile.baseUrl;
+  const [searchPageData, settings] = await Promise.all([getSearchPage(lang), getSettings()]);
+  const canonical = searchPageData?.canonicalUrl || `${baseUrl}/${lang}/search`;
 
   const alternates = {
     canonical,
@@ -23,27 +35,37 @@ export async function generateMetadata({ params }) {
     },
   };
 
-  const title =
+  // SEO editable desde Sanity (documento searchPage -> grupo "SEO"):
+  // cae de vuelta al texto de respaldo bilingüe de siempre si se deja
+  // vacío o si el documento no existe todavía en Studio.
+  const fallbackTitle =
     lang === "es"
-      ? "Buscar | Encuentra Productos y Artículos | GoldGhee"
-      : "Search | Find Products and Articles | GoldGhee";
+      ? "Buscar | Encuentra Propiedades y Artículos | Get a Property"
+      : "Search | Find Properties and Articles | Get a Property";
 
-  const description =
+  const fallbackDescription =
     lang === "es"
-      ? "Encuentra rápidamente productos, recetas, beneficios del ghee y contenido especializado de GoldGhee usando nuestro buscador."
-      : "Quickly find products, recipes, ghee benefits, and GoldGhee specialty content using our search tool.";
+      ? "Encuentra rápidamente casas, apartamentos, terrenos y artículos del blog de Get a Property usando nuestro buscador."
+      : "Quickly find houses, apartments, land, and Get a Property blog articles using our search tool.";
 
-  const keywords =
+  const fallbackKeywords =
     lang === "es"
-      ? "ghee, goldghee, mantequilla clarificada, productos naturales, recetas con ghee, beneficios del ghee, saludable, búsqueda"
-      : "ghee, goldghee, clarified butter, natural products, ghee recipes, ghee benefits, healthy, search";
+      ? "bienes raíces Panamá, casas en venta, apartamentos en alquiler, terrenos en venta, búsqueda, Get a Property"
+      : "real estate Panama, houses for sale, apartments for rent, land for sale, search, Get a Property";
+
+  const title = searchPageData?.metaTitle || fallbackTitle;
+  const description = searchPageData?.metaDescription || fallbackDescription;
+  const keywords = searchPageData?.seoKeywords || fallbackKeywords;
+  const ogImageSrc = searchPageData?.ogImage
+    ? urlForImage(searchPageData.ogImage)?.src
+    : `${baseUrl}${profile.defaultOgImagePath}`;
 
   // JSON-LD SearchAction (Google rich results)
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
     url: baseUrl,
-    name: "GoldGhee",
+    name: profile.siteName,
     potentialAction: {
       "@type": "SearchAction",
       target: `${baseUrl}/${lang}/search?q={search_term_string}`,
@@ -52,7 +74,11 @@ export async function generateMetadata({ params }) {
   };
 
   return {
-    title,
+    // { absolute } evita que el template del layout padre ("%s | " +
+    // nombre del sitio) vuelva a agregar el nombre acá -- "title" ya
+    // viene completo. BUG REAL preexistente corregido: sin esto el
+    // <title> quedaba duplicado: "... | Get a Property | Get a Property".
+    title: { absolute: title },
     description,
     metadataBase: new URL(baseUrl),
     alternates,
@@ -62,17 +88,17 @@ export async function generateMetadata({ params }) {
       description,
       url: canonical,
       type: "website",
-      locale: lang === "es" ? "es_ES" : "en_US",
-      siteName: "GoldGhee",
+      locale: lang === "es" ? "es_PA" : "en_US",
+      siteName: profile.siteName,
       images: [
         {
-          url: `${baseUrl}/images/og-default.jpg`,
+          url: ogImageSrc,
           width: 1200,
           height: 630,
           alt:
             lang === "es"
-              ? "GoldGhee - Buscar productos y contenido"
-              : "GoldGhee - Search products and content",
+              ? "Get a Property - Buscar propiedades y contenido"
+              : "Get a Property - Search properties and content",
         },
       ],
     },
@@ -80,17 +106,21 @@ export async function generateMetadata({ params }) {
       card: "summary_large_image",
       title,
       description,
-      site: "@goldghee",
-      images: [`${baseUrl}/images/og-default.jpg`],
+      // Honesto: sólo se manda "site" si de verdad hay un handle real
+      // de Twitter/X (siteConfig.ts -- Get a Property no tiene uno
+      // confirmado todavía, así que no se inventa).
+      ...(profile.twitterHandle ? { site: profile.twitterHandle } : {}),
+      images: [ogImageSrc],
     },
-    robots: {
-      index: true,
-      follow: true,
-    },
-    icons: {
-      icon: "/favicon.ico",
-      apple: "/apple-touch-icon.png",
-    },
+    // noIndex (Sanity, searchPage -> SEO): interruptor para sacar esta
+    // página de los resultados de Google sin borrar contenido.
+    robots: searchPageData?.noIndex
+      ? { index: false, follow: false }
+      : {
+          index: true,
+          follow: true,
+        },
+    icons: getFaviconIcons(settings),
     other: {
       script: [
         {

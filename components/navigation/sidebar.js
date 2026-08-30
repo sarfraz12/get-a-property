@@ -1,3 +1,13 @@
+// components/navigation/sidebar.js
+//
+// Barra lateral vieja de la página de un post (buscador + posts
+// relacionados + lista de categorías). Ya NO se usa: se quitó de
+// app/(website)/[lang]/[category]/post/[slug]/postHome.js (ver el
+// comentario en ese archivo) a favor del layout nuevo de la página de
+// post. Se deja el archivo por si alguna pieza (por ejemplo, el
+// buscador) se reaprovecha más adelante, pero hoy no forma parte del
+// sitio.
+
 import SearchInput from "@/components/ui/search";
 import { urlForImage } from "@/lib/sanity/image";
 import Image from "next/image";

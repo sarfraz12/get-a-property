@@ -48,7 +48,8 @@ const config: Config = {
       },
       fontFamily: {
         // to change, update font in _document.js
-        sans: ["var(--font-garet)", "sans-serif"],
+        // Poppins cargada en app/(website)/[lang]/layout.tsx vía next/font/google
+        sans: ["var(--font-poppins)", "sans-serif"],
       },
       aspectRatio: {
         "4/3": "4 / 3",

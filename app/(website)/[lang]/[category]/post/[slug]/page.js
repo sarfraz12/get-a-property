@@ -2,26 +2,38 @@ import PostPage from "./postHome";
 import { Suspense } from "react";
 import  Loading from "@/app/(website)/[lang]/loading";
 import { urlForImage } from "@/lib/sanity/image";
+import { getSiteKey } from "@/lib/siteContext";
+import { getSiteProfile } from "@/lib/siteConfig";
 
 import {
   getAllPostsSlugs,
   getPostBySlug,
   getTopCategories,
+  getSettings,
 } from "@/lib/sanity/client";
+import { getFaviconIcons } from "@/lib/sanity/favicon";
 
 export async function generateStaticParams() {
   return await getAllPostsSlugs();
 }
 
+// BUG REAL corregido: esta función generaba metadata (title/OG/
+// Twitter/JSON-LD) 100% hardcodeada a "Gold Ghee" para TODOS los
+// artículos del blog, sin importar el contenido real del post -- a
+// diferencia del resto de páginas del sitio (aboutUs, contact,
+// [category]), que ya usaban lib/siteConfig.ts para esto. Ahora usa
+// el mismo perfil de marca (Get a Property) que el resto del sitio.
 export async function generateMetadata({ params }) {
   const { lang, slug } = params;
-  const baseUrl = "https://www.goldghee.com.pa";
-  const post = await getPostBySlug(slug, lang);
+  const profile = getSiteProfile(getSiteKey());
+  const baseUrl = profile.baseUrl;
+  const [post, settings] = await Promise.all([getPostBySlug(slug, lang), getSettings()]);
 
   if (!post) {
     return {
-      title: lang === "es" ? "Artículo no encontrado | Gold Ghee" : "Article Not Found | Gold Ghee",
+      title: lang === "es" ? "Artículo no encontrado | Get a Property" : "Article Not Found | Get a Property",
       description: lang === "es" ? "El artículo que buscas no está disponible." : "The article you are looking for is not available.",
+      icons: getFaviconIcons(settings),
     };
   }
 
@@ -30,28 +42,35 @@ export async function generateMetadata({ params }) {
   const keywords =
     post.keywords?.join(", ") ||
     (lang === "es"
-      ? "ghee, ghee Panamá, ayurveda, cocina saludable, bienestar natural, recetas con ghee"
-      : "ghee, ghee Panama, ayurveda, healthy cooking, natural wellness, ghee recipes");
+      ? "bienes raíces Panamá, propiedades en Panamá, casas en venta, apartamentos en alquiler, Get a Property"
+      : "real estate Panama, properties in Panama, houses for sale, apartments for rent, Get a Property");
 
+  // SEO editable desde Sanity (post -> grupo "SEO", opcional): si el
+  // vendedor cargó un metaTitle/metaDescription distinto, se usa ese;
+  // si no, se sigue armando automático a partir del título/extracto
+  // real del post, como ya hacía esta página (nada cambia mientras
+  // esos campos se dejen vacíos).
   const title =
+    post.metaTitle ||
     post.title ||
-    (lang === "es" ? "Artículo del Blog | Gold Ghee" : "Blog Article | Gold Ghee");
+    (lang === "es" ? "Artículo del Blog | Get a Property" : "Blog Article | Get a Property");
 
   const description =
+    post.metaDescription ||
     post.excerpt ||
     post.description ||
     (lang === "es"
-      ? "Lee artículos sobre ghee, bienestar natural, ayurveda y cocina saludable en Gold Ghee."
-      : "Read articles about ghee, natural wellness, Ayurveda, and healthy cooking at Gold Ghee.");
+      ? "Lee sobre nuestras propiedades y novedades del mercado inmobiliario en Panamá con Get a Property."
+      : "Read about our properties and real estate market news in Panama with Get a Property.");
 
   const image = post.mainImage
     ? urlForImage(post?.mainImage)?.src
-    : `${baseUrl}/images/asset-2.jpg`;
+    : `${baseUrl}${profile.defaultOgImagePath}`;
 
   const datePublished = post?._createdAt;
   const dateModified = post?._updatedAt || post._createdAt;
 
-  // JSON-LD optimizado para artículo de Gold Ghee
+  // JSON-LD optimizado para artículo de Get a Property
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -62,22 +81,21 @@ export async function generateMetadata({ params }) {
     dateModified,
     author: {
       "@type": "Organization",
-      name: "Gold Ghee",
+      name: profile.organizationName,
       url: baseUrl,
     },
     publisher: {
       "@type": "Organization",
-      name: "Gold Ghee",
+      name: profile.organizationName,
       logo: {
         "@type": "ImageObject",
-        url: `${baseUrl}/images/logo.png`,
+        url: `${baseUrl}/images/get-a-property-logo-transparent.png`,
       },
     },
     mainEntityOfPage: {
       "@type": "WebPage",
       "@id": canonical,
     },
-    // Opcional, si quieres incluir contacto físico
     address: {
       "@type": "PostalAddress",
       streetAddress: "Ciudad de Panamá",
@@ -85,7 +103,8 @@ export async function generateMetadata({ params }) {
       addressRegion: "PA",
       addressCountry: "PA",
     },
-    telephone: "+507 6000-0000",
+    // TODO: sin teléfono de contacto real confirmado -- se omite en
+    // vez de inventar uno (mismo criterio que layout.tsx / page.tsx).
   };
 
   return {
@@ -108,7 +127,7 @@ export async function generateMetadata({ params }) {
       description,
       type: "article",
       url: canonical,
-      siteName: "Gold Ghee",
+      siteName: profile.siteName,
       publishedTime: datePublished,
       modifiedTime: dateModified,
       locale: lang === "es" ? "es_PA" : "en_US",
@@ -117,7 +136,7 @@ export async function generateMetadata({ params }) {
           url: image,
           width: 1200,
           height: 630,
-          alt: post.mainImage?.alt || "Artículo del Blog Gold Ghee",
+          alt: post.mainImage?.alt || (lang === "es" ? "Artículo del Blog Get a Property" : "Get a Property blog article"),
         },
       ],
     },
@@ -127,27 +146,31 @@ export async function generateMetadata({ params }) {
       title,
       description,
       images: [image],
-      site: "@goldghee",
+      // Honesto: sólo se manda "site" si de verdad hay un handle real
+      // de Twitter/X (siteConfig.ts -- Get a Property no tiene uno
+      // confirmado todavía, así que no se inventa).
+      ...(profile.twitterHandle ? { site: profile.twitterHandle } : {}),
     },
 
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-        "max-snippet": -1,
-        "max-image-preview": "large",
-        "max-video-preview": -1,
-      },
-    },
+    // noIndex (Sanity, post -> SEO): interruptor para sacar este
+    // artículo de los resultados de Google sin despublicarlo.
+    robots: post.noIndex
+      ? { index: false, follow: false }
+      : {
+          index: true,
+          follow: true,
+          googleBot: {
+            index: true,
+            follow: true,
+            "max-snippet": -1,
+            "max-image-preview": "large",
+            "max-video-preview": -1,
+          },
+        },
 
-    icons: {
-      icon: "/favicon.ico",
-      apple: "/appletouchicon.png",
-    },
+    icons: getFaviconIcons(settings),
 
-    category: "wellness",
+    category: "Real Estate",
     generator: "Next.js 14 + Sanity CMS",
 
     other: {

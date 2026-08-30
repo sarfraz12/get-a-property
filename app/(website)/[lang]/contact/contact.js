@@ -1,221 +1,195 @@
-"use client";
-
+// app/(website)/[lang]/contact/contact.js
+//
+// Página de contacto — rediseñada por completo para calcar la
+// referencia que enviaste ("Contact us"): un banner negro redondeado
+// con el título y un texto de bienvenida, y debajo una sola fila
+// dividida en dos columnas (misma altura de fila): a la izquierda el
+// bloque de información (correo / dirección / teléfono + redes
+// sociales) y a la derecha la tarjeta gris con el formulario. Al
+// final se mantiene el mapa de Google, sólo con estilo nuevo.
+//
+// Funciones/datos que YA existían y se mantienen intactos:
+// - settings.email / settings.phone / settings.address / settings.social
+//   (mismos campos de Sanity que ya usaba esta página y el footer).
+// - settings.googleIframe -> el iframe embebido de Google Maps sigue
+//   ahí, sólo con un contenedor redondeado nuevo.
+// - El envío del formulario sigue mandando un correo real, pero ahora
+//   pasa por el mismo endpoint que ya usa el resto del sitio
+//   (pages/api/emailJs.js -> POST /api/emailJs) en vez de llamar a
+//   emailjs.send(...) directo desde este componente. Ver
+//   components/sections/ContactPageForm.tsx.
+//
+// Placeholders / valores por defecto (para poder previsualizar la UI
+// aunque falte algún dato en Sanity, y para no dejar nada roto):
+// - DEFAULT_EMAIL / DEFAULT_PHONE: los mismos datos de contacto que ya
+//   se usan como respaldo en otras partes del sitio (footer,
+//   AboutTeamSection).
+// - DEFAULT_ADDRESS: si "settings.address" está vacío, se muestra
+//   "Ciudad de Panamá, Panamá" como placeholder.
+// - DEFAULT_GOOGLE_IFRAME: si "settings.googleIframe" está vacío, se
+//   embebe un mapa genérico de Ciudad de Panamá (sin necesitar una API
+//   key de Google), sólo para que el bloque del mapa no quede vacío
+//   mientras cargas el link real en Sanity.
+// - La línea final ("¿Tienes más preguntas?") en la referencia
+//   enlazaba a una página de FAQs -- este sitio todavía no tiene una,
+//   así que en vez de dejar un link roto se conecta al canal de
+//   contacto más rápido que sí existe hoy (el correo). El día que haya
+//   una página de preguntas frecuentes, sólo hay que cambiar el href.
 import Container from "@/components/generalUse/container";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import ContactPageForm from "@/components/sections/ContactPageForm";
+import SocialLink from "@/components/generalUse/socialIcons";
 import { MapPinIcon, EnvelopeIcon, PhoneIcon } from "@heroicons/react/24/outline";
-import emailjs from '@emailjs/browser';
 
+const DEFAULT_EMAIL = "info@getaproperty.com.pa";
+const DEFAULT_PHONE = "+507 6440-9399";
+const DEFAULT_ADDRESS = {
+  es: "Ciudad de Panamá, Panamá",
+  en: "Panama City, Panama",
+};
+const DEFAULT_GOOGLE_IFRAME =
+  "https://maps.google.com/maps?q=Panama%20City%2C%20Panama&t=&z=12&ie=UTF8&iwloc=&output=embed";
+
+const COPY = {
+  es: {
+    heroTitle: "Contáctanos",
+    heroDescription:
+      "Escríbenos con tus preguntas sobre nuestras propiedades. Tu mensaje es importante para nosotros y nuestro equipo te responderá lo antes posible.",
+    sectionTitle: "Contáctanos hoy",
+    sectionDescription:
+      "Nuestras puertas están abiertas para consultas, comentarios y alianzas. Escríbenos y conversemos.",
+    emailLabel: "Correo",
+    addressLabel: "Dirección",
+    phoneLabel: "Teléfono",
+    questionsText: "¿Tienes más preguntas? Escríbenos directamente por",
+    questionsLink: "correo",
+    mapEyebrow: "Ubicación",
+    mapTitle: "Encuéntranos",
+  },
+  en: {
+    heroTitle: "Contact us",
+    heroDescription:
+      "Send us your questions about our properties. Your message matters to us and our team will get back to you as soon as possible.",
+    sectionTitle: "Contact us today",
+    sectionDescription:
+      "Our doors are open for inquiries, feedback, and collaboration. Reach out to us and let's connect.",
+    emailLabel: "Email",
+    addressLabel: "Address",
+    phoneLabel: "Phone",
+    questionsText: "Do you still have questions? Reach us directly by",
+    questionsLink: "email",
+    mapEyebrow: "Location",
+    mapTitle: "Find us",
+  },
+};
+
+function InfoItem({ icon: Icon, label, children }) {
+  return (
+    <div>
+      <div className="flex items-center gap-3">
+        <Icon className="h-6 w-6 flex-shrink-0 text-black" />
+        <p className="text-xl font-extrabold text-black sm:text-2xl">{label}</p>
+      </div>
+      <div className="mt-2 pl-9 text-[15px] text-black/60">{children}</div>
+    </div>
+  );
+}
 
 export default function Contact({ settings, lang }) {
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors, isSubmitSuccessful, isSubmitting }
-  } = useForm({
-    mode: "onTouched"
-  });
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [message, setMessage] = useState(false);
-  // Please update the Access Key in the Sanity CMS - Site Congig Page
-  // const apiKey = settings?.w3ckey || "e8e6e46b-8fbf-499b-b423-1cb7b726017c";
+  const t = COPY[lang] || COPY.es;
 
-
-  const onSubmit = async (data) => {
-
-    const templateParams = {
-      from_name: data.name,
-      from_email: data.email,
-      message: data.message,
-    }
-
-    try {
-
-      const serviceID = 'service_ns37blu';
-      const templateID = 'template_fs9wkpp';
-      const userID = 'etnkFFSzzkczK63iL';
-
-      await emailjs.send(serviceID, templateID, templateParams, userID).then(
-        (result) => {
-          console.log("resullt", result.text);
-          setIsSuccess(true);
-          setMessage((lang=="es"? "Logrado. Mensaje enviado" : "Success. Message sent successfully"));
-          reset();
-        },
-        (error) => {
-          console.log("erro1", error);
-          setServerError(error);
-        }
-      );
-
-    } catch (error) {
-
-      console.error('Error:', error);
-      setServerError(error.message);
-    }
-  };
-
+  const email = settings?.email || DEFAULT_EMAIL;
+  const phone = settings?.phone || DEFAULT_PHONE;
+  const address = settings?.address || DEFAULT_ADDRESS[lang] || DEFAULT_ADDRESS.es;
+  const googleIframe = settings?.googleIframe || DEFAULT_GOOGLE_IFRAME;
+  const sectionDescription = settings?.description || t.sectionDescription;
 
   return (
-    <Container>
-      <div>
-        <iframe className="w-full h-40" src={settings?.googleIframe} allowFullScreen="" loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>    
+    <Container large alt className="py-10 md:py-16">
+      {/* Banner negro (misma pieza que ya se usa en /all y en categorías,
+          para que todas las páginas "de listado/landing" del sitio se
+          sientan parte de la misma familia visual). */}
+      <div className="overflow-hidden rounded-3xl bg-black px-6 py-14 text-center sm:py-20">
+        <h1 className="text-4xl font-black tracking-tight text-white sm:text-6xl md:text-7xl lg:text-8xl">
+          {t.heroTitle}
+        </h1>
+        <p className="mx-auto mt-6 max-w-2xl text-sm font-semibold text-white/70 sm:text-base">
+          {t.heroDescription}
+        </p>
       </div>
-      <h1 className="mt-4 mb-3 text-3xl font-semibold tracking-tight text-center lg:leading-snug text-brand-primary lg:text-4xl dark:text-white">
-        {lang=="es"?"Contacto":"Contact"}
-      </h1>
 
-
-      <div className="grid my-10 md:grid-cols-2">
-        <div className="my-10">
-          <h2 className="text-2xl font-semibold dark:text-white">
-            {settings?.title ? settings?.title : "Centro Educativo Panamá"}
-          </h2>
-          <p className="max-w-sm mt-5">
-            {settings?.description ? settings?.description : " "}
-          </p>
-
-          <div className="mt-5">
-            <div className="flex items-center mt-2 space-x-2 text-dark-600 dark:text-gray-400">
-              <MapPinIcon className="w-4 h-4" />
-              <span>{settings?.address && settings?.address}</span>
-            </div>
-            {settings?.email && (
-              <div className="flex items-center mt-2 space-x-2 text-dark-600 dark:text-gray-400">
-                <EnvelopeIcon className="w-4 h-4" />
-                <a href={`mailto:${settings.email}`}>
-                  {settings.email}
-                </a>
-              </div>
-            )}
-            {settings?.phone && (
-              <div className="flex items-center mt-2 space-x-2 text-dark-600 dark:text-gray-400">
-                <PhoneIcon className="w-4 h-4" />
-                <a href={`tel:${settings.phone}`}>{settings.phone}</a>
-              </div>
-            )}
-          </div>
-        </div>
+      {/* Una sola fila dividida en dos columnas: info a la izquierda,
+          formulario a la derecha. */}
+      <div className="mt-16 grid gap-10 lg:grid-cols-2 lg:gap-16">
         <div>
+          <h2 className="text-3xl font-extrabold tracking-tight text-black sm:text-4xl">
+            {t.sectionTitle}
+          </h2>
+          <p className="mt-4 max-w-md text-black/60">{sectionDescription}</p>
 
-          {/* FORM */}
+          <div className="mt-10 space-y-8">
+            <InfoItem icon={EnvelopeIcon} label={t.emailLabel}>
+              <a
+                href={`mailto:${email}`}
+                className="font-semibold underline decoration-black/20 underline-offset-4 transition-opacity hover:opacity-60"
+              >
+                {email}
+              </a>
+            </InfoItem>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="my-10">
-            <input
-              type="checkbox"
-              id=""
-              className="hidden"
-              style={{ display: "none" }}
-              {...register("botcheck")}></input>
+            <InfoItem icon={MapPinIcon} label={t.addressLabel}>
+              <span>{address}</span>
+            </InfoItem>
 
-            <div className="mb-5">
-              <input
-                type="text"
-                placeholder={`${lang=="es"?"Nombre Completo":"Full Name"}`}
-                autoComplete="false"
-                className={`w-full px-4 py-3 border-2 placeholder:text-gray-800 dark:text-white rounded-md outline-none dark:placeholder:text-gray-200 dark:bg-gray-900   focus:ring-4  ${errors.name
-                  ? "border-red-600 focus:border-red-600 ring-red-100 dark:ring-0"
-                  : "border-gray-300 focus:border-gray-600 ring-gray-100 dark:border-gray-600 dark:focus:border-white dark:ring-0"
-                  }`}
-                {...register("name", {
-                  required: (lang=="es"?"Nombre requerido":"Name required"),
-                  maxLength: 80
-                })}
-              />
-              {errors.name && (
-                <div className="mt-1 text-red-600">
-                  <small>{errors.name.message}</small>
-                </div>
-              )}
-            </div>
+            <InfoItem icon={PhoneIcon} label={t.phoneLabel}>
+              <a
+                href={`tel:${phone}`}
+                className="font-semibold underline decoration-black/20 underline-offset-4 transition-opacity hover:opacity-60"
+              >
+                {phone}
+              </a>
+            </InfoItem>
+          </div>
 
-            <div className="mb-5">
-              <label htmlFor="email_address" className="sr-only">
-                Email
-              </label>
-              <input
-                id="email_address"
-                type="email"
-                placeholder="Email"
-                name="email"
-                autoComplete="false"
-                className={`w-full px-4 py-3 border-2 placeholder:text-gray-800 dark:text-white rounded-md outline-none dark:placeholder:text-gray-200 dark:bg-gray-900   focus:ring-4  ${errors.email
-                  ? "border-red-600 focus:border-red-600 ring-red-100 dark:ring-0"
-                  : "border-gray-300 focus:border-gray-600 ring-gray-100 dark:border-gray-600 dark:focus:border-white dark:ring-0"
-                  }`}
-                {...register("email", {
-                  required: (lang=="es"?"Email requerido":"Email required"),
-                  pattern: {
-                    value: /^\S+@\S+$/i,
-                    message: (lang=="es"?"Ingrese Un Email Válido":"Add a Valid Email")
-                  }
-                })}
-              />
-              {errors.email && (
-                <div className="mt-1 text-red-600">
-                  <small>{errors.email.message}</small>
-                </div>
-              )}
-            </div>
-
-            <div className="mb-3">
-              <textarea
-                name="message"
-                placeholder={`${lang=="es"?"Mensaje":"Message"}`}
-                className={`w-full px-4 py-3 border-2 placeholder:text-gray-800 dark:text-white dark:placeholder:text-gray-200 dark:bg-gray-900   rounded-md outline-none  h-36 focus:ring-4  ${errors.message
-                  ? "border-red-600 focus:border-red-600 ring-red-100 dark:ring-0"
-                  : "border-gray-300 focus:border-gray-600 ring-gray-100 dark:border-gray-600 dark:focus:border-white dark:ring-0"
-                  }`}
-                {...register("message", {
-                  required: (lang=="es"?"Mensaje requerido":"Message required")
-                })}
-              />
-              {errors.message && (
-                <div className="mt-1 text-red-600">
-                  {" "}
-                  <small>{errors.message.message}</small>
-                </div>
-              )}
-            </div>
-
-            <button
-              type="submit"
-              className="w-full py-4 font-semibold text-white transition-colors bg-gray-900 rounded-md hover:bg-gray-800 focus:outline-none focus:ring-offset-2 focus:ring focus:ring-gray-200 px-7 dark:bg-white dark:text-black ">
-              {isSubmitting ? (
-                <svg
-                  className="w-5 h-5 mx-auto text-white dark:text-black animate-spin"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24">
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-              ) : (
-                (lang=="es"? "Enviar Mensaje" : "Send Message")
-              )}
-            </button>
-          </form>
-
-          {isSubmitSuccessful && isSuccess && (
-            <div className="mt-3 text-sm text-center text-green-500">
-              {message || (lang=="es"? "Logrado. Mensaje enviado" : "Success. Message sent successfully")}
-            </div>
+          {settings?.social?.length > 0 && (
+            <ul className="mt-10 flex gap-3">
+              {settings.social.map((item, index) => (
+                <li key={item.id || `${item.media}-${index}`}>
+                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-black/5 text-black transition-colors hover:bg-black hover:text-white [&_svg]:h-[1.15rem] [&_svg]:w-[1.15rem]">
+                    <SocialLink platform={item.media} link={item.url} />
+                  </div>
+                </li>
+              ))}
+            </ul>
           )}
-          {isSubmitSuccessful && !isSuccess && (
-            <div className="mt-3 text-sm text-center text-red-500">
-              {message || (lang=="es"? "Algo Salió Mal" : "Something went wrong. Please try later.")}
-            </div>
-          )}
+
+          <p className="mt-10 text-sm text-black/50">
+            {t.questionsText}{" "}
+            <a
+              href={`mailto:${email}`}
+              className="font-bold text-black underline decoration-black/20 underline-offset-4 hover:opacity-60"
+            >
+              {t.questionsLink}
+            </a>
+            .
+          </p>
+        </div>
+
+        <ContactPageForm lang={lang} />
+      </div>
+
+      {/* Mapa embebido de Google — se mantiene igual que antes
+          (settings.googleIframe), sólo con un contenedor nuevo. */}
+      <div className="mt-16">
+        <p className="text-xs font-bold uppercase tracking-widest text-brand-gold">{t.mapEyebrow}</p>
+        <h3 className="mt-2 text-2xl font-extrabold text-black sm:text-3xl">{t.mapTitle}</h3>
+        <div className="mt-6 overflow-hidden rounded-3xl border border-black/10">
+          <iframe
+            className="h-80 w-full sm:h-96"
+            src={googleIframe}
+            allowFullScreen=""
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          />
         </div>
       </div>
     </Container>

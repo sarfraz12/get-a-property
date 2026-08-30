@@ -1,6 +1,18 @@
 import CategoryPosts from "./categoryPosts";
 import Container from "@/components/generalUse/container";
-import { getAllCategories, getPostsByCategory, getAllPosts, getAllCategoriesCount } from "@/lib/sanity/client";
+import {
+  getAllCategories,
+  getPostsByCategory,
+  getAllPosts,
+  getAllCategoriesCount,
+  getLandingData,
+  getCategoryBySlug,
+  getSettings,
+} from "@/lib/sanity/client";
+import { getSiteKey } from "@/lib/siteContext";
+import { getSiteProfile } from "@/lib/siteConfig";
+import { urlForImage } from "@/lib/sanity/image";
+import { getFaviconIcons } from "@/lib/sanity/favicon";
 import { Suspense } from "react";
 import Loading from "@/app/(website)/[lang]/loading";
 
@@ -8,11 +20,49 @@ export async function generateStaticParams() {
   return await getAllCategories();
 }
 
+// Copy bilingüe del listado (único negocio: Get a Property).
+const LISTING_COPY = {
+  "get-a-property": {
+    es: {
+      description:
+        "Explora casas, apartamentos, terrenos y propiedades disponibles en Panamá, organizadas por ubicación, tipo y tipo de oferta.",
+      ogDescription: "Catálogo de propiedades de Get a Property: casas, apartamentos y terrenos en Panamá.",
+      twitterDescription: "Casas, apartamentos y terrenos en venta y alquiler en Panamá.",
+      jsonLdDescription:
+        "Explora el catálogo de propiedades de Get a Property: casas, apartamentos, terrenos y más, disponibles en Panamá.",
+      fallbackTitle: "Propiedades en Panamá | Get a Property",
+      ogAlt: "Catálogo de propiedades Get a Property",
+      category: "Real Estate",
+    },
+    en: {
+      description:
+        "Explore houses, apartments, land, and properties available in Panama, organized by location, property type and offer type.",
+      ogDescription: "Get a Property's catalog: houses, apartments, and land in Panama.",
+      twitterDescription: "Houses, apartments, and land for sale and rent in Panama.",
+      jsonLdDescription:
+        "Explore Get a Property's catalog: houses, apartments, land and more, available in Panama.",
+      fallbackTitle: "Properties in Panama | Get a Property",
+      ogAlt: "Get a Property listings catalog",
+      category: "Real Estate",
+    },
+  },
+};
+
 export async function generateMetadata({ params }) {
-  const data = await getCategoryPosts(params.category, params.lang);
+  const [data, landingData, categorySeo, settings] = await Promise.all([
+    getCategoryPosts(params.category, params.lang),
+    getLandingData(params.lang),
+    // "all" no es una categoría real en Sanity (es el listado
+    // completo) -- se evita la consulta para ese caso.
+    params.category === "all" ? null : getCategoryBySlug(params.category, params.lang),
+    getSettings(),
+  ]);
 
   const lang = params.lang;
-  const baseUrl = "https://www.goldghee.com.pa";
+  const siteKey = getSiteKey(landingData?.[0]);
+  const profile = getSiteProfile(siteKey);
+  const copy = LISTING_COPY[siteKey][lang] || LISTING_COPY[siteKey].es;
+  const baseUrl = profile.baseUrl;
   const canonical = `${baseUrl}/${lang}/${data?.title || "all"}`;
 
   const alternates = {
@@ -23,34 +73,31 @@ export async function generateMetadata({ params }) {
     },
   };
 
-  const image = data.mainImage
-    ? urlForImage(data?.mainImage)?.src
-    : `${baseUrl}/images/asset-2.jpg`;
+  const image = data.mainImage ? urlForImage(data?.mainImage)?.src : `${baseUrl}${profile.defaultOgImagePath}`;
 
-  const keywordsEs =
-    "ghee, ghee premium, ghee Panamá, cocina saludable, ayurveda, mantequilla clarificada, bienestar natural, recetas saludables, productos naturales Panamá";
-  const keywordsEn =
-    "ghee, premium ghee, ghee Panama, healthy cooking, ayurveda, clarified butter, natural wellness, healthy recipes, natural products Panama";
+  // SEO editable desde Sanity (category -> grupo "SEO", opcional):
+  // si el vendedor cargó un metaTitle/metaDescription distinto para
+  // esta categoría, se usa ese; si no, se sigue armando automático a
+  // partir del nombre real de la categoría, como ya hacía esta
+  // página.
+  const title =
+    categorySeo?.metaTitle ||
+    (data?.title && data.title !== "ALL" ? `${data.title} | ${profile.siteName}` : copy.fallbackTitle);
+  const metaDescription = categorySeo?.metaDescription || copy.description;
 
-  // JSON-LD optimizado para Gold Ghee
+  // JSON-LD -- honesto: nada de teléfono/logo inventados (mismo
+  // criterio que layout.tsx / page.tsx / contact / aboutUs esta sesión).
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    "name": data?.title || (lang === "es" ? "Categoría del Blog" : "Blog Category"),
-    "description":
-      lang === "es"
-        ? "Explora artículos sobre ghee, bienestar natural, cocina saludable, Ayurveda y estilos de vida sanos en el blog de Gold Ghee."
-        : "Explore articles about ghee, natural wellness, healthy cooking, Ayurveda, and healthy lifestyle on the Gold Ghee blog.",
+    "name": data?.title && data.title !== "ALL" ? data.title : (lang === "es" ? "Categoría" : "Category"),
+    "description": copy.jsonLdDescription,
     "url": canonical,
     "image": image,
     "publisher": {
       "@type": "Organization",
-      "name": "Gold Ghee",
+      "name": profile.organizationName,
       "url": baseUrl,
-      "logo": {
-        "@type": "ImageObject",
-        "url": `${baseUrl}/images/logo.png`
-      }
     },
     "inLanguage": lang === "es" ? "es" : "en",
     "mainEntity": {
@@ -59,37 +106,27 @@ export async function generateMetadata({ params }) {
         "@type": "ListItem",
         "position": index + 1,
         "url": `${baseUrl}/${lang}/all/post/${post.slug.current}`,
-        "name": post.title
-      }))
-    }
+        "name": post.title,
+      })),
+    },
   };
 
   return {
-    title:
-      lang === "es"
-        ? (data?.title || "Blog de Ghee, Ayurveda y Bienestar | Gold Ghee Panamá")
-        : (data?.title || "Ghee, Ayurveda & Wellness Blog | Gold Ghee Panama"),
-
-    description:
-      lang === "es"
-        ? "Artículos sobre ghee, cocina saludable, bienestar natural y Ayurveda. Aprende a mejorar tu salud con productos naturales."
-        : "Articles about ghee, healthy cooking, natural wellness, and Ayurveda. Learn how to improve your health with natural products.",
-
+    // { absolute } evita que el template del layout padre ("%s | " +
+    // nombre del sitio) vuelva a agregar el nombre acá -- "title" ya
+    // viene completo. Sin esto, el <title> quedaba duplicado: "... |
+    // Get a Property | Get a Property".
+    title: { absolute: title },
+    description: metaDescription,
     metadataBase: new URL(baseUrl),
     alternates,
-    keywords: lang === "es" ? keywordsEs : keywordsEn,
+    keywords: profile.defaultKeywords[lang] || profile.defaultKeywords.es,
 
     openGraph: {
-      title:
-        lang === "es"
-          ? "Blog de Ghee, Ayurveda y Bienestar | Gold Ghee"
-          : "Ghee, Ayurveda & Wellness Blog | Gold Ghee",
-      description:
-        lang === "es"
-          ? "Contenido sobre bienestar natural, Ayurveda, cocina saludable y beneficios del ghee."
-          : "Content about natural wellness, Ayurveda, healthy cooking, and the benefits of ghee.",
+      title,
+      description: copy.ogDescription,
       url: canonical,
-      siteName: "Gold Ghee",
+      siteName: profile.siteName,
       locale: lang === "es" ? "es_PA" : "en_US",
       type: "website",
       images: [
@@ -97,66 +134,54 @@ export async function generateMetadata({ params }) {
           url: image,
           width: 1200,
           height: 630,
-          alt: "Gold Ghee Blog",
+          alt: copy.ogAlt,
         },
       ],
     },
 
     twitter: {
       card: "summary_large_image",
-      title:
-        lang === "es"
-          ? "Blog de Bienestar y Ghee | Gold Ghee"
-          : "Wellness & Ghee Blog | Gold Ghee",
-      description:
-        lang === "es"
-          ? "Consejos de salud, recetas y beneficios del ghee para tu bienestar."
-          : "Health tips, recipes and the benefits of ghee for your wellness.",
+      title,
+      description: copy.twitterDescription,
       images: [image],
-      site: "@goldghee",
+      // Honesto: sólo se manda "site" si de verdad hay un handle real
+      // de Twitter/X para este negocio (siteConfig.ts -- Get a Property
+      // no tiene uno confirmado todavía, así que no se inventa).
+      ...(profile.twitterHandle ? { site: profile.twitterHandle } : {}),
     },
 
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-        "max-image-preview": "large",
-      },
-    },
+    // noIndex (Sanity, category -> SEO): interruptor para sacar esta
+    // categoría de los resultados de Google sin ocultarla del sitio.
+    robots: categorySeo?.noIndex
+      ? { index: false, follow: false }
+      : {
+          index: true,
+          follow: true,
+          googleBot: {
+            index: true,
+            follow: true,
+            "max-image-preview": "large",
+          },
+        },
 
-    icons: {
-      icon: "/favicon.ico",
-      shortcut: "/favicon.ico",
-      apple: "/appletouchicon.png",
-    },
+    icons: getFaviconIcons(settings),
 
-    category: "wellness",
+    category: copy.category,
 
     generator: "Next.js 14 + Sanity CMS",
 
-    // JSON-LD insertado correctamente
     other: {
       "script:ld+json": JSON.stringify(jsonLd),
     },
   };
 }
 
-
 async function getCategoryPosts(category, lang) {
-
   const posts = (category === "all" ? await getAllPosts(lang) : await getPostsByCategory(category, lang));
   const title = category === "all" ? "ALL" : posts[0]?.categories.filter(
     e => e.slug.current === category)[0]?.title;
   return { title, posts };
 }
-
-// export async function generateMetadata({ params }) {
-//   const data = await getCategoryPosts(params.category, params.lang);
-//   return { title: data.title };
-// }
-
 
 export default async function SearchPage({ params }) {
   const data = await getCategoryPosts(params.category, params.lang);

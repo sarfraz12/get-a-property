@@ -1,113 +1,108 @@
-'use client'
-import Image from 'next/image'
-import { useState } from 'react'
-import { urlForImage } from "@/lib/sanity/image"
-import { cx } from '@/utils/all'
+// components/generalUse/courosel.js
+//
+// Carrusel a pantalla completa con overlays de color configurables desde
+// Sanity (fondo, título y descripción pueden llevar su propio overlay).
+// Se mantiene toda la lógica (prevSlide/nextSlide, overlays dinámicos),
+// solo se ajustan esquinas/sombras y el color de los puntos de
+// paginación (antes azul genérico, ahora dorado de marca).
+"use client";
+import Image from "next/image";
+import { useState } from "react";
+import { urlForImage } from "@/lib/sanity/image";
+import { cx } from "@/utils/all";
 
 const Carousel = ({ images = [] }) => {
-  const [currentIndex, setCurrentIndex] = useState(0)
+  const [currentIndex, setCurrentIndex] = useState(0);
 
-  const hasMultiple = images.length > 1
-  const hasImages = images.length > 0
+  const hasMultiple = images.length > 1;
+  const hasImages = images.length > 0;
 
   const prevSlide = () => {
-    if (!hasMultiple) return
-    setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? images.length - 1 : prevIndex - 1
-    )
-  }
+    if (!hasMultiple) return;
+    setCurrentIndex((prevIndex) => (prevIndex === 0 ? images.length - 1 : prevIndex - 1));
+  };
 
   const nextSlide = () => {
-    if (!hasMultiple) return
-    setCurrentIndex((prevIndex) =>
-      prevIndex === images.length - 1 ? 0 : prevIndex + 1
-    )
-  }
+    if (!hasMultiple) return;
+    setCurrentIndex((prevIndex) => (prevIndex === images.length - 1 ? 0 : prevIndex + 1));
+  };
 
-  if (!hasImages) return null
+  if (!hasImages) return null;
 
-  const currentImage = images[currentIndex]
+  const currentImage = images[currentIndex];
 
   const getOverlayClass = (overlay) => {
     switch (overlay) {
-      case 'white':
-        return 'bg-gradient-to-br from-white/50 via-white/70 to-white/30'
-      case 'black':
-        return 'bg-gradient-to-br from-black/50 via-black/70 to-black/30'
-      case 'none':
-        return ''
+      case "white":
+        return "bg-gradient-to-br from-white/50 via-white/70 to-white/30";
+      case "black":
+        return "bg-gradient-to-br from-black/50 via-black/70 to-black/30";
+      case "none":
+        return "";
       default:
-        return 'bg-gradient-to-br from-black/50 via-black/70 to-black/30'
+        return "bg-gradient-to-br from-black/50 via-black/70 to-black/30";
     }
-  }
+  };
 
   return (
-    <div className="relative rounded-xl overflow-hidden w-full 
-                    h-[100vh] sm:h-[65vh] md:h-[70vh] lg:h-[80vh]">
-
+    <div className="relative h-[100vh] w-full overflow-hidden rounded-3xl sm:h-[65vh] md:h-[70vh] lg:h-[80vh]">
       <div
-        className="relative w-full h-full bg-center bg-cover md:bg-fixed"
+        className="relative h-full w-full bg-cover bg-center md:bg-fixed"
         style={{
+          // Si el slide no tiene imagen cargada en Sanity, se usa una
+          // foto genérica del sitio en vez de dejar el fondo vacío
+          // (antes: url("") -> sin imagen de fondo, sólo el overlay).
           backgroundImage: `url(${
-            currentImage?.sliderImage
-              ? urlForImage(currentImage.sliderImage).src
-              : ''
-          })`
+            currentImage?.sliderImage ? urlForImage(currentImage.sliderImage)?.src : "/images/placeholder-hero-1.jpg"
+          })`,
         }}
       >
         <div className={`absolute inset-0 ${getOverlayClass(currentImage?.overlay)}`} />
 
-        {/* Content Wrapper */}
         {currentImage && (
           <div
             role="region"
-            aria-label="Carousel Slide Content"
-            className="absolute inset-0 z-20 
-                       flex flex-col justify-center items-center 
-                       px-4 sm:px-6"
+            aria-label="Carousel slide content"
+            className="absolute inset-0 z-20 flex flex-col items-center justify-center px-4 sm:px-6"
           >
-            {/* Title */}
             {currentImage?.sliderTitle && (
               <div
                 className={cx(
                   "w-full max-w-full sm:max-w-3xl",
-                  "px-6 py-5 rounded-xl mb-4",
-                  "transition-all duration-700 ease-in-out animate-slide-up",
-                  currentImage?.titleOverlayColor === 'white'
-                    ? 'bg-white/85 text-black'
-                    : currentImage?.titleOverlayColor === 'black'
-                    ? 'bg-black/75 text-white'
-                    : currentImage?.titleTextColor === 'black'
-                    ? 'text-black'
-                    : 'text-white'
+                  "mb-4 rounded-2xl px-6 py-5",
+                  "animate-slide-up transition-all duration-700 ease-in-out",
+                  currentImage?.titleOverlayColor === "white"
+                    ? "bg-white/85 text-black"
+                    : currentImage?.titleOverlayColor === "black"
+                    ? "bg-black/75 text-white"
+                    : currentImage?.titleTextColor === "black"
+                    ? "text-black"
+                    : "text-white"
                 )}
               >
-                <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-5xl 
-                               font-semibold tracking-tight leading-tight text-center break-words">
+                <h2 className="break-words text-center text-xl font-semibold leading-tight tracking-tight sm:text-2xl md:text-3xl lg:text-5xl">
                   {currentImage.sliderTitle}
                 </h2>
               </div>
             )}
 
-            {/* Description */}
             {currentImage?.sliderDescription && (
               <div
-                style={{ whiteSpace: 'pre-line' }}
+                style={{ whiteSpace: "pre-line" }}
                 className={cx(
                   "w-full max-w-full sm:max-w-2xl",
-                  "px-6 py-5 rounded-xl",
-                  "transition-all duration-700 ease-in-out animate-slide-up delay-150",
-                  currentImage?.descriptionOverlayColor === 'white'
-                    ? 'bg-white/85 text-black'
-                    : currentImage?.descriptionOverlayColor === 'black'
-                    ? 'bg-black/70 text-white'
-                    : currentImage?.overlay === 'white'
-                    ? 'text-black'
-                    : 'text-white'
+                  "rounded-2xl px-6 py-5",
+                  "delay-150 animate-slide-up transition-all duration-700 ease-in-out",
+                  currentImage?.descriptionOverlayColor === "white"
+                    ? "bg-white/85 text-black"
+                    : currentImage?.descriptionOverlayColor === "black"
+                    ? "bg-black/70 text-white"
+                    : currentImage?.overlay === "white"
+                    ? "text-black"
+                    : "text-white"
                 )}
               >
-                <p className="text-sm sm:text-base md:text-lg lg:text-xl 
-                              leading-relaxed text-center break-words">
+                <p className="break-words text-center text-sm leading-relaxed sm:text-base md:text-lg lg:text-xl">
                   {currentImage.sliderDescription}
                 </p>
               </div>
@@ -116,42 +111,31 @@ const Carousel = ({ images = [] }) => {
         )}
       </div>
 
-      {/* Navigation */}
       {hasMultiple && (
         <>
-          {/* Arrows */}
           <button
             onClick={prevSlide}
-            className="absolute z-20 top-1/2 left-3 sm:left-4 
-                       transform -translate-y-1/2 
-                       bg-black/50 text-white p-3 sm:p-4 
-                       rounded-full hover:bg-black/75 transition"
+            aria-label="Previous slide"
+            className="absolute left-3 top-1/2 z-20 -translate-y-1/2 rounded-full bg-black/50 p-3 text-white transition hover:bg-black/75 sm:left-4 sm:p-4"
           >
             &#10094;
           </button>
 
           <button
             onClick={nextSlide}
-            className="absolute z-20 top-1/2 right-3 sm:right-4 
-                       transform -translate-y-1/2 
-                       bg-black/50 text-white p-3 sm:p-4 
-                       rounded-full hover:bg-black/75 transition"
+            aria-label="Next slide"
+            className="absolute right-3 top-1/2 z-20 -translate-y-1/2 rounded-full bg-black/50 p-3 text-white transition hover:bg-black/75 sm:right-4 sm:p-4"
           >
             &#10095;
           </button>
 
-          {/* Dots */}
-          <div className="absolute z-20 bottom-4 left-1/2 
-                          transform -translate-x-1/2 
-                          flex space-x-2">
+          <div className="absolute bottom-4 left-1/2 z-20 flex -translate-x-1/2 space-x-2">
             {images.map((_, index) => (
               <div
                 key={index}
                 onClick={() => setCurrentIndex(index)}
-                className={`w-3 h-3 rounded-full cursor-pointer transition ${
-                  index === currentIndex
-                    ? 'bg-blue-500 scale-110'
-                    : 'bg-gray-300'
+                className={`h-3 w-3 cursor-pointer rounded-full transition ${
+                  index === currentIndex ? "scale-110 bg-brand-gold" : "bg-white/60"
                 }`}
               />
             ))}
@@ -159,7 +143,7 @@ const Carousel = ({ images = [] }) => {
         </>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default Carousel
+export default Carousel;
