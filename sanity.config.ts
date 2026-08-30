@@ -1,5 +1,5 @@
 import { defineConfig } from "sanity";
-import { deskTool } from "sanity/desk";
+import { structureTool } from "sanity/structure";
 import { visionTool } from "@sanity/vision";
 import { schemaTypes } from "./lib/sanity/schemas";
 import {
@@ -38,7 +38,7 @@ export default defineConfig({
   },
 
   plugins: [
-    deskTool({
+    structureTool({
       structure: pageStructure([settings])
       // `defaultDocumentNode` is responsible for adding a “Preview” tab to the document pane
       // defaultDocumentNode: previewDocumentNode({ apiVersion, previewSecretId }),

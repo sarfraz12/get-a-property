@@ -7,7 +7,7 @@
 //   previewSecretId,
 // } from "@/lib/sanity/config";
 import { type DocumentDefinition } from "sanity";
-import { type StructureResolver } from "sanity/desk";
+import { type StructureResolver } from "sanity/structure";
 
 export const singletonPlugin = (types: string[]) => {
   return {
