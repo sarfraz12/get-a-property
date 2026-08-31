@@ -192,7 +192,7 @@ export default async function RootLayout(
         
 
       </head>
-      <body className={cx("font-sans","dark:bg-brand-dark bg-brand text-brand-black dark:text-brand-light")} >
+      <body className={cx("font-sans","bg-white text-black dark:bg-black dark:text-white")} >
         <noscript>
           <iframe
             src="https://www.googletagmanager.com/ns.html?id=GTM-T2XGGLLP"

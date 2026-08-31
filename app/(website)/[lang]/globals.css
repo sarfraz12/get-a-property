@@ -4,47 +4,11 @@
 /* Set global defaults */
 @layer base {
   body {
-    @apply font-sans text-gray-900 bg-[#EBBE50] dark:bg-black dark:text-gray-100;
-  }
-}
-
-/* Default Light Mode */
-
-/* body {
-  background-color: #EBBE50;
-  color: black;
-} */
-
-/* Dark Mode */
-
-/* body.dark {
-  background-color: #121212;
-  color: white;
-} */
-
-:root {
-  --background: #EBAA20;
-  --foreground: #064396;
-  --color-text: #000000;
-  --color-bg: #EBAA20;
-  --color-brand: #EBAA20;
-}
-
-.dark {
-  --color-bg: #000000;
-  --color-text: #ffffff;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    @apply font-sans text-black bg-white dark:bg-black dark:text-white;
   }
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
 
