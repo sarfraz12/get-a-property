@@ -1,0 +1,21 @@
+diff --git a/node_modules/motion/dist/es/react.mjs b/node_modules/motion/dist/es/react.mjs
+index 8d67cfa..e7c6354 100644
+--- a/node_modules/motion/dist/es/react.mjs
++++ b/node_modules/motion/dist/es/react.mjs
+@@ -1,6 +1,16 @@
+ import * as fm from 'framer-motion';
+ export * from 'framer-motion';
+ 
++// PARCHE LOCAL (via patch-package, ver patches/motion+*.patch): framer-motion
++// 13.1.1 no re-exporta 'stagger' en su build ESM (dist/es/index.mjs) aunque
++// SI existe en su propio build CJS y en su dependencia motion-dom (que la
++// define correctamente). No hay una version 13.x mas nueva que lo arregle
++// todavia. @sanity/ui@4.0.7 (parte de sanity@6.11.0, ambos 'latest')
++// importa 'stagger' desde 'motion/react', y sin este re-export Turbopack
++// falla el build entero por analisis estatico de ESM. Se re-exporta desde
++// motion-dom directamente, que si la trae bien.
++export { stagger } from 'motion-dom';
++
+ // Re-export everything from framer-motion.
+ //
+ // `motion` and `m` are aliased through local bindings so the module has
