@@ -16,6 +16,8 @@
 //   el ítem lo tiene elegido; si no (contenido viejo cargado antes de
 //   que existiera el selector de ícono), cae en una rotación
 //   decorativa genérica para que ningún ítem quede sin ícono.
+import type { JSX } from "react";
+
 export const KEY_FEATURE_ICONS: Record<string, (className: string) => JSX.Element> = {
   bed: className => (
     <svg viewBox="0 0 24 24" fill="none" strokeWidth={2} stroke="currentColor" className={className}>

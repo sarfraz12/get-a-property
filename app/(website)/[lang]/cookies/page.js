@@ -22,7 +22,8 @@ export async function generateStaticParams() {
   return langs.map(lang => ({ lang }));
 }
 
-export async function generateMetadata({ params }) {
+export async function generateMetadata(props) {
+  const params = await props.params;
   const { lang } = params;
   const [landingData, settings] = await Promise.all([getLandingData(lang), getSettings()]);
   const siteKey = getSiteKey(landingData?.[0]);
@@ -76,7 +77,8 @@ export async function generateMetadata({ params }) {
   };
 }
 
-export default function CookiesPage({ params }) {
+export default async function CookiesPage(props) {
+  const params = await props.params;
   const { lang } = params;
   const copy = COOKIES_CONTENT[lang] || COOKIES_CONTENT.es;
   const lastUpdated = LAST_UPDATED[lang] || LAST_UPDATED.es;

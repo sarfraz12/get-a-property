@@ -5,6 +5,8 @@
 // patrón que components/blog/keyFeatureIcons.tsx: un ícono real por cada
 // "value" del selector de Sanity, más una rotación de respaldo para
 // tarjetas viejas/sin ícono elegido, así ninguna tarjeta queda sin ícono.
+import type { JSX } from "react";
+
 export const WHAT_WE_DO_ICONS: Record<string, () => JSX.Element> = {
   search: () => (
     <svg viewBox="0 0 24 24" fill="none" strokeWidth={1.75} stroke="currentColor" className="h-8 w-8">

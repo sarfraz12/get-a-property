@@ -39,6 +39,10 @@ export default function CookieNotice({ lang }: { lang: string }) {
     // hidratación entre servidor y navegador.
     try {
       const dismissed = window.localStorage.getItem(STORAGE_KEY);
+      // Lectura única de localStorage (API externa no disponible en SSR)
+      // tras el primer render; es el patrón de sincronización con un
+      // sistema externo que describe la regla, no un derivado de estado.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (!dismissed) setVisible(true);
     } catch {
       // Si localStorage no está disponible (ej. navegación privada

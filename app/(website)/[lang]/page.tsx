@@ -28,7 +28,8 @@ export async function generateStaticParams() {
 // Los defaults de SEO viven en lib/siteConfig.ts (perfil de marca de
 // Get a Property), no hardcodeados acá.
 
-export async function generateMetadata({ params }: { params: { lang: string } }) {
+export async function generateMetadata(props: { params: Promise<{ lang: string }> }) {
+  const params = await props.params;
   const { lang } = params;
   const landingData = await getLandingData(lang);
   const landing = landingData?.[0];
@@ -91,7 +92,8 @@ export async function generateMetadata({ params }: { params: { lang: string } })
   };
 }
 
-export default async function IndexPage({ params }: { params: { lang: string } }) {
+export default async function IndexPage(props: { params: Promise<{ lang: string }> }) {
+  const params = await props.params;
   const posts = await getAllPosts(params.lang);
   const data = await getLandingData(params.lang);
   const post = data?.[0]?.post?._ref ? await getPostById(data[0].post._ref, params.lang) : null;

@@ -20,7 +20,8 @@ export async function generateStaticParams() {
 // búsqueda -- a diferencia del resto de páginas del sitio, que ya
 // usaban lib/siteConfig.ts para esto. Ahora usa el mismo perfil de
 // marca (Get a Property) que el resto del sitio.
-export async function generateMetadata({ params }) {
+export async function generateMetadata(props) {
+  const params = await props.params;
   const { lang } = params;
   const profile = getSiteProfile(getSiteKey());
   const baseUrl = profile.baseUrl;
@@ -133,7 +134,8 @@ export async function generateMetadata({ params }) {
 }
 
 
-export default async function SearchPage({ params }) {
+export default async function SearchPage(props) {
+  const params = await props.params;
   return (
     <Suspense fallback={<Loading />}>
       <Search lang={params.lang} />

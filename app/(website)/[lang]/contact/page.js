@@ -41,7 +41,8 @@ export async function generateStaticParams() {
 
 
 // ✅ Esta función define el <title>, <meta description> y <link rel="canonical">
-export async function generateMetadata({ params }) {
+export async function generateMetadata(props) {
+  const params = await props.params;
   const { lang } = params;
   const [landingData, contactPageData, settings] = await Promise.all([
     getLandingData(lang),
@@ -162,7 +163,8 @@ export async function generateMetadata({ params }) {
 }
 
 
-export default async function ContactPage({ params }) {
+export default async function ContactPage(props) {
+  const params = await props.params;
   const settings = await getSettings();
   return (
     <Suspense fallback={<Loading />}>

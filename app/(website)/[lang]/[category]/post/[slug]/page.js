@@ -23,7 +23,8 @@ export async function generateStaticParams() {
 // diferencia del resto de páginas del sitio (aboutUs, contact,
 // [category]), que ya usaban lib/siteConfig.ts para esto. Ahora usa
 // el mismo perfil de marca (Get a Property) que el resto del sitio.
-export async function generateMetadata({ params }) {
+export async function generateMetadata(props) {
+  const params = await props.params;
   const { lang, slug } = params;
   const profile = getSiteProfile(getSiteKey());
   const baseUrl = profile.baseUrl;
@@ -185,7 +186,8 @@ export async function generateMetadata({ params }) {
 //   return { title: post.title };
 // }
 
-export default async function PostDefault({ params }) {
+export default async function PostDefault(props) {
+  const params = await props.params;
   const post = await getPostBySlug(params.slug, params.lang);
   const categories = await getTopCategories(params.lang);
 

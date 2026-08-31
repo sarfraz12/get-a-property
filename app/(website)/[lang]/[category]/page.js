@@ -48,7 +48,8 @@ const LISTING_COPY = {
   },
 };
 
-export async function generateMetadata({ params }) {
+export async function generateMetadata(props) {
+  const params = await props.params;
   const [data, landingData, categorySeo, settings] = await Promise.all([
     getCategoryPosts(params.category, params.lang),
     getLandingData(params.lang),
@@ -183,7 +184,8 @@ async function getCategoryPosts(category, lang) {
   return { title, posts };
 }
 
-export default async function SearchPage({ params }) {
+export default async function SearchPage(props) {
+  const params = await props.params;
   const data = await getCategoryPosts(params.category, params.lang);
   const categories = await getAllCategoriesCount(params.lang)
   const { title, posts } = data;

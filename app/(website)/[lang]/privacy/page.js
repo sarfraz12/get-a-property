@@ -22,7 +22,8 @@ export async function generateStaticParams() {
   return langs.map(lang => ({ lang }));
 }
 
-export async function generateMetadata({ params }) {
+export async function generateMetadata(props) {
+  const params = await props.params;
   const { lang } = params;
   const [landingData, settings] = await Promise.all([getLandingData(lang), getSettings()]);
   const siteKey = getSiteKey(landingData?.[0]);
@@ -76,7 +77,8 @@ export async function generateMetadata({ params }) {
   };
 }
 
-export default function PrivacyPage({ params }) {
+export default async function PrivacyPage(props) {
+  const params = await props.params;
   const { lang } = params;
   const copy = PRIVACY_CONTENT[lang] || PRIVACY_CONTENT.es;
   const lastUpdated = LAST_UPDATED[lang] || LAST_UPDATED.es;

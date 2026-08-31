@@ -40,7 +40,8 @@ export async function generateStaticParams() {
 
 // ✅ This function defines <title>, <meta description>, canonical and hreflang for the About Us page
 
-export async function generateMetadata({ params }) {
+export async function generateMetadata(props) {
+  const params = await props.params;
   const { lang } = params;
   const [landingData, aboutPageData, settings] = await Promise.all([
     getLandingData(lang),
@@ -159,7 +160,8 @@ export async function generateMetadata({ params }) {
 }
 
 
-export default async function AboutPage({ params }) {
+export default async function AboutPage(props) {
+  const params = await props.params;
   const authors = await getAllAuthors(params.lang);
   const data = await getAboutPage(params.lang);
 

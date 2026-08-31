@@ -135,6 +135,9 @@ export default function Navbar({ lang, data, logo, logoalt, faviconLight, favico
   }, [mobileOpen]);
 
   useEffect(() => {
+    // Cierra el menú móvil al cambiar de ruta; reset intencional de
+    // estado local (no un valor derivable durante el render).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMobileOpen(false);
   }, [pathname]);
 

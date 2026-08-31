@@ -108,6 +108,10 @@ export default function CategoryPosts(props) {
   // posts) y la página actual quedó fuera de rango, se vuelve a la 1
   // en vez de mostrar una grilla vacía.
   useEffect(() => {
+    // Resetea la paginación cuando cambian filtros/categoría; es un
+    // reset intencional de estado local, no un derivado que se pueda
+    // calcular en el render.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCurrentPage(1);
   }, [title, searchParams]);
 

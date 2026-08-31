@@ -149,17 +149,23 @@ export async function sharedMetaData(lang: string) {
 // un lang=undefined rompe la consulta GROQ ("Unable to parse value of
 // $lang=undefined"). Se corrige desestructurando "params" del objeto
 // real que entrega Next.
-export async function generateMetadata({ params }: { params: { lang: string } }) {
+export async function generateMetadata(props: { params: Promise<{ lang: string }> }) {
+  const params = await props.params;
   return await sharedMetaData(params.lang);
 }
 
-export default async function RootLayout({
-  children,
-  params,
-}: Readonly<{
-  children: React.ReactNode;
-  params: { lang: string };
-}>) {
+export default async function RootLayout(
+  props: Readonly<{
+    children: React.ReactNode;
+    params: Promise<{ lang: string }>;
+  }>
+) {
+  const params = await props.params;
+
+  const {
+    children
+  } = props;
+
   const settings = await getSettings();
   const navData = await getNavbarData(params.lang);
   const footData = await getFooterData(params.lang);
