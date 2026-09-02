@@ -7,11 +7,13 @@
 // usa cuando esos campos vienen vacíos, y lo que arma el <title>/
 // JSON-LD/Open Graph "de fábrica" de cada página.
 //
-// IMPORTANTE -- "Get a Property" todavía tiene datos de marca que NO
-// conozco y que NO debo inventar (dominio real, cuentas de redes
-// sociales, email de contacto real): quedan marcados "// TODO" abajo
-// con un valor de relleno obviamente temporal. Antes de publicar el
-// sitio hay que reemplazarlos por los reales.
+// Dominio real confirmado: www.getapropertypanama.com. El email de
+// contacto de respaldo coincide con el que ya está cargado en Sanity
+// (settings.email) para que nunca haya dos valores distintos dando
+// vueltas. Instagram/Facebook NO se hardcodean aquí -- ya están en
+// Sanity (settings.social[]) y ese es el origen de verdad; usa
+// getSocialUrl()/similar en el sitio en vez de estos campos si
+// necesitas esas URLs.
 
 import type { SiteKey } from "./siteContext";
 
@@ -37,10 +39,7 @@ const GET_A_PROPERTY: SiteProfile = {
   siteKey: "get-a-property",
   siteName: "Get a Property",
   titleTemplate: "%s | Get a Property",
-  // TODO: reemplazar por el dominio real de Get a Property antes de
-  // publicar (afecta canonical/OG/JSON-LD -- hoy es un valor de
-  // relleno, ver nota arriba).
-  baseUrl: "https://www.getaproperty.com.pa",
+  baseUrl: "https://www.getapropertypanama.com",
   defaultTitle: {
     es: "Get a Property | Bienes Raíces en Panamá",
     en: "Get a Property | Real Estate in Panama",
@@ -56,14 +55,12 @@ const GET_A_PROPERTY: SiteProfile = {
   defaultOgImagePath: "/images/lotes-frente-playa.webp",
   organizationName: "Get a Property Panama",
   appleMobileWebAppTitle: "Get a Property",
-  // TODO: no tengo las cuentas reales de Instagram/Twitter de Get a
-  // Property -- se dejan sin definir a propósito (en vez de inventar
-  // un handle) hasta que las compartas; mientras tanto el código que
-  // las usa debe omitir esas etiquetas si vienen undefined.
+  // Redes sociales: se leen de Sanity (settings.social[]), no de aquí
+  // -- se dejan sin definir para no duplicar/desincronizar ese dato.
   instagramUrl: undefined,
   twitterHandle: undefined,
-  // TODO: reemplazar por el email real de contacto de Get a Property.
-  defaultContactEmail: "info@getaproperty.com.pa",
+  // Debe coincidir con settings.email en Sanity (hoy: admin@getapropertypanama.com).
+  defaultContactEmail: "admin@getapropertypanama.com",
 };
 
 const PROFILES: Record<SiteKey, SiteProfile> = {

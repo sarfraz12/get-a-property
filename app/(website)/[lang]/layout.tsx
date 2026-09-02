@@ -10,6 +10,8 @@ import { getSiteKey } from "@/lib/siteContext";
 import { getSiteProfile } from "@/lib/siteConfig";
 import { urlForImage } from "@/lib/sanity/image";
 import { getFaviconIcons } from "@/lib/sanity/favicon";
+import { buildOrganizationJsonLd, buildWebsiteJsonLd } from "@/lib/seo/jsonld";
+import JsonLd from "@/components/seo/JsonLd";
 import { Suspense } from "react";
 import Loading from "./loading";
 import Script from "next/script";
@@ -31,25 +33,48 @@ const poppins = Poppins({
 
 // Next sólo usa metadataBase para resolver URLs relativas de imágenes
 // cuando openGraph.url ya es absoluta (como acá), así que no importa
-// demasiado -- se deja apuntando al dominio de Get a Property.
-export const metadataBase = new URL("https://www.getaproperty.com.pa");
+// demasiado -- se deja apuntando al dominio real confirmado de Get a
+// Property (lib/siteConfig.ts).
+export const metadataBase = new URL("https://www.getapropertypanama.com");
 
-export async function sharedMetaData(lang: string) {
+// theme-color (color de la barra de navegación del navegador en
+// móvil) usa la API de "viewport" en vez del campo "other" de
+// metadata -- Next.js recomienda esto explícitamente (el theme-color
+// dentro de "metadata" está deprecado). Antes había 3 valores
+// distintos peleando por esto: uno fijo "#ffffff" hardcodeado en el
+// <head>, y otro "#0b1220" en metadata.other -- acá queda uno solo,
+// consciente de modo claro/oscuro (mismo criterio que el fix de
+// tema del hero de esta misma sesión).
+export const viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b1220" },
+  ],
+};
+
+async function getSiteAndProfileData(lang: string) {
   const [settings, landingData] = await Promise.all([getSettings(), getLandingData(lang)]);
   const siteKey = getSiteKey(landingData?.[0]);
   const profile = getSiteProfile(siteKey);
   const baseUrl = profile.baseUrl;
+  const image = settings?.openGraphImage
+    ? urlForImage(settings.openGraphImage)?.src
+    : `${baseUrl}${profile.defaultOgImagePath}`;
+  return { settings, profile, baseUrl, image };
+}
+
+export async function sharedMetaData(lang: string) {
+  const { settings, profile, baseUrl, image } = await getSiteAndProfileData(lang);
 
   const title = settings?.title || profile.defaultTitle[lang as "es" | "en"] || profile.defaultTitle.es;
 
   const description =
     settings?.description || profile.defaultDescription[lang as "es" | "en"] || profile.defaultDescription.es;
 
-  const image = settings?.openGraphImage
-    ? urlForImage(settings.openGraphImage)?.src
-    : `${baseUrl}${profile.defaultOgImagePath}`;
-
-  const sameAs = [profile.instagramUrl].filter(Boolean) as string[];
+  // Twitter/X: se prefiere el handle real cargado en Sanity
+  // (settings.twitterHandle) -- profile.twitterHandle queda sólo como
+  // respaldo por si algún día se define ahí en vez de en Sanity.
+  const twitterHandle = settings?.twitterHandle || profile.twitterHandle;
 
   // Favicon claro/oscuro (Settings -> fieldset "Favicon"): se arma
   // acá con la misma función que ahora usan TODAS las páginas del
@@ -72,6 +97,12 @@ export async function sharedMetaData(lang: string) {
       languages: {
         en: `${baseUrl}/en`,
         es: `${baseUrl}/es`,
+        // "x-default": la versión a mostrar cuando el idioma del
+        // visitante no matchea ninguna de las anteriores (ej.
+        // visitante de Francia) -- Google recomienda declarar esto
+        // explícitamente en sitios bilingües en vez de dejar que
+        // adivine cuál mostrar.
+        "x-default": `${baseUrl}/es`,
       },
     },
     openGraph: {
@@ -94,7 +125,7 @@ export async function sharedMetaData(lang: string) {
       card: "summary_large_image",
       title,
       description,
-      ...(profile.twitterHandle ? { site: profile.twitterHandle } : {}),
+      ...(twitterHandle ? { site: twitterHandle } : {}),
       images: [image],
     },
     robots: {
@@ -108,32 +139,21 @@ export async function sharedMetaData(lang: string) {
         "max-video-preview": -1,
       },
     },
+    // Verificación de Google Search Console por "etiqueta HTML"
+    // (Settings -> "Código de verificación de Google Search Console"
+    // en Sanity). Si se deja vacío, Next simplemente no renderiza la
+    // etiqueta -- no hace falta tocar código para conectar Search
+    // Console, sólo pegar el código en Sanity.
+    ...(settings?.googleSiteVerification
+      ? { verification: { google: settings.googleSiteVerification } }
+      : {}),
     icons: iconsMeta,
     category: "Real Estate",
-    generator: "Next.js 14 + Sanity CMS",
+    generator: "Next.js 16 + Sanity CMS",
     other: {
-      "theme-color": "#0b1220",
       "format-detection": "telephone=no",
       "apple-mobile-web-app-capable": "yes",
       "apple-mobile-web-app-title": profile.appleMobileWebAppTitle,
-      "script:ld+json": JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "RealEstateAgent",
-        name: profile.organizationName,
-        url: baseUrl,
-        image,
-        description,
-        address: {
-          "@type": "PostalAddress",
-          addressLocality: "Panamá",
-          addressCountry: "PA",
-        },
-        // TODO: número de teléfono real -- no lo tengo para ninguno de
-        // los dos sitios, se deja sin inventar en vez de un placeholder
-        // falso (a diferencia de un número inventado, omitir el campo
-        // no genera datos incorrectos en el JSON-LD).
-        ...(sameAs.length ? { sameAs } : {}),
-      }),
     },
   };
 }
@@ -170,6 +190,15 @@ export default async function RootLayout(
   const navData = await getNavbarData(params.lang);
   const footData = await getFooterData(params.lang);
 
+  // Datos estructurados (JSON-LD) sitewide: Organization/RealEstateAgent
+  // + WebSite, la MISMA data en cada página (se renderiza acá, en el
+  // layout raíz, para no repetirla en cada página de contenido). Cada
+  // página que necesite "hablar" del negocio referencia este mismo
+  // @id (lib/seo/jsonld.js) en vez de declarar su propia copia.
+  const { profile, baseUrl, image } = await getSiteAndProfileData(params.lang);
+  const organizationJsonLd = buildOrganizationJsonLd({ settings, profile, baseUrl, image });
+  const websiteJsonLd = buildWebsiteJsonLd({ baseUrl, siteName: profile.siteName, lang: params.lang });
+
   return (
     <html
       suppressHydrationWarning
@@ -185,12 +214,12 @@ export default async function RootLayout(
           'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
           })(window,document,'script','dataLayer','GTM-T2XGGLLP');`}
         </Script>
-        <link rel="apple-touch-icon" sizes="180x180" href="/images/appletouchicon.png" />
-        <meta name="theme-color" content="#ffffff" />
         <meta charSet="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        
-
+        {/* Datos estructurados sitewide -- ver lib/seo/jsonld.js y
+            components/seo/JsonLd.jsx para el porqué (Next.js's
+            metadata.other NO genera <script> reales, sólo <meta>). */}
+        <JsonLd data={[organizationJsonLd, websiteJsonLd]} />
       </head>
       <body className={cx("font-sans","bg-white text-black dark:bg-black dark:text-white")} >
         <noscript>
@@ -230,4 +259,3 @@ export default async function RootLayout(
     </html>
   );
 }
-

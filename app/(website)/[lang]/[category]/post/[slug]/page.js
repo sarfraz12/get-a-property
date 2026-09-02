@@ -12,6 +12,8 @@ import {
   getSettings,
 } from "@/lib/sanity/client";
 import { getFaviconIcons } from "@/lib/sanity/favicon";
+import { buildOrganizationId } from "@/lib/seo/jsonld";
+import JsonLd from "@/components/seo/JsonLd";
 
 export async function generateStaticParams() {
   return await getAllPostsSlugs();
@@ -41,7 +43,7 @@ export async function generateMetadata(props) {
   const canonical = `${baseUrl}/${lang}/all/post/${slug}`;
 
   const keywords =
-    post.keywords?.join(", ") ||
+    post.seoKeywords ||
     (lang === "es"
       ? "bienes raíces Panamá, propiedades en Panamá, casas en venta, apartamentos en alquiler, Get a Property"
       : "real estate Panama, properties in Panama, houses for sale, apartments for rent, Get a Property");
@@ -64,49 +66,12 @@ export async function generateMetadata(props) {
       ? "Lee sobre nuestras propiedades y novedades del mercado inmobiliario en Panamá con Get a Property."
       : "Read about our properties and real estate market news in Panama with Get a Property.");
 
-  const image = post.mainImage
-    ? urlForImage(post?.mainImage)?.src
-    : `${baseUrl}${profile.defaultOgImagePath}`;
+  const image = post.ogImage
+    ? urlForImage(post.ogImage)?.src
+    : (post.mainImage ? urlForImage(post?.mainImage)?.src : `${baseUrl}${profile.defaultOgImagePath}`);
 
   const datePublished = post?._createdAt;
   const dateModified = post?._updatedAt || post._createdAt;
-
-  // JSON-LD optimizado para artículo de Get a Property
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: title,
-    description: description,
-    image: [image],
-    datePublished,
-    dateModified,
-    author: {
-      "@type": "Organization",
-      name: profile.organizationName,
-      url: baseUrl,
-    },
-    publisher: {
-      "@type": "Organization",
-      name: profile.organizationName,
-      logo: {
-        "@type": "ImageObject",
-        url: `${baseUrl}/images/get-a-property-logo-transparent.png`,
-      },
-    },
-    mainEntityOfPage: {
-      "@type": "WebPage",
-      "@id": canonical,
-    },
-    address: {
-      "@type": "PostalAddress",
-      streetAddress: "Ciudad de Panamá",
-      addressLocality: "Panamá",
-      addressRegion: "PA",
-      addressCountry: "PA",
-    },
-    // TODO: sin teléfono de contacto real confirmado -- se omite en
-    // vez de inventar uno (mismo criterio que layout.tsx / page.tsx).
-  };
 
   return {
     title,
@@ -118,6 +83,7 @@ export async function generateMetadata(props) {
       languages: {
         en: `${baseUrl}/en/all/post/${slug}`,
         es: `${baseUrl}/es/all/post/${slug}`,
+        "x-default": `${baseUrl}/es/all/post/${slug}`,
       },
     },
 
@@ -172,10 +138,49 @@ export async function generateMetadata(props) {
     icons: getFaviconIcons(settings),
 
     category: "Real Estate",
-    generator: "Next.js 14 + Sanity CMS",
+    generator: "Next.js 16 + Sanity CMS",
+  };
+}
 
-    other: {
-      "script:ld+json": JSON.stringify(structuredData),
+// JSON-LD real (ver components/seo/JsonLd.jsx). "author"/"publisher"
+// referencian la Organization sitewide por @id en vez de repetirla
+// (lib/seo/jsonld.js) -- el logo real de Sanity (settings.logo) se
+// resuelve una sola vez ahí, así que acá sólo hace falta el @id.
+async function buildPostJsonLd(slug, lang) {
+  const profile = getSiteProfile(getSiteKey());
+  const baseUrl = profile.baseUrl;
+  const post = await getPostBySlug(slug, lang);
+  if (!post) return null;
+
+  const canonical = `${baseUrl}/${lang}/all/post/${slug}`;
+  const title =
+    post.metaTitle ||
+    post.title ||
+    (lang === "es" ? "Artículo del Blog | Get a Property" : "Blog Article | Get a Property");
+  const description =
+    post.metaDescription ||
+    post.excerpt ||
+    post.description ||
+    (lang === "es"
+      ? "Lee sobre nuestras propiedades y novedades del mercado inmobiliario en Panamá con Get a Property."
+      : "Read about our properties and real estate market news in Panama with Get a Property.");
+  const image = post.ogImage
+    ? urlForImage(post.ogImage)?.src
+    : (post.mainImage ? urlForImage(post?.mainImage)?.src : `${baseUrl}${profile.defaultOgImagePath}`);
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: title,
+    description,
+    image: [image],
+    datePublished: post?._createdAt,
+    dateModified: post?._updatedAt || post._createdAt,
+    author: { "@id": buildOrganizationId(baseUrl) },
+    publisher: { "@id": buildOrganizationId(baseUrl) },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": canonical,
     },
   };
 }
@@ -190,9 +195,11 @@ export default async function PostDefault(props) {
   const params = await props.params;
   const post = await getPostBySlug(params.slug, params.lang);
   const categories = await getTopCategories(params.lang);
+  const jsonLd = await buildPostJsonLd(params.slug, params.lang);
 
   return (
     <Suspense fallback={<Loading />}>
+      <JsonLd data={jsonLd} />
       <PostPage post={post} categories={categories} lang={params.lang} />
     </Suspense>
 

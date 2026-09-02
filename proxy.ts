@@ -16,20 +16,25 @@ function getLocale(request: NextRequest): string | undefined {
 // Middleware
 export default function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
-    const userAgent = request.headers.get('user-agent') || '';
 
-    const isBot = /Googlebot|Bingbot|DuckDuckBot|Slurp|YandexBot/i.test(userAgent);
-
-    // ✅ Evita redirección para bots
-    if (isBot && pathname === '/') {
-        return NextResponse.next();
-    }
-
-    // ✅ Redirige solo en la raíz del sitio
+    // BUG REAL corregido (encontrado durante la auditoría de SEO
+    // previa al lanzamiento): antes, para bots (Googlebot/Bingbot/
+    // etc.) la raíz "/" NO se redirigía a "/es" -- se dejaba pasar tal
+    // cual con NextResponse.next(). El problema es que no existe
+    // ningún app/page.tsx en la raíz del proyecto (todo el contenido
+    // vive bajo app/(website)/[lang]/...), así que Googlebot recibía
+    // un 404 al visitar el dominio pelado (https://tudominio.com/) --
+    // justo la URL más importante del sitio para SEO. Se quita el
+    // trato especial para bots: ahora TODOS (bots y personas) reciben
+    // el mismo redirect 301 (permanente -- antes era 302/temporal,
+    // que le dice a Google que no consolide el "link equity" de "/"
+    // hacia "/es") hacia el idioma por defecto. Un redirect es 100%
+    // normal para SEO (Google lo sigue sin penalizar); un 404 en la
+    // raíz del dominio no lo es.
     if (pathname === '/') {
         const url = request.nextUrl.clone();
         url.pathname = '/es'; // o '/en' si quieres usar otro idioma por defecto
-        return NextResponse.redirect(url, 302);
+        return NextResponse.redirect(url, 301);
     }
 
     const pathnameIsMissingLocale = i18n.locales.every(

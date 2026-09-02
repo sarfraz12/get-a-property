@@ -13,6 +13,8 @@ import { getSiteKey } from "@/lib/siteContext";
 import { getSiteProfile } from "@/lib/siteConfig";
 import { urlForImage } from "@/lib/sanity/image";
 import { getFaviconIcons } from "@/lib/sanity/favicon";
+import { buildOrganizationId } from "@/lib/seo/jsonld";
+import JsonLd from "@/components/seo/JsonLd";
 import { Suspense } from "react";
 import Loading from "@/app/(website)/[lang]/loading";
 
@@ -64,13 +66,23 @@ export async function generateMetadata(props) {
   const profile = getSiteProfile(siteKey);
   const copy = LISTING_COPY[siteKey][lang] || LISTING_COPY[siteKey].es;
   const baseUrl = profile.baseUrl;
-  const canonical = `${baseUrl}/${lang}/${data?.title || "all"}`;
+  // BUG REAL preexistente corregido: cuando category==="all",
+  // data.title vale el string literal "ALL" (mayúsculas, ver
+  // getCategoryPosts() más abajo) -- eso hacía que la canonical/
+  // hreflang/JSON-LD de esta página apuntaran a "/ALL" en vez de la
+  // URL real y minúscula "/all" que usa el resto del sitio (navbar,
+  // footer, links internos). "/ALL" ni siquiera es una ruta válida
+  // (category es case-sensitive), así que Google indexaba una
+  // canonical rota. urlSlug usa siempre el segmento real de la URL.
+  const urlSlug = data?.title && data.title !== "ALL" ? data.title : "all";
+  const canonical = `${baseUrl}/${lang}/${urlSlug}`;
 
   const alternates = {
     canonical,
     languages: {
-      en: `${baseUrl}/en/${data?.title || "all"}`,
-      es: `${baseUrl}/es/${data?.title || "all"}`,
+      en: `${baseUrl}/en/${urlSlug}`,
+      es: `${baseUrl}/es/${urlSlug}`,
+      "x-default": `${baseUrl}/es/${urlSlug}`,
     },
   };
 
@@ -85,32 +97,6 @@ export async function generateMetadata(props) {
     categorySeo?.metaTitle ||
     (data?.title && data.title !== "ALL" ? `${data.title} | ${profile.siteName}` : copy.fallbackTitle);
   const metaDescription = categorySeo?.metaDescription || copy.description;
-
-  // JSON-LD -- honesto: nada de teléfono/logo inventados (mismo
-  // criterio que layout.tsx / page.tsx / contact / aboutUs esta sesión).
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "CollectionPage",
-    "name": data?.title && data.title !== "ALL" ? data.title : (lang === "es" ? "Categoría" : "Category"),
-    "description": copy.jsonLdDescription,
-    "url": canonical,
-    "image": image,
-    "publisher": {
-      "@type": "Organization",
-      "name": profile.organizationName,
-      "url": baseUrl,
-    },
-    "inLanguage": lang === "es" ? "es" : "en",
-    "mainEntity": {
-      "@type": "ItemList",
-      "itemListElement": (data?.posts || []).map((post, index) => ({
-        "@type": "ListItem",
-        "position": index + 1,
-        "url": `${baseUrl}/${lang}/all/post/${post.slug.current}`,
-        "name": post.title,
-      })),
-    },
-  };
 
   return {
     // { absolute } evita que el template del layout padre ("%s | " +
@@ -169,10 +155,41 @@ export async function generateMetadata(props) {
 
     category: copy.category,
 
-    generator: "Next.js 14 + Sanity CMS",
+    generator: "Next.js 16 + Sanity CMS",
+  };
+}
 
-    other: {
-      "script:ld+json": JSON.stringify(jsonLd),
+// JSON-LD real (ver components/seo/JsonLd.jsx). "publisher" referencia
+// la Organization sitewide por @id en vez de repetirla (lib/seo/jsonld.js).
+async function buildCategoryJsonLd(categorySlug, lang) {
+  const [data, categorySeo] = await Promise.all([
+    getCategoryPosts(categorySlug, lang),
+    categorySlug === "all" ? null : getCategoryBySlug(categorySlug, lang),
+  ]);
+  const profile = getSiteProfile(getSiteKey());
+  const baseUrl = profile.baseUrl;
+  const copy = LISTING_COPY["get-a-property"][lang] || LISTING_COPY["get-a-property"].es;
+  const urlSlug = data?.title && data.title !== "ALL" ? data.title : "all";
+  const canonical = `${baseUrl}/${lang}/${urlSlug}`;
+  const image = data.mainImage ? urlForImage(data?.mainImage)?.src : `${baseUrl}${profile.defaultOgImagePath}`;
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": data?.title && data.title !== "ALL" ? data.title : (lang === "es" ? "Categoría" : "Category"),
+    "description": categorySeo?.metaDescription || copy.jsonLdDescription,
+    "url": canonical,
+    "image": image,
+    "publisher": { "@id": buildOrganizationId(baseUrl) },
+    "inLanguage": lang === "es" ? "es" : "en",
+    "mainEntity": {
+      "@type": "ItemList",
+      "itemListElement": (data?.posts || []).map((post, index) => ({
+        "@type": "ListItem",
+        "position": index + 1,
+        "url": `${baseUrl}/${lang}/all/post/${post.slug.current}`,
+        "name": post.title,
+      })),
     },
   };
 }
@@ -189,10 +206,11 @@ export default async function SearchPage(props) {
   const data = await getCategoryPosts(params.category, params.lang);
   const categories = await getAllCategoriesCount(params.lang)
   const { title, posts } = data;
-
+  const jsonLd = await buildCategoryJsonLd(params.category, params.lang);
 
   return (
     <Suspense fallback={<Loading />}>
+      <JsonLd data={jsonLd} />
       <Container>
         <CategoryPosts internalPosts={posts} title={title} categories={categories} lang={params.lang} />
       </Container>

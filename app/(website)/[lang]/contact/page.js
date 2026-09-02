@@ -3,6 +3,8 @@ import { getSiteKey } from "@/lib/siteContext";
 import { getSiteProfile } from "@/lib/siteConfig";
 import { urlForImage } from "@/lib/sanity/image";
 import { getFaviconIcons } from "@/lib/sanity/favicon";
+import { buildOrganizationId } from "@/lib/seo/jsonld";
+import JsonLd from "@/components/seo/JsonLd";
 import Contact from "./contact";
 import { Suspense } from "react";
 import Loading from "@/app/(website)/[lang]/loading";
@@ -61,39 +63,13 @@ export async function generateMetadata(props) {
   // SEO editable desde Sanity (documento contactPage -> grupo "SEO"):
   // cae de vuelta al texto de respaldo (CONTACT_COPY) si se deja
   // vacío o si el documento no existe todavía en Studio.
-  const { ogAlt, businessDescription } = copy;
+  const { ogAlt } = copy;
   const title = contactPageData?.metaTitle || copy.title;
   const description = contactPageData?.metaDescription || copy.description;
   const keywords = contactPageData?.seoKeywords || copy.keywords;
   const image = contactPageData?.ogImage
     ? urlForImage(contactPageData.ogImage)?.src
     : `${baseUrl}${profile.defaultOgImagePath}`;
-
-  // -------- JSON-LD for AboutPage + Brand/LocalBusiness -------
-  const schemaLd = {
-    "@context": "https://schema.org",
-    "@type": "AboutPage",
-    name: title,
-    description,
-    url: canonical,
-    image,
-    mainEntity: {
-      "@type": "RealEstateAgent",
-      name: profile.organizationName,
-      url: baseUrl,
-      image,
-      description: businessDescription,
-      address: {
-        "@type": "PostalAddress",
-        addressLocality: "Panamá",
-        addressCountry: "PA",
-      },
-      ...(profile.instagramUrl ? { sameAs: [profile.instagramUrl] } : {}),
-      // TODO: sin teléfono/email de contacto real confirmados para
-      // este contactPoint -- se omite en vez de inventar uno (ver
-      // notas en lib/siteConfig.ts).
-    }
-  };
 
   return {
     // { absolute } evita que el template del layout padre
@@ -108,6 +84,7 @@ export async function generateMetadata(props) {
       languages: {
         en: `${baseUrl}/en/contact`,
         es: `${baseUrl}/es/contact`,
+        "x-default": `${baseUrl}/es/contact`,
       },
     },
     keywords,
@@ -151,10 +128,8 @@ export async function generateMetadata(props) {
         },
     icons: getFaviconIcons(settings),
     category: "Real Estate",
-    generator: "Next.js 14 + Sanity CMS",
+    generator: "Next.js 16 + Sanity CMS",
     other: {
-      "script:ld+json": JSON.stringify(schemaLd),
-      "theme-color": "#0b1220",
       "format-detection": "telephone=no",
       "apple-mobile-web-app-capable": "yes",
       "apple-mobile-web-app-title": profile.appleMobileWebAppTitle,
@@ -162,12 +137,40 @@ export async function generateMetadata(props) {
   };
 }
 
+// JSON-LD real (ver components/seo/JsonLd.jsx). Referencia a la
+// Organization sitewide por @id en vez de repetirla (lib/seo/jsonld.js).
+async function buildContactJsonLd(lang) {
+  const [landingData, contactPageData] = await Promise.all([getLandingData(lang), getContactPage(lang)]);
+  const siteKey = getSiteKey(landingData?.[0]);
+  const profile = getSiteProfile(siteKey);
+  const copy = CONTACT_COPY[siteKey][lang] || CONTACT_COPY[siteKey].es;
+  const baseUrl = profile.baseUrl;
+  const canonical = contactPageData?.canonicalUrl || `${baseUrl}/${lang}/contact`;
+  const title = contactPageData?.metaTitle || copy.title;
+  const description = contactPageData?.metaDescription || copy.description;
+  const image = contactPageData?.ogImage
+    ? urlForImage(contactPageData.ogImage)?.src
+    : `${baseUrl}${profile.defaultOgImagePath}`;
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "ContactPage",
+    name: title,
+    description,
+    url: canonical,
+    image,
+    mainEntity: { "@id": buildOrganizationId(baseUrl) },
+  };
+}
+
 
 export default async function ContactPage(props) {
   const params = await props.params;
   const settings = await getSettings();
+  const jsonLd = await buildContactJsonLd(params.lang);
   return (
     <Suspense fallback={<Loading />}>
+      <JsonLd data={jsonLd} />
       <Contact settings={settings} lang={params.lang} />
     </Suspense>
 

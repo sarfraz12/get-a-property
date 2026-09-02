@@ -40,8 +40,8 @@ import ContactPageForm from "@/components/sections/ContactPageForm";
 import SocialLink from "@/components/generalUse/socialIcons";
 import { MapPinIcon, EnvelopeIcon, PhoneIcon } from "@heroicons/react/24/outline";
 
-const DEFAULT_EMAIL = "info@getaproperty.com.pa";
-const DEFAULT_PHONE = "+507 6440-9399";
+const DEFAULT_EMAIL = "admin@getapropertypanama.com";
+const DEFAULT_PHONE = "+507 6652-5238";
 const DEFAULT_ADDRESS = {
   es: "Ciudad de Panamá, Panamá",
   en: "Panama City, Panama",

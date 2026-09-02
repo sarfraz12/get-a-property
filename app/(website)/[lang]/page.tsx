@@ -56,6 +56,7 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
       languages: {
         en: `${BASE_URL}/en`,
         es: `${BASE_URL}/es`,
+        "x-default": `${BASE_URL}/es`,
       },
     },
     // noIndex (Sanity, grupo SEO): interruptor para sacar la home de

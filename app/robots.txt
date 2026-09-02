@@ -1,4 +1,0 @@
-User-agent: *
-Disallow: /studio/
-Allow: /
-Sitemap: https://www.getaproperty.com.pa/sitemap.xml

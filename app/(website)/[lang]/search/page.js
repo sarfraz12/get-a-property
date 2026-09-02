@@ -33,6 +33,7 @@ export async function generateMetadata(props) {
     languages: {
       en: `${baseUrl}/en/search`,
       es: `${baseUrl}/es/search`,
+      "x-default": `${baseUrl}/es/search`,
     },
   };
 
@@ -61,18 +62,11 @@ export async function generateMetadata(props) {
     ? urlForImage(searchPageData.ogImage)?.src
     : `${baseUrl}${profile.defaultOgImagePath}`;
 
-  // JSON-LD SearchAction (Google rich results)
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    url: baseUrl,
-    name: profile.siteName,
-    potentialAction: {
-      "@type": "SearchAction",
-      target: `${baseUrl}/${lang}/search?q={search_term_string}`,
-      "query-input": "required name=search_term_string",
-    },
-  };
+  // El JSON-LD "WebSite" + SearchAction (para el sitelinks search box
+  // de Google) ya se emite sitewide desde el layout raíz
+  // (app/(website)/[lang]/layout.tsx -> lib/seo/jsonld.js), así que no
+  // hace falta repetirlo acá -- antes este bloque ni siquiera
+  // funcionaba (ver nota en other.script más abajo, ahora eliminado).
 
   return {
     // { absolute } evita que el template del layout padre ("%s | " +
@@ -122,14 +116,6 @@ export async function generateMetadata(props) {
           follow: true,
         },
     icons: getFaviconIcons(settings),
-    other: {
-      script: [
-        {
-          type: "application/ld+json",
-          innerHTML: JSON.stringify(jsonLd),
-        },
-      ],
-    },
   };
 }
 
