@@ -14,7 +14,7 @@ function getLocale(request: NextRequest): string | undefined {
 }
 
 // Middleware
-export default function middleware(request: NextRequest) {
+export default function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
     const userAgent = request.headers.get('user-agent') || '';
 
