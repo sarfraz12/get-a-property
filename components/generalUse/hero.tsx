@@ -60,6 +60,15 @@
 //    siempre: "/{lang}/all". El resto de las props (slides,
 //    backgroundImage, productImage, filters) sigue viniendo del primer
 //    item del arreglo "hero", igual que antes.
+// 7) NUEVO: cada slide del carrusel ahora puede ser una IMAGEN o un
+//    VIDEO (schema: landingPage.js -> hero.slides.mediaType). El video
+//    se reproduce automático, en silencio y en loop mientras su slide
+//    está visible -- ver isUsableVideo(), el <video> dentro de
+//    HeroCarousel, y el useEffect que reproduce sólo el video del
+//    slide activo (el resto queda pausado, aunque siga montado en el
+//    DOM por el crossfade). La URL del video ya viene resuelta desde
+//    Sanity (lib/sanity/groq.js -> "videoUrl": video.asset->url), acá
+//    no se procesa ningún _ref de archivo.
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -86,6 +95,15 @@ import {
 type HeroSlide = {
   image: any; // objeto de imagen de Sanity, O un string (ruta local /images/...)
   alt?: string;
+  // NUEVO: un slide puede ser una imagen (por defecto) o un video que
+  // se autoreproduce en loop/silencio mientras está visible -- ver
+  // lib/sanity/schemas/landingPage.js -> hero.slides.mediaType.
+  // "videoUrl" ya viene resuelto desde Sanity (lib/sanity/groq.js ->
+  // video.asset->url), no hace falta procesarlo acá.
+  mediaType?: "image" | "video";
+  videoUrl?: string;
+  videoMimeType?: string;
+  videoPoster?: any; // objeto de imagen de Sanity, opcional
   // NUEVO: si el slide viene de Sanity con 1 o más categorías
   // vinculadas (schema: landingPage.js -> hero.slides.categories), la
   // foto del carrusel se vuelve clickeable y lleva a esa COMBINACIÓN
@@ -160,6 +178,14 @@ function isUsableImage(image: any): boolean {
   if (!image) return false;
   if (typeof image === "string") return !INVALID_LEGACY_IMAGE_PATHS.has(image);
   return true; // objeto de imagen de Sanity: se asume válido
+}
+
+// Un slide de video es "usable" si tiene mediaType "video" Y una URL
+// resuelta (lib/sanity/groq.js -> "videoUrl": video.asset->url) --
+// si el editor eligió "Video" pero todavía no subió el archivo, no
+// hay nada que reproducir.
+function isUsableVideo(raw: any): boolean {
+  return Boolean(raw && typeof raw === "object" && raw.mediaType === "video" && raw.videoUrl);
 }
 
 /* ------------------------------------------------------------------ */
@@ -387,6 +413,12 @@ function HeroCarousel({
   const [paused, setPaused] = useState(false);
   const count = slides?.length;
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // Un <video> por slide de tipo video (los slides de imagen dejan su
+  // posición en null). Se usan para reproducir SOLO el video del slide
+  // activo -- todos los slides quedan montados en el DOM a la vez
+  // (crossfade por opacity, ver más abajo), así que sin esto cada
+  // video de fondo estaría reproduciéndose aunque no se vea.
+  const videoRefs = useRef<Array<HTMLVideoElement | null>>([]);
 
   const goTo = useCallback(
     (i: number) => {
@@ -414,6 +446,32 @@ function HeroCarousel({
     if (e.key === "ArrowRight") next();
   };
 
+  // Reproduce el video del slide activo y pausa (+ rebobina) el resto,
+  // para que cada video arranque de nuevo la próxima vez que se
+  // muestre su slide.
+  useEffect(() => {
+    videoRefs.current.forEach((el, i) => {
+      if (!el) return;
+      if (i === index) {
+        const playPromise = el.play();
+        if (playPromise && typeof playPromise.catch === "function") {
+          playPromise.catch(() => {
+            // Autoplay bloqueado por el navegador (raro, ya que va
+            // muted): no rompe nada, el video queda pausado en su
+            // primer frame / poster.
+          });
+        }
+      } else {
+        el.pause();
+        try {
+          el.currentTime = 0;
+        } catch {
+          // no-op
+        }
+      }
+    });
+  }, [index, slides]);
+
   if (!count) return null;
 
   return (
@@ -429,29 +487,51 @@ function HeroCarousel({
     >
       {/* Slides */}
       <div className="relative h-[420px] w-full sm:h-[520px] lg:h-[640px]">
-        {slides?.map((slide, i) => (
-          <div
-            key={i}
-            className="absolute inset-0 transition-opacity duration-700 ease-in-out"
-            style={{ opacity: i === index ? 1 : 0, pointerEvents: i === index ? "auto" : "none" }}
-            aria-hidden={i !== index}
-          >
-            <Image
-              {...(resolveSlideImageProps(slide.image) as ImageProps)}
-              alt={slide.alt || `Slide ${i + 1}`}
-              fill
-              priority={i === 0}
-              sizes="100vw"
-              className="object-cover"
-            />
-            {/* CORRECCIÓN del cliente: la foto del carrusel NO es un
-                link a una categoría -- la navegación pasa ÚNICA Y
-                EXCLUSIVAMENTE por los botones de arriba (HeroFilters).
-                "categories" en el slide (Sanity: hero.slides.categories)
-                sigue existiendo como dato del slide, pero ya no se usa
-                para armar un link acá. */}
-          </div>
-        ))}
+        {slides?.map((slide, i) => {
+          const isVideoSlide = slide.mediaType === "video" && Boolean(slide.videoUrl);
+          const posterSrc = resolveSlideImageProps(slide.videoPoster)?.src || undefined;
+          return (
+            <div
+              key={i}
+              className="absolute inset-0 transition-opacity duration-700 ease-in-out"
+              style={{ opacity: i === index ? 1 : 0, pointerEvents: i === index ? "auto" : "none" }}
+              aria-hidden={i !== index}
+            >
+              {isVideoSlide ? (
+                <video
+                  ref={(el) => {
+                    videoRefs.current[i] = el;
+                  }}
+                  className="h-full w-full object-cover"
+                  muted
+                  loop
+                  playsInline
+                  autoPlay
+                  preload="metadata"
+                  poster={posterSrc}
+                  aria-label={slide.alt || `Slide ${i + 1}`}
+                >
+                  <source src={slide.videoUrl} type={slide.videoMimeType || "video/mp4"} />
+                </video>
+              ) : (
+                <Image
+                  {...(resolveSlideImageProps(slide.image) as ImageProps)}
+                  alt={slide.alt || `Slide ${i + 1}`}
+                  fill
+                  priority={i === 0}
+                  sizes="100vw"
+                  className="object-cover"
+                />
+              )}
+              {/* CORRECCIÓN del cliente: la foto/video del carrusel NO
+                  es un link a una categoría -- la navegación pasa
+                  ÚNICA Y EXCLUSIVAMENTE por los botones de arriba
+                  (HeroFilters). "categories" en el slide (Sanity:
+                  hero.slides.categories) sigue existiendo como dato
+                  del slide, pero ya no se usa para armar un link acá. */}
+            </div>
+          );
+        })}
       </div>
 
       {/* Degradado para que la píldora de filtros se lea sobre la imagen */}
@@ -544,18 +624,29 @@ export default function Hero({
   const normalizedSanitySlides = (slides || [])
     .map((raw: any) => {
       const hasImageField = raw && typeof raw === "object" && "image" in raw;
+      const video = isUsableVideo(raw);
       const image = hasImageField ? raw.image : raw;
-      if (!isUsableImage(image)) return null;
+      // Un slide de video no necesita imagen -- sólo se exige
+      // isUsableImage() para slides de imagen (el caso de siempre).
+      if (!video && !isUsableImage(image)) return null;
       return {
-        image,
+        image: video ? undefined : image,
         alt: (hasImageField ? raw.alt : undefined) as string | undefined,
         categories: hasImageField ? raw.categories : undefined,
+        mediaType: video ? ("video" as const) : ("image" as const),
+        videoUrl: video ? raw.videoUrl : undefined,
+        videoMimeType: video ? raw.videoMimeType : undefined,
+        videoPoster: video ? raw.videoPoster : undefined,
       };
     })
     .filter(Boolean) as {
     image: any;
     alt?: string;
     categories?: Array<{ slug?: string; title?: string; categoryType?: CategoryType | null }>;
+    mediaType?: "image" | "video";
+    videoUrl?: string;
+    videoMimeType?: string;
+    videoPoster?: any;
   }[];
 
   let finalSlides: HeroSlide[] = [];
@@ -564,6 +655,10 @@ export default function Hero({
       image: slide.image,
       alt: slide.alt || `${finalTitle} ${i + 1}`,
       categories: slide.categories,
+      mediaType: slide.mediaType,
+      videoUrl: slide.videoUrl,
+      videoMimeType: slide.videoMimeType,
+      videoPoster: slide.videoPoster,
     }));
   } else if (usableBackground || usableProduct) {
     finalSlides = [
