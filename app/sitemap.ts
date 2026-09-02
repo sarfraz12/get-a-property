@@ -9,17 +9,17 @@ export default async function generateSitemap(): Promise<MetadataRoute.Sitemap> 
   const posts = await getAllPostsSlugs() || [];
 
 
-  const postLinks = posts?.flatMap(({ slug }: any) => [
+  const postLinks: MetadataRoute.Sitemap = posts?.flatMap(({ slug }: any) => [
     {
       url: `${baseURL}/en/all/post/${slug}`,
       lastModified: new Date(),
-      changeFrequency: 'yearly',
+      changeFrequency: 'yearly' as const,
       priority: 0.7,
     },
     {
       url: `${baseURL}/es/all/post/${slug}`,
       lastModified: new Date(),
-      changeFrequency: 'yearly',
+      changeFrequency: 'yearly' as const,
       priority: 0.7,
     },
   ]);
@@ -32,17 +32,17 @@ export default async function generateSitemap(): Promise<MetadataRoute.Sitemap> 
 
   // console.log(categories)
 
-  const categoryLinks = categories?.flatMap(({ category }: any) => [
+  const categoryLinks: MetadataRoute.Sitemap = categories?.flatMap(({ category }: any) => [
     {
       url: `${baseURL}/en/${category}`,
       lastModified: new Date(),
-      changeFrequency: 'yearly',
+      changeFrequency: 'yearly' as const,
       priority: 0.7,
     },
     {
       url: `${baseURL}/es/${category}`,
       lastModified: new Date(),
-      changeFrequency: 'yearly',
+      changeFrequency: 'yearly' as const,
       priority: 0.7,
     },
   ]);

@@ -7,3 +7,7 @@
 // el propio paquete no entrega.
 declare module "next-sanity";
 declare module "next-sanity/studio";
+// Mismo caso que arriba, para el subpath usado por
+// app/api/revalidate/route.ts (parseBody, para validar el webhook de
+// Sanity).
+declare module "next-sanity/webhook";
