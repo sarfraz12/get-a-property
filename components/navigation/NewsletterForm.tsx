@@ -57,7 +57,13 @@ export default function NewsletterForm({ lang }: NewsletterFormProps) {
         body: JSON.stringify({
           name: "Newsletter",
           email,
-          message: "Nueva suscripción al newsletter desde el footer.",
+          // Mensaje default pedido por el cliente: dice explícitamente
+          // cuál es el correo del visitante que se quiere suscribir
+          // (antes era un texto genérico sin el correo incluido).
+          message:
+            lang === "es"
+              ? `Este correo (${email}) desea agregarse a sus suscripciones de correo.`
+              : `This email (${email}) would like to be added to your email subscriptions.`,
         }),
       });
       if (!res.ok) throw new Error("request failed");

@@ -1,18 +1,24 @@
 // pages/api/emailJs.js
 //
-// API route de Next.js (Pages Router: /api/emailJs) que reenvía un
-// mensaje de contacto a través de EmailJS.
+// API route de Next.js (Pages Router: /api/emailJs) que reenvía CUALQUIER
+// formulario del sitio a través de EmailJS -- es el único lugar del
+// código donde vive el serviceID/templateID, así que todos los
+// formularios (ContactCtaSection en la home, ContactPageForm en
+// /contact, PostContactForm en la página de un post, y NewsletterForm
+// en el footer) mandan su propio {name, email, phone?, message} acá en
+// vez de llamar a EmailJS cada uno por su cuenta. Corrección de un
+// comentario viejo de este archivo: en algún momento se pensó que
+// /contact llamaba a EmailJS directo desde el navegador -- ya no es
+// así, ContactPageForm también pasa por esta misma ruta.
 //
-// OJO — hallazgo importante: hoy este endpoint solo lo usa
-// ContactCtaSection (el formulario nuevo de 3 campos en la home). La
-// página /contact (app/(website)/[lang]/contact/contact.js) NO pasa
-// por acá: llama a `emailjs.send(...)` directo desde el navegador con
-// la librería @emailjs/browser. Esa librería está pensada para correr
-// en el navegador, así que ejecutarla en un route handler de servidor
-// (como este) puede no comportarse igual en todos los entornos — si
-// después de publicar notas que los correos de ESTE formulario no
-// llegan, la alternativa segura es mover el envío al cliente, con el
-// mismo patrón que ya usa /contact.
+// service_6refp6c / template_7frcfrh: los IDs reales que confirmó el
+// cliente para esta cuenta de EmailJS (antes tenía IDs viejos de otro
+// proyecto/cuenta -- service_ns37blu / template_4noz9sf -- que ya no
+// mandaban los correos a destino). El "userID" (Public Key) se deja
+// igual porque no se compartió uno nuevo -- si después de publicar los
+// correos NO llegan, lo primero a revisar es si ese Public Key
+// pertenece a la MISMA cuenta de EmailJS que service_6refp6c (en
+// dashboard.emailjs.com -> Account -> General).
 //
 // Body esperado: { name, email, phone?, message }
 // `phone` es opcional (así una request vieja sin ese campo sigue
@@ -37,8 +43,8 @@ export default async function Handler(req, res) {
     };
 
     try {
-        const serviceID = 'service_ns37blu';
-        const templateID = 'template_4noz9sf';
+        const serviceID = 'service_6refp6c';
+        const templateID = 'template_7frcfrh';
         const userID = 'etnkFFSzzkczK63iL';
 
         await emailjs.send(serviceID, templateID, templateParams, userID).then(

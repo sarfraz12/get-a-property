@@ -14,11 +14,10 @@
 //   referencia (esa es una foto de stock con licencia del template,
 //   no del proyecto).
 // - El formulario tiene 3 campos (nombre, correo, celular) y se envía
-//   al endpoint que ya existe en el proyecto: pages/api/emailJs.js
-//   (POST a /api/emailJs). Ver el comentario en ese archivo: hoy es el
-//   único lugar del código que usa esa ruta — la página /contact envía
-//   el correo directo desde el navegador con la librería de EmailJS,
-//   sin pasar por esta API.
+//   al endpoint compartido por TODO el sitio: pages/api/emailJs.js
+//   (POST a /api/emailJs) -- ahí vive el serviceID/templateID reales
+//   de EmailJS (service_6refp6c / template_7frcfrh), así que este
+//   formulario nunca necesita tocarlos directamente.
 "use client";
 
 import { useState } from "react";

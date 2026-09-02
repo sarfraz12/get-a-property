@@ -8,10 +8,9 @@
 // MÁS los datos del post desde el que se está escribiendo (título,
 // categoría, fecha y el link directo al artículo), para que quien
 // reciba el correo sepa exactamente sobre qué post es la consulta sin
-// tener que preguntar. Ver el comentario en pages/api/emailJs.js para
-// la salvedad de que hoy es la única API que usa esa ruta -- la
-// página /contact manda el correo directo desde el navegador con
-// @emailjs/browser.
+// tener que preguntar. Mismo endpoint compartido por todo el sitio
+// (ver pages/api/emailJs.js -- ahí viven el serviceID/templateID
+// reales de EmailJS).
 "use client";
 
 import { useState } from "react";
