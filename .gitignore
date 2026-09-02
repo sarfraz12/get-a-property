@@ -36,6 +36,11 @@ yarn-error.log*
 # vercel
 .vercel
 
+# exports/backups locales de datos de Sanity -- no deben vivir en git
+# (60MB+, GitHub avisa por encima de 50MB). Se generan localmente, no
+# hace falta versionarlos.
+lib/sanity/data/production.tar.gz
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
