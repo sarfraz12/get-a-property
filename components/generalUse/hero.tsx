@@ -411,6 +411,13 @@ function HeroCarousel({
 }) {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
+  // NUEVO: en cuanto alguien navega el carrusel a mano (flechas,
+  // puntos de paginación o teclado), el autoplay se apaga DEFINITIVO
+  // para ese carrusel -- ya no debe "robarle" el slide que la persona
+  // eligió ver. goTo() es la única función que mueve el índice por una
+  // acción manual (el autoplay usa su propio setIndex, ver más abajo),
+  // así que ahí es donde se marca la interacción.
+  const [userInteracted, setUserInteracted] = useState(false);
   const count = slides?.length;
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   // Un <video> por slide de tipo video (los slides de imagen dejan su
@@ -423,6 +430,7 @@ function HeroCarousel({
   const goTo = useCallback(
     (i: number) => {
       if (!count) return;
+      setUserInteracted(true);
       setIndex(((i % count) + count) % count);
     },
     [count]
@@ -431,14 +439,17 @@ function HeroCarousel({
   const next = useCallback(() => goTo(index + 1), [goTo, index]);
   const prev = useCallback(() => goTo(index - 1), [goTo, index]);
 
-  // Autoplay: avanza solo si hay más de 1 slide y el usuario no está pasando el mouse encima
+  // Autoplay: avanza solo si hay más de 1 slide, el usuario no está
+  // pasando el mouse encima, Y todavía no navegó el carrusel a mano
+  // (ver "userInteracted" arriba) -- una vez que hace click en una
+  // flecha o un punto, el carrusel queda 100% manual de ahí en más.
   useEffect(() => {
-    if (!autoPlayInterval || paused || !count || count <= 1) return;
+    if (!autoPlayInterval || paused || userInteracted || !count || count <= 1) return;
     timerRef.current = setInterval(() => setIndex((i) => (i + 1) % count), autoPlayInterval);
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [autoPlayInterval, paused, count]);
+  }, [autoPlayInterval, paused, userInteracted, count]);
 
   // Navegación con flechas del teclado cuando el carrusel tiene foco
   const handleKeyDown = (e: React.KeyboardEvent) => {
