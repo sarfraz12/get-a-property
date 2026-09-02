@@ -31,5 +31,18 @@ export const apiVersion =
 export const previewSecretId = process.env
   .SANITY_REVALIDATE_SECRET as string;
 
-// token to edit and wrtie
-export const tokenId = process.env.NEXT_PUBLIC_SANITY_TOKEN as string;
+// VULNERABILIDAD REAL corregida antes del lanzamiento: este token tiene
+// permiso de ESCRITURA en Sanity (createPreRegisterUser() en client.ts
+// lo usa para crear documentos), pero estaba leyendo la variable
+// NEXT_PUBLIC_SANITY_TOKEN -- cualquier variable con prefijo
+// NEXT_PUBLIC_ Next.js la incrusta tal cual (como texto plano) en el
+// bundle de JavaScript que se manda al navegador de CADA visitante.
+// Un token de escritura publico = cualquiera podria extraerlo del
+// bundle y crear/editar/borrar contenido en el Sanity de produccion.
+// Ahora lee SANITY_API_TOKEN (SIN NEXT_PUBLIC_) para que Next.js lo
+// mantenga solo en el servidor. IMPORTANTE: en Vercel, esta variable
+// debe cargarse como SANITY_API_TOKEN (no NEXT_PUBLIC_SANITY_TOKEN)
+// -- y como el valor actual ya vivio en un env var publico, lo mas
+// seguro es generar un token nuevo en manage.sanity.io y revocar el
+// viejo antes de usarlo en produccion.
+export const tokenId = process.env.SANITY_API_TOKEN as string;
