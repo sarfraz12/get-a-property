@@ -250,8 +250,22 @@ export default function Home({ posts, landingData, lang, post, featuredCategorie
       {/* ===== Formulario final ===== */}
       {landing?.formSlider?.[0] && <FormSlider {...landing.formSlider[0]} />}
 
-      {/* ===== Post reciente + contacto rápido ===== */}
-      <ContactCtaSection lang={lang} post={posts?.[0]} />
+      {/* ===== Post reciente + contacto rápido =====
+          BUG REAL corregido: antes no se le pasaban title/description/
+          buttonText a ContactCtaSection -- la tarjeta negra ("¿Todavía
+          tienes una pregunta?") siempre mostraba el copy fijo del
+          componente, sin forma de editarla desde Sanity (ver los 3
+          campos nuevos "contactCta*" en landingPage.js, fieldset
+          "Tarjeta de contacto"). Si se dejan vacíos en Sanity, el
+          componente sigue cayendo en el mismo copy de respaldo bilingüe
+          de siempre. */}
+      <ContactCtaSection
+        lang={lang}
+        post={posts?.[0]}
+        title={landing?.contactCtaTitle}
+        description={landing?.contactCtaDescription}
+        buttonText={landing?.contactCtaButtonText}
+      />
     </div>
   );
 }

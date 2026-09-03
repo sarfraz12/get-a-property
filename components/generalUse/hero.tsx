@@ -265,7 +265,24 @@ function FilterIcon({ type }: { type: "location" | "property" | "status" }) {
 /*  leer para filtrar la lista de posts.                                */
 /* ------------------------------------------------------------------ */
 
-function HeroFilters({ categoryGroups, lang }: { categoryGroups?: CategoryGroups; lang: string }) {
+function HeroFilters({
+  categoryGroups,
+  lang,
+  variant = "floating",
+}: {
+  categoryGroups?: CategoryGroups;
+  lang: string;
+  // NUEVO: "floating" es la píldora absoluta de siempre, flotando sobre
+  // la foto (sólo visible desde "sm" hacia arriba -- flotar esa
+  // píldora + sus dropdowns sobre una foto de 375px de ancho no entra
+  // bien). En mobile se usa una SEGUNDA instancia de este mismo
+  // componente con variant="inline": un panel normal (no absoluto)
+  // debajo del carrusel, para que "el panel para ir a las categorías"
+  // (como lo describió el cliente) sea visible en el celular -- ver el
+  // segundo <HeroFilters> en el return de Hero, más abajo en este
+  // archivo.
+  variant?: "floating" | "inline";
+}) {
   const router = useRouter();
   const [openGroup, setOpenGroup] = useState<FilterGroupKey | null>(null);
   const [selection, setSelection] = useState(emptySelection());
@@ -313,11 +330,16 @@ function HeroFilters({ categoryGroups, lang }: { categoryGroups?: CategoryGroups
     router.push(`/${lang}/all${query ? `?${query}` : ""}`);
   };
 
+  // Variante "inline" (mobile): panel normal debajo del carrusel, NO
+  // absoluto -- evita que sus dropdowns queden recortados por el
+  // "overflow-hidden" del contenedor del carrusel (ver HeroCarousel).
+  const containerClassName =
+    variant === "inline"
+      ? "relative z-10 mt-4 flex flex-wrap items-center gap-2 rounded-2xl bg-white/95 px-3 py-3 shadow-lg backdrop-blur-sm sm:hidden"
+      : "absolute right-4 top-4 z-10 hidden max-w-[calc(100%-2rem)] items-center gap-1 rounded-full bg-white/95 px-2 py-2 shadow-lg backdrop-blur-sm sm:flex md:right-8 md:top-8";
+
   return (
-    <div
-      ref={containerRef}
-      className="absolute right-4 top-4 z-10 hidden max-w-[calc(100%-2rem)] items-center gap-1 rounded-full bg-white/95 px-2 py-2 shadow-lg backdrop-blur-sm sm:flex md:right-8 md:top-8"
-    >
+    <div ref={containerRef} className={containerClassName}>
       {activeGroups.map((key) => {
         const meta = FILTER_GROUP_META[key];
         const options = categoryGroups?.[key] || [];
@@ -345,7 +367,7 @@ function HeroFilters({ categoryGroups, lang }: { categoryGroups?: CategoryGroups
             </button>
 
             {isOpen && (
-              <div className="absolute right-0 top-[calc(100%+0.5rem)] z-20 max-h-64 w-56 overflow-y-auto rounded-2xl bg-white p-2 text-left shadow-xl ring-1 ring-black/5">
+              <div className="absolute left-0 top-[calc(100%+0.5rem)] z-20 max-h-64 w-56 max-w-[calc(100vw-2.5rem)] overflow-y-auto rounded-2xl bg-white p-2 text-left shadow-xl ring-1 ring-black/5">
                 {options.map((category) => {
                   const slug = getCategorySlug(category);
                   if (!slug) return null;
@@ -497,7 +519,7 @@ function HeroCarousel({
       tabIndex={0}
     >
       {/* Slides */}
-      <div className="relative h-[420px] w-full sm:h-[520px] lg:h-[640px]">
+      <div className="relative aspect-[4/3] w-full sm:aspect-auto sm:h-[520px] lg:h-[640px]">
         {slides?.map((slide, i) => {
           const isVideoSlide = slide.mediaType === "video" && Boolean(slide.videoUrl);
           const posterSrc = resolveSlideImageProps(slide.videoPoster)?.src || undefined;
@@ -559,7 +581,7 @@ function HeroCarousel({
             type="button"
             onClick={prev}
             aria-label="Previous slide"
-            className="absolute left-3 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-black opacity-0 shadow-md transition-all duration-200 hover:bg-white group-hover:opacity-100 focus-visible:opacity-100 md:left-5"
+            className="absolute left-2 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-black opacity-100 shadow-md transition-all duration-200 hover:bg-white md:left-5 md:h-11 md:w-11 md:opacity-0 md:group-hover:opacity-100 md:focus-visible:opacity-100"
           >
             <ChevronLeftIcon />
           </button>
@@ -567,7 +589,7 @@ function HeroCarousel({
             type="button"
             onClick={next}
             aria-label="Next slide"
-            className="absolute right-3 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-black opacity-0 shadow-md transition-all duration-200 hover:bg-white group-hover:opacity-100 focus-visible:opacity-100 md:right-5"
+            className="absolute right-2 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-black opacity-100 shadow-md transition-all duration-200 hover:bg-white md:right-5 md:h-11 md:w-11 md:opacity-0 md:group-hover:opacity-100 md:focus-visible:opacity-100"
           >
             <ChevronRightIcon />
           </button>
@@ -710,6 +732,17 @@ export default function Hero({
 
         {/* Carrusel */}
         <HeroCarousel slides={finalSlides} categoryGroups={categoryGroups} lang={lang} autoPlayInterval={autoPlayInterval} />
+
+        {/* CORRECCIÓN mobile (queja del cliente: no se ve "el panel para
+            ir a las categorías" en el celular). La píldora de arriba
+            (HeroFilters dentro de HeroCarousel) sigue oculta hasta "sm"
+            a propósito -- flotarla sobre una foto de 375px de ancho no
+            entra bien. Acá se muestra el MISMO panel de filtros, pero
+            como bloque normal debajo del carrusel (variant="inline"),
+            visible y usable con el dedo; en "sm" hacia arriba esta
+            instancia se oculta sola (ver su className) y vuelve a
+            aplicar la píldora flotante de siempre. */}
+        <HeroFilters categoryGroups={categoryGroups} lang={lang} variant="inline" />
       </Container>
     </section>
   );
