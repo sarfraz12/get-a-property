@@ -1,7 +1,7 @@
 import { getAllAuthors, getAboutPage, getLandingData, getSettings } from "@/lib/sanity/client";
 import { getSiteKey } from "@/lib/siteContext";
 import { getSiteProfile } from "@/lib/siteConfig";
-import { urlForImage } from "@/lib/sanity/image";
+import { urlForOgImage } from "@/lib/sanity/image";
 import { getFaviconIcons } from "@/lib/sanity/favicon";
 import { buildOrganizationId } from "@/lib/seo/jsonld";
 import JsonLd from "@/components/seo/JsonLd";
@@ -69,7 +69,7 @@ export async function generateMetadata(props) {
   const title = aboutSeo?.metaTitle || copy.title;
   const description = aboutSeo?.metaDescription || copy.description;
   const keywords = aboutSeo?.seoKeywords || copy.keywords;
-  const image = aboutSeo?.ogImage ? urlForImage(aboutSeo.ogImage)?.src : `${baseUrl}${profile.defaultOgImagePath}`;
+  const image = aboutSeo?.ogImage ? urlForOgImage(aboutSeo.ogImage)?.src : `${baseUrl}${profile.defaultOgImagePath}`;
 
   return {
     // { absolute } evita que el template del layout padre
@@ -150,7 +150,7 @@ async function buildAboutJsonLd(lang) {
   const canonical = aboutSeo?.canonicalUrl || `${baseUrl}/${lang}/about`;
   const title = aboutSeo?.metaTitle || copy.title;
   const description = aboutSeo?.metaDescription || copy.description;
-  const image = aboutSeo?.ogImage ? urlForImage(aboutSeo.ogImage)?.src : `${baseUrl}${profile.defaultOgImagePath}`;
+  const image = aboutSeo?.ogImage ? urlForOgImage(aboutSeo.ogImage)?.src : `${baseUrl}${profile.defaultOgImagePath}`;
 
   return {
     "@context": "https://schema.org",

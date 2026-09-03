@@ -1,7 +1,7 @@
 import PostPage from "./postHome";
 import { Suspense } from "react";
 import  Loading from "@/app/(website)/[lang]/loading";
-import { urlForImage } from "@/lib/sanity/image";
+import { urlForOgImage } from "@/lib/sanity/image";
 import { getSiteKey } from "@/lib/siteContext";
 import { getSiteProfile } from "@/lib/siteConfig";
 
@@ -67,8 +67,8 @@ export async function generateMetadata(props) {
       : "Read about our properties and real estate market news in Panama with Get a Property.");
 
   const image = post.ogImage
-    ? urlForImage(post.ogImage)?.src
-    : (post.mainImage ? urlForImage(post?.mainImage)?.src : `${baseUrl}${profile.defaultOgImagePath}`);
+    ? urlForOgImage(post.ogImage)?.src
+    : (post.mainImage ? urlForOgImage(post?.mainImage)?.src : `${baseUrl}${profile.defaultOgImagePath}`);
 
   const datePublished = post?._createdAt;
   const dateModified = post?._updatedAt || post._createdAt;
@@ -165,8 +165,8 @@ async function buildPostJsonLd(slug, lang) {
       ? "Lee sobre nuestras propiedades y novedades del mercado inmobiliario en Panamá con Get a Property."
       : "Read about our properties and real estate market news in Panama with Get a Property.");
   const image = post.ogImage
-    ? urlForImage(post.ogImage)?.src
-    : (post.mainImage ? urlForImage(post?.mainImage)?.src : `${baseUrl}${profile.defaultOgImagePath}`);
+    ? urlForOgImage(post.ogImage)?.src
+    : (post.mainImage ? urlForOgImage(post?.mainImage)?.src : `${baseUrl}${profile.defaultOgImagePath}`);
 
   return {
     "@context": "https://schema.org",

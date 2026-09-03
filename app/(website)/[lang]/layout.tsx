@@ -8,7 +8,7 @@ import CookieNotice from "@/components/legal/CookieNotice";
 import { getSettings, getNavbarData, getFooterData, getLandingData } from "@/lib/sanity/client";
 import { getSiteKey } from "@/lib/siteContext";
 import { getSiteProfile } from "@/lib/siteConfig";
-import { urlForImage } from "@/lib/sanity/image";
+import { urlForOgImage } from "@/lib/sanity/image";
 import { getFaviconIcons } from "@/lib/sanity/favicon";
 import { buildOrganizationJsonLd, buildWebsiteJsonLd } from "@/lib/seo/jsonld";
 import JsonLd from "@/components/seo/JsonLd";
@@ -60,7 +60,7 @@ async function getSiteAndProfileData(lang: string) {
   const profile = getSiteProfile(siteKey);
   const baseUrl = profile.baseUrl;
   const image = settings?.openGraphImage
-    ? urlForImage(settings.openGraphImage)?.src
+    ? urlForOgImage(settings.openGraphImage)?.src
     : `${baseUrl}${profile.defaultOgImagePath}`;
   return { settings, profile, baseUrl, image };
 }

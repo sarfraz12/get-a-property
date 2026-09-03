@@ -4,7 +4,7 @@ import  Loading from "@/app/(website)/[lang]/loading";
 import { getSiteKey } from "@/lib/siteContext";
 import { getSiteProfile } from "@/lib/siteConfig";
 import { getSearchPage, getSettings } from "@/lib/sanity/client";
-import { urlForImage } from "@/lib/sanity/image";
+import { urlForOgImage } from "@/lib/sanity/image";
 import { getFaviconIcons } from "@/lib/sanity/favicon";
 
 export async function generateStaticParams() {
@@ -59,7 +59,7 @@ export async function generateMetadata(props) {
   const description = searchPageData?.metaDescription || fallbackDescription;
   const keywords = searchPageData?.seoKeywords || fallbackKeywords;
   const ogImageSrc = searchPageData?.ogImage
-    ? urlForImage(searchPageData.ogImage)?.src
+    ? urlForOgImage(searchPageData.ogImage)?.src
     : `${baseUrl}${profile.defaultOgImagePath}`;
 
   // El JSON-LD "WebSite" + SearchAction (para el sitelinks search box

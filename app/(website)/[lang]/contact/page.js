@@ -1,7 +1,7 @@
 import { getSettings, getLandingData, getContactPage } from "@/lib/sanity/client";
 import { getSiteKey } from "@/lib/siteContext";
 import { getSiteProfile } from "@/lib/siteConfig";
-import { urlForImage } from "@/lib/sanity/image";
+import { urlForOgImage } from "@/lib/sanity/image";
 import { getFaviconIcons } from "@/lib/sanity/favicon";
 import { buildOrganizationId } from "@/lib/seo/jsonld";
 import JsonLd from "@/components/seo/JsonLd";
@@ -68,7 +68,7 @@ export async function generateMetadata(props) {
   const description = contactPageData?.metaDescription || copy.description;
   const keywords = contactPageData?.seoKeywords || copy.keywords;
   const image = contactPageData?.ogImage
-    ? urlForImage(contactPageData.ogImage)?.src
+    ? urlForOgImage(contactPageData.ogImage)?.src
     : `${baseUrl}${profile.defaultOgImagePath}`;
 
   return {
@@ -149,7 +149,7 @@ async function buildContactJsonLd(lang) {
   const title = contactPageData?.metaTitle || copy.title;
   const description = contactPageData?.metaDescription || copy.description;
   const image = contactPageData?.ogImage
-    ? urlForImage(contactPageData.ogImage)?.src
+    ? urlForOgImage(contactPageData.ogImage)?.src
     : `${baseUrl}${profile.defaultOgImagePath}`;
 
   return {

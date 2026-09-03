@@ -1,6 +1,6 @@
 import HomePage from "./home";
 import { getAllPosts, getLandingData, getPostById, getFeaturedCategories } from "@/lib/sanity/client";
-import { urlForImage } from "@/lib/sanity/image";
+import { urlForOgImage } from "@/lib/sanity/image";
 import { getSiteKey } from "@/lib/siteContext";
 import { getSiteProfile } from "@/lib/siteConfig";
 import { Suspense } from "react";
@@ -40,7 +40,7 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
   const metaTitle = landing?.metaTitle || profile.defaultTitle[lang as "es" | "en"] || profile.defaultTitle.es;
   const metaDescription =
     landing?.metaDescription || profile.defaultDescription[lang as "es" | "en"] || profile.defaultDescription.es;
-  const ogImageSrc = landing?.ogImage ? urlForImage(landing.ogImage)?.src : `${BASE_URL}${profile.defaultOgImagePath}`;
+  const ogImageSrc = landing?.ogImage ? urlForOgImage(landing.ogImage)?.src : `${BASE_URL}${profile.defaultOgImagePath}`;
   const canonical = landing?.canonicalUrl || `${BASE_URL}/${lang}`;
 
   return {

@@ -11,7 +11,7 @@ import {
 } from "@/lib/sanity/client";
 import { getSiteKey } from "@/lib/siteContext";
 import { getSiteProfile } from "@/lib/siteConfig";
-import { urlForImage } from "@/lib/sanity/image";
+import { urlForOgImage } from "@/lib/sanity/image";
 import { getFaviconIcons } from "@/lib/sanity/favicon";
 import { buildOrganizationId } from "@/lib/seo/jsonld";
 import JsonLd from "@/components/seo/JsonLd";
@@ -86,7 +86,7 @@ export async function generateMetadata(props) {
     },
   };
 
-  const image = data.mainImage ? urlForImage(data?.mainImage)?.src : `${baseUrl}${profile.defaultOgImagePath}`;
+  const image = data.mainImage ? urlForOgImage(data?.mainImage)?.src : `${baseUrl}${profile.defaultOgImagePath}`;
 
   // SEO editable desde Sanity (category -> grupo "SEO", opcional):
   // si el vendedor cargó un metaTitle/metaDescription distinto para
@@ -171,7 +171,7 @@ async function buildCategoryJsonLd(categorySlug, lang) {
   const copy = LISTING_COPY["get-a-property"][lang] || LISTING_COPY["get-a-property"].es;
   const urlSlug = data?.title && data.title !== "ALL" ? data.title : "all";
   const canonical = `${baseUrl}/${lang}/${urlSlug}`;
-  const image = data.mainImage ? urlForImage(data?.mainImage)?.src : `${baseUrl}${profile.defaultOgImagePath}`;
+  const image = data.mainImage ? urlForOgImage(data?.mainImage)?.src : `${baseUrl}${profile.defaultOgImagePath}`;
 
   return {
     "@context": "https://schema.org",
