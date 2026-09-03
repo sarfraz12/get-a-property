@@ -33,9 +33,11 @@ const poppins = Poppins({
 
 // Next sólo usa metadataBase para resolver URLs relativas de imágenes
 // cuando openGraph.url ya es absoluta (como acá), así que no importa
-// demasiado -- se deja apuntando al dominio real confirmado de Get a
-// Property (lib/siteConfig.ts).
-export const metadataBase = new URL("https://www.getapropertypanama.com");
+// demasiado -- pero se arma a partir de lib/siteConfig.ts (en vez de
+// repetir el dominio como string suelto acá) para que exista un único
+// lugar del código donde cambiar el dominio principal del sitio (ver
+// el comentario de baseUrl en siteConfig.ts).
+export const metadataBase = new URL(getSiteProfile(getSiteKey()).baseUrl);
 
 // theme-color (color de la barra de navegación del navegador en
 // móvil) usa la API de "viewport" en vez del campo "other" de

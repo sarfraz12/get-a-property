@@ -7,13 +7,22 @@
 // usa cuando esos campos vienen vacíos, y lo que arma el <title>/
 // JSON-LD/Open Graph "de fábrica" de cada página.
 //
-// Dominio real confirmado: www.getapropertypanama.com. El email de
-// contacto de respaldo coincide con el que ya está cargado en Sanity
-// (settings.email) para que nunca haya dos valores distintos dando
-// vueltas. Instagram/Facebook NO se hardcodean aquí -- ya están en
-// Sanity (settings.social[]) y ese es el origen de verdad; usa
-// getSocialUrl()/similar en el sitio en vez de estos campos si
-// necesitas esas URLs.
+// Dominio principal (a pedido del cliente, set. 2026):
+// https://getaproperty.com.pa -- getapropertypanama.com pasó a ser el
+// dominio secundario que redirecciona (301) hacia este en Vercel
+// (Project Settings -> Domains -> "Redirect to"), así que ya NO debe
+// aparecer como canónico/JSON-LD/sitemap. Si el negocio vuelve a
+// cambiar de dominio principal, este es el único lugar del código que
+// hace falta tocar (ver también metadataBase en
+// app/(website)/[lang]/layout.tsx, que ahora se arma a partir de este
+// mismo valor en vez de repetirlo). El email de contacto de respaldo
+// coincide con el que ya está cargado en Sanity (settings.email) para
+// que nunca haya dos valores distintos dando vueltas -- el dominio del
+// correo (@getapropertypanama.com) NO se tocó acá porque es un tema de
+// buzón de correo real, no del sitio web. Instagram/Facebook NO se
+// hardcodean aquí -- ya están en Sanity (settings.social[]) y ese es
+// el origen de verdad; usa getSocialUrl()/similar en el sitio en vez
+// de estos campos si necesitas esas URLs.
 
 import type { SiteKey } from "./siteContext";
 
@@ -39,7 +48,7 @@ const GET_A_PROPERTY: SiteProfile = {
   siteKey: "get-a-property",
   siteName: "Get a Property",
   titleTemplate: "%s | Get a Property",
-  baseUrl: "https://www.getapropertypanama.com",
+  baseUrl: "https://getaproperty.com.pa",
   defaultTitle: {
     es: "Get a Property | Bienes Raíces en Panamá",
     en: "Get a Property | Real Estate in Panama",
