@@ -15,14 +15,23 @@
 // cambiar de dominio principal, este es el único lugar del código que
 // hace falta tocar (ver también metadataBase en
 // app/(website)/[lang]/layout.tsx, que ahora se arma a partir de este
-// mismo valor en vez de repetirlo). El email de contacto de respaldo
-// coincide con el que ya está cargado en Sanity (settings.email) para
-// que nunca haya dos valores distintos dando vueltas -- el dominio del
-// correo (@getapropertypanama.com) NO se tocó acá porque es un tema de
-// buzón de correo real, no del sitio web. Instagram/Facebook NO se
-// hardcodean aquí -- ya están en Sanity (settings.social[]) y ese es
-// el origen de verdad; usa getSocialUrl()/similar en el sitio en vez
-// de estos campos si necesitas esas URLs.
+// mismo valor en vez de repetirlo).
+//
+// defaultContactEmail (y los otros "admin@..." repetidos como
+// respaldo en contact.js/AboutTeamSection.tsx/legalContent.js)
+// también se actualizaron al nuevo dominio (admin@getaproperty.com.pa,
+// set. 2026) a pedido del cliente. IMPORTANTE: esto es sólo el valor
+// de RESPALDO -- el que se ve hoy en el sitio en la mayoría de los
+// lugares viene de settings.email en Sanity (tiene prioridad sobre
+// este default), así que ese campo también hay que actualizarlo
+// manualmente en el Studio para que el sitio muestre el correo nuevo.
+// Y, fuera de este código: ese buzón (admin@getaproperty.com.pa) tiene
+// que existir y recibir correo de verdad antes de publicar este
+// cambio, o los mailto: de contacto/legal van a apuntar a una
+// dirección que rebota. Instagram/Facebook NO se hardcodean aquí -- ya
+// están en Sanity (settings.social[]) y ese es el origen de verdad;
+// usa getSocialUrl()/similar en el sitio en vez de estos campos si
+// necesitas esas URLs.
 
 import type { SiteKey } from "./siteContext";
 
@@ -68,8 +77,8 @@ const GET_A_PROPERTY: SiteProfile = {
   // -- se dejan sin definir para no duplicar/desincronizar ese dato.
   instagramUrl: undefined,
   twitterHandle: undefined,
-  // Debe coincidir con settings.email en Sanity (hoy: admin@getapropertypanama.com).
-  defaultContactEmail: "admin@getapropertypanama.com",
+  // Debe coincidir con settings.email en Sanity (hoy: admin@getaproperty.com.pa).
+  defaultContactEmail: "admin@getaproperty.com.pa",
 };
 
 const PROFILES: Record<SiteKey, SiteProfile> = {

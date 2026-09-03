@@ -86,7 +86,7 @@ const COPY: Record<string, { heading: string; description: string }> = {
 // no un placeholder inventado. Se usan cuando a un autor le falta el
 // email/teléfono/nombre, para que la tarjeta nunca quede con esos
 // datos vacíos.
-const DEFAULT_EMAIL = "admin@getapropertypanama.com";
+const DEFAULT_EMAIL = "admin@getaproperty.com.pa";
 const DEFAULT_PHONE = "+507 6652-5238";
 const DEFAULT_NAME: Record<string, string> = { es: "Equipo Get a Property", en: "Get a Property Team" };
 
