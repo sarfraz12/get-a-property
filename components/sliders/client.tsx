@@ -47,7 +47,7 @@ export default function ClientSlider ({lang, dataImage}:ClientSliderProps ) {
                                     // ningún lado hoy (quedó reemplazado por
                                     // infiniteSlider.tsx) -- se corrige igual por si se
                                     // vuelve a usar más adelante.
-                                    src={urlForImage(logo.image)?.src || "/images/logo.jpg"}
+                                    src={urlForImage(logo.image)?.src || "/images/logo.png"}
                                     alt={logo.imageAlt || "Get a Property"}
                                     fill
                                     style={{ objectFit: "cover" }} 

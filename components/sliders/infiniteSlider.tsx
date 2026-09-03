@@ -68,7 +68,7 @@ export default function InfiniteSlider({ dataImage }: ClientSliderProps) {
                   // urlForImage() devuelve undefined -- antes el
                   // respaldo era "/" (ruta inválida, rompe la imagen);
                   // ahora cae en un logo genérico real del sitio.
-                  src={urlForImage(item.image)?.src || "/images/logo.jpg"}
+                  src={urlForImage(item.image)?.src || "/images/logo.png"}
                   alt={item.imageAlt || "Get a Property"}
                   fill
                   className="object-contain"
