@@ -8,14 +8,25 @@
 // JSON-LD/Open Graph "de fábrica" de cada página.
 //
 // Dominio principal (a pedido del cliente, set. 2026):
-// https://getaproperty.com.pa -- getapropertypanama.com pasó a ser el
-// dominio secundario que redirecciona (301) hacia este en Vercel
-// (Project Settings -> Domains -> "Redirect to"), así que ya NO debe
-// aparecer como canónico/JSON-LD/sitemap. Si el negocio vuelve a
-// cambiar de dominio principal, este es el único lugar del código que
-// hace falta tocar (ver también metadataBase en
-// app/(website)/[lang]/layout.tsx, que ahora se arma a partir de este
-// mismo valor en vez de repetirlo).
+// https://www.getaproperty.com.pa -- CON "www". En Vercel,
+// www.getaproperty.com.pa quedó como el dominio de "Production" y
+// getaproperty.com.pa (sin www) redirige hacia él con un 308 (eso lo
+// configura Vercel solo, no es código) -- antes este archivo tenía la
+// versión SIN www, lo que hacía que el canonical/JSON-LD del sitio
+// apuntaran a una URL que en la práctica sólo redirige, mientras el
+// visitante real termina en la versión con www. Se alinea acá para
+// que canonical/JSON-LD/OG coincidan con la URL real donde vive el
+// sitio. getapropertypanama.com (el dominio viejo) es el que
+// redirecciona hacia este. Si el negocio vuelve a cambiar de dominio
+// principal, este es el único lugar del código que hace falta tocar
+// (ver también metadataBase en app/(website)/[lang]/layout.tsx, que
+// se arma a partir de este mismo valor en vez de repetirlo).
+//
+// IMPORTANTE, fuera de este código: la variable de entorno
+// NEXT_PUBLIC_SITE_URL en Vercel (la usan app/robots.ts y
+// app/sitemap.ts directamente, no leen este archivo) también debe ser
+// "https://www.getaproperty.com.pa" para que coincida -- confirmá que
+// quedó así en Project Settings -> Environment Variables.
 //
 // defaultContactEmail (y los otros "admin@..." repetidos como
 // respaldo en contact.js/AboutTeamSection.tsx/legalContent.js)
@@ -57,7 +68,7 @@ const GET_A_PROPERTY: SiteProfile = {
   siteKey: "get-a-property",
   siteName: "Get a Property",
   titleTemplate: "%s | Get a Property",
-  baseUrl: "https://getaproperty.com.pa",
+  baseUrl: "https://www.getaproperty.com.pa",
   defaultTitle: {
     es: "Get a Property | Bienes Raíces en Panamá",
     en: "Get a Property | Real Estate in Panama",
