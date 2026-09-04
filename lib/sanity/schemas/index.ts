@@ -9,6 +9,7 @@ import navbarData from './navbarData'
 import footerData from './footerData'
 import contactPage from './contactPage'
 import searchPage from './searchPage'
+import legalPage from './legalPage'
 
 
 
@@ -16,4 +17,5 @@ export const schemaTypes = [
      post, author, category, settings, blockContent, // default must not exclude
      landingPage, aboutPage, navbarData, footerData, // web customization
      contactPage, searchPage, // SEO editable de páginas sin documento propio
+     legalPage, // NUEVO: políticas/términos -- documentos con su propia página en /legal/{slug}
 ]

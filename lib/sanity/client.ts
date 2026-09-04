@@ -22,6 +22,9 @@ import {
   featuredCategoriesQuery,
   contactpagequery,
   searchpagequery,
+  legalpagequery,
+  legalpagepathquery,
+  alllegalpagesquery,
 } from "./groq";
 import {createClient } from "next-sanity";
 
@@ -69,7 +72,9 @@ type SanityTag =
   | "aboutPage"
   | "contactPage"
   | "searchPage"
-  | "landingPage";
+  | "landingPage"
+  | "legalPage"
+  | `legalPage:${string}`;
 
 async function sanityFetch<T = any>(
   query: string,
@@ -235,6 +240,24 @@ export async function getContactPage(lang: string) {
 // SEO editable desde Sanity para la página "Búsqueda" (documento
 // searchPage -- ver lib/sanity/schemas/searchPage.js). Mismo criterio
 // que getContactPage: objeto vacío si aún no existe el documento.
+// Páginas legales dinámicas (lib/sanity/schemas/legalPage.js) --
+// mismo patrón que getPostBySlug/getAllPostsSlugs arriba.
+export async function getLegalPageBySlug(slug: string, lang: string) {
+  return (
+    (await sanityFetch(legalpagequery, { slug, lang }, ["legalPage", `legalPage:${slug}`])) || null
+  );
+}
+
+export async function getAllLegalPageSlugs() {
+  const slugs = (await sanityFetch<any[]>(legalpagepathquery, {}, ["legalPage"])) || [];
+  return slugs.map((slug: any) => ({ slug }));
+}
+
+// Listado liviano para el pie de página (título + slug).
+export async function getAllLegalPages(lang: string) {
+  return (await sanityFetch(alllegalpagesquery, { lang }, ["legalPage"])) || [];
+}
+
 export async function getSearchPage(lang: string) {
   return (await sanityFetch(searchpagequery, { lang }, ["searchPage"])) || {};
 };

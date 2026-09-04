@@ -202,7 +202,7 @@ function FooterColumn({ items, lang, flat }) {
 }
 
 export default async function Footer(props) {
-  const { data = [], lang } = props;
+  const { data = [], lang, extraLegalLinks = [] } = props;
   const t = COPY[lang] || COPY.es;
   const logoSrc = props?.logo ? urlForImage(props.logo) : null;
 
@@ -330,6 +330,21 @@ export default async function Footer(props) {
                       className="text-xs font-semibold text-white/50 transition-colors hover:text-white"
                     >
                       {item.label}
+                    </Link>
+                  </li>
+                ))}
+                {/* Políticas adicionales creadas desde Sanity (legalPage --
+                    ver lib/sanity/schemas/legalPage.js). Se agregan DESPUÉS
+                    de los 3 links de siempre, sin tocarlos, para que el
+                    cliente pueda sumar las políticas que le pidan Google,
+                    Facebook, etc. sin que un desarrollador toque código. */}
+                {extraLegalLinks.map(item => (
+                  <li key={item.slug}>
+                    <Link
+                      href={`/${lang}/legal/${item.slug}`}
+                      className="text-xs font-semibold text-white/50 transition-colors hover:text-white"
+                    >
+                      {item.title}
                     </Link>
                   </li>
                 ))}

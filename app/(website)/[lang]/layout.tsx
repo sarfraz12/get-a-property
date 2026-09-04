@@ -5,7 +5,7 @@ import Footer from "@/components/navigation/footer";
 import { Backlink } from "@/components/navigation/backlink";
 import { Providers } from "./providers";
 import CookieNotice from "@/components/legal/CookieNotice";
-import { getSettings, getNavbarData, getFooterData, getLandingData } from "@/lib/sanity/client";
+import { getSettings, getNavbarData, getFooterData, getLandingData, getAllLegalPages } from "@/lib/sanity/client";
 import { getSiteKey } from "@/lib/siteContext";
 import { getSiteProfile } from "@/lib/siteConfig";
 import { urlForOgImage } from "@/lib/sanity/image";
@@ -191,6 +191,11 @@ export default async function RootLayout(
   const settings = await getSettings();
   const navData = await getNavbarData(params.lang);
   const footData = await getFooterData(params.lang);
+  // Políticas/términos dinámicos creados desde Sanity (legalPage --
+  // ver lib/sanity/schemas/legalPage.js). Se agregan al pie de página
+  // DESPUÉS de los 3 links legales de siempre (Términos/Privacidad/
+  // Cookies), ver components/navigation/footer.js.
+  const extraLegalPages = await getAllLegalPages(params.lang);
 
   // Datos estructurados (JSON-LD) sitewide: Organization/RealEstateAgent
   // + WebSite, la MISMA data en cada página (se renderiza acá, en el
@@ -254,7 +259,7 @@ export default async function RootLayout(
             {children}
             <Backlink linkValue={settings.url} />
           </Suspense>
-          <Footer lang={params.lang} data={footData} {...settings} />
+          <Footer lang={params.lang} data={footData} extraLegalLinks={extraLegalPages} {...settings} />
           <CookieNotice lang={params.lang} />
         </Providers>
       </body>
