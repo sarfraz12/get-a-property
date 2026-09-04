@@ -30,12 +30,12 @@ const COPY = {
   es: {
     description:
       "Bienes raíces en Panamá: casas, apartamentos y terrenos en venta y alquiler, con acompañamiento en cada paso.",
-    rights: "Hecho con ❤️ en Panamá.",
+    rights: "@copyright Solutekpty",
   },
   en: {
     description:
       "Real estate in Panama: houses, apartments, and land for sale and rent, with support at every step.",
-    rights: "Made with ❤️ in Panama.",
+    rights: "@copyright Solutekpty",
   },
 };
 
