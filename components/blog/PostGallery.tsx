@@ -25,7 +25,16 @@ import { createPortal } from "react-dom";
 import Image from "next/image";
 
 interface GalleryImage {
-  src: string;
+  // NUEVO: cada ítem de la galería ahora puede ser una foto (de
+  // siempre) o un video (ver lib/sanity/schemas/post.js -> gallery,
+  // mismo patrón que el carrusel del Hero -- hero.tsx). "src" es la
+  // foto en sí para mediaType "image", o la portada OPCIONAL para
+  // mediaType "video" (puede no venir -- ver renderMediaThumb más
+  // abajo, que ahí usa el propio <video> como miniatura).
+  mediaType?: "image" | "video";
+  src?: string;
+  videoUrl?: string;
+  videoMimeType?: string;
   alt?: string;
   key?: string | number;
 }
@@ -41,6 +50,50 @@ function CloseIcon() {
       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
     </svg>
   );
+}
+
+function PlayIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className="h-6 w-6 sm:h-7 sm:w-7">
+      <path d="M8 5.14v13.72c0 .8.87 1.29 1.56.87l10.99-6.86a1 1 0 0 0 0-1.7L9.56 4.27A1 1 0 0 0 8 5.14Z" />
+    </svg>
+  );
+}
+
+// Miniatura de un ítem de galería, foto O video (grilla y foto
+// principal comparten esta misma lógica). Un video sin portada
+// cargada usa el video mismo como miniatura (pausado, silencioso,
+// primer frame) en vez de quedar sin imagen -- siempre con el ícono
+// de "play" encima para que quede claro que es un video y no una foto.
+function MediaThumb({ item, className }: { item: GalleryImage; className: string }) {
+  const isVideo = item.mediaType === "video";
+
+  if (isVideo) {
+    return (
+      <>
+        {item.src ? (
+          <Image src={item.src} alt={item.alt || "Video"} fill sizes="(max-width: 640px) 33vw, 16vw" className={className} />
+        ) : item.videoUrl ? (
+          <video
+            src={item.videoUrl}
+            muted
+            playsInline
+            preload="metadata"
+            className={`h-full w-full ${className}`}
+          />
+        ) : null}
+        <span className="absolute inset-0 flex items-center justify-center bg-black/25 text-white transition-colors group-hover:bg-black/35">
+          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-black/50 backdrop-blur-sm">
+            <PlayIcon />
+          </span>
+        </span>
+      </>
+    );
+  }
+
+  return item.src ? (
+    <Image src={item.src} alt={item.alt || ""} fill sizes="(max-width: 640px) 33vw, 16vw" className={className} />
+  ) : null;
 }
 
 function ChevronIcon({ direction }: { direction: "left" | "right" }) {
@@ -66,7 +119,7 @@ export default function PostGallery({ mainImage, gallery = [] }: PostGalleryProp
   const allImages: GalleryImage[] = [
     ...(mainImage ? [mainImage] : []),
     ...gallery,
-  ].filter((img) => img?.src);
+  ].filter((item) => item?.src || item?.videoUrl);
 
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
@@ -114,14 +167,7 @@ export default function PostGallery({ mainImage, gallery = [] }: PostGalleryProp
           aria-label={mainImage.alt || "Ampliar foto"}
           className="group relative mt-12 aspect-[16/10] w-full cursor-zoom-in overflow-hidden rounded-3xl bg-gray-100 sm:aspect-[21/9]"
         >
-          <Image
-            src={mainImage.src}
-            alt={mainImage.alt || "Thumbnail"}
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
-          />
+          <MediaThumb item={mainImage} className="object-cover transition-transform duration-300 group-hover:scale-[1.02]" />
         </button>
       )}
 
@@ -136,13 +182,7 @@ export default function PostGallery({ mainImage, gallery = [] }: PostGalleryProp
               aria-label={img.alt || "Ampliar foto"}
               className="group relative aspect-square cursor-zoom-in overflow-hidden rounded-2xl bg-gray-100"
             >
-              <Image
-                src={img.src}
-                alt={img.alt || ""}
-                fill
-                sizes="(max-width: 640px) 33vw, 16vw"
-                className="object-cover transition-transform duration-300 group-hover:scale-105"
-              />
+              <MediaThumb item={img} className="object-cover transition-transform duration-300 group-hover:scale-105" />
             </button>
           ))}
         </div>
@@ -225,14 +265,29 @@ export default function PostGallery({ mainImage, gallery = [] }: PostGalleryProp
             className="relative h-full max-h-[85vh] w-full max-w-5xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <Image
-              src={activeImage.src}
-              alt={activeImage.alt || ""}
-              fill
-              sizes="100vw"
-              className="object-contain"
-              priority
-            />
+            {activeImage.mediaType === "video" && activeImage.videoUrl ? (
+              <video
+                key={activeImage.videoUrl}
+                src={activeImage.videoUrl}
+                controls
+                autoPlay
+                playsInline
+                className="h-full w-full object-contain"
+              >
+                {activeImage.videoMimeType && <source src={activeImage.videoUrl} type={activeImage.videoMimeType} />}
+              </video>
+            ) : (
+              activeImage.src && (
+                <Image
+                  src={activeImage.src}
+                  alt={activeImage.alt || ""}
+                  fill
+                  sizes="100vw"
+                  className="object-contain"
+                  priority
+                />
+              )
+            )}
           </div>
         </div>,
         document.body

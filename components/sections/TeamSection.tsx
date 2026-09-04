@@ -19,6 +19,7 @@
 // aparezca la sección completa en sí").
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import { cx } from "@/utils/all";
 import { useInView } from "@/lib/hooks/useInView";
@@ -59,7 +60,26 @@ function initialsOf(name: string) {
     .toUpperCase();
 }
 
-function TeamMemberCard({ member, index }: { member: TeamMember; index: number }) {
+function TeamMemberCard({
+  member,
+  index,
+  isSelected,
+  onToggle,
+}: {
+  member: TeamMember;
+  index: number;
+  // NUEVO (queja del cliente: "en formato mobile no se puede ver los
+  // datos del team"): el overlay con nombre/cargo/correo/teléfono
+  // antes SÓLO aparecía con "group-hover:opacity-100" -- en celular no
+  // hay cursor/hover, así que esos datos eran literalmente imposibles
+  // de ver ahí. "isSelected"/"onToggle" agregan una segunda forma de
+  // mostrarlo: tocar el círculo. TeamSection (más abajo) lleva cuál
+  // integrante está seleccionado -- uno solo a la vez, y "queda fijo"
+  // (visible) hasta que se toca otro o el mismo de nuevo, tal como lo
+  // pidió el cliente. El hover de escritorio se mantiene intacto.
+  isSelected: boolean;
+  onToggle: () => void;
+}) {
   // Cada tarjeta se anima al entrar en pantalla, con un pequeño delay
   // escalonado según su posición (mismo recurso que RecentPostsSection).
   const { ref, isVisible } = useInView<HTMLDivElement>();
@@ -73,7 +93,13 @@ function TeamMemberCard({ member, index }: { member: TeamMember; index: number }
         isVisible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"
       )}
     >
-      <div className="group relative aspect-square w-full max-w-[220px] overflow-hidden rounded-full shadow-sm transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg">
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-pressed={isSelected}
+        aria-label={`${member.name}${member.role ? `, ${member.role}` : ""}`}
+        className="group relative aspect-square w-full max-w-[220px] overflow-hidden rounded-full shadow-sm transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold"
+      >
         {/* Foto (o iniciales si no hay foto) */}
         {member.image ? (
           <Image
@@ -89,11 +115,15 @@ function TeamMemberCard({ member, index }: { member: TeamMember; index: number }
           </div>
         )}
 
-        {/* Overlay al pasar el cursor: nombre, cargo, correo y teléfono */}
+        {/* Overlay: nombre, cargo, correo y teléfono. Visible con el
+            cursor en escritorio (hover), O tocando el círculo en
+            cualquier pantalla (isSelected) -- así queda "fijo" hasta
+            que se elige otro integrante o se vuelve a tocar el mismo. */}
         <div
           className={cx(
             "absolute inset-0 flex flex-col items-center justify-center gap-1 rounded-full bg-black/80 px-4 text-center",
-            "opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+            "transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100",
+            isSelected ? "opacity-100" : "opacity-0"
           )}
         >
           <p className="text-base font-bold text-white">{member.name}</p>
@@ -103,12 +133,17 @@ function TeamMemberCard({ member, index }: { member: TeamMember; index: number }
           {member.email && <p className="mt-1 break-all text-xs text-white/80">{member.email}</p>}
           {member.phone && <p className="text-xs text-white/80">{member.phone}</p>}
         </div>
-      </div>
+      </button>
     </div>
   );
 }
 
 export default function TeamSection({ lang, title, description, team }: TeamSectionProps) {
+  // Un solo integrante "seleccionado" (tocado) a la vez -- ver
+  // TeamMemberCard arriba. null = ninguno tocado todavía (o se
+  // destocó el que estaba abierto).
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+
   // Sin integrantes reales cargados en Sanity, no se muestra el equipo
   // de ejemplo -- se oculta la sección completa.
   if (!team || team.length === 0) return null;
@@ -147,7 +182,13 @@ export default function TeamSection({ lang, title, description, team }: TeamSect
           deja que quepan menos por fila sin que se encimen. */}
       <div className="mx-auto mt-12 grid max-w-[724px] grid-cols-[repeat(auto-fit,minmax(160px,220px))] justify-center gap-x-8 gap-y-10">
         {team.map((member, index) => (
-          <TeamMemberCard key={`${member.name}-${index}`} member={member} index={index} />
+          <TeamMemberCard
+            key={`${member.name}-${index}`}
+            member={member}
+            index={index}
+            isSelected={selectedIndex === index}
+            onToggle={() => setSelectedIndex((current) => (current === index ? null : index))}
+          />
         ))}
       </div>
     </section>

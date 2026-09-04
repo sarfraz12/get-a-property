@@ -200,16 +200,36 @@ export default function Post(props) {
   // Fotos secundarias reales si existen; si no, se rellena con fotos
   // genéricas del sitio (ver PLACEHOLDER_GALLERY) para poder ver cómo
   // queda la fila de miniaturas mientras no se cargue una galería real.
+  // Cada ítem de la galería ahora puede ser una FOTO (type "image",
+  // como siempre) o un VIDEO (type "galleryVideo", ver
+  // lib/sanity/schemas/post.js -> gallery). PostGallery.tsx ya sabe
+  // renderizar ambos (mismo patrón que el carrusel del Hero -- ver
+  // hero.tsx) -- acá sólo se arma la lista con la forma que espera.
   const realGallery = (post?.gallery || [])
-    .map((img, index) => {
-      const galleryImage = urlForImage(img);
-      return galleryImage?.src ? { src: galleryImage.src, alt: img?.alt || `${post.title} ${index + 1}`, key: img?._key || index } : null;
+    .map((item, index) => {
+      const isVideo = item?._type === "galleryVideo";
+      if (isVideo) {
+        if (!item?.videoUrl) return null; // el editor eligió "Video" pero todavía no subió el archivo
+        const posterImage = item?.poster ? urlForImage(item.poster) : null;
+        return {
+          mediaType: "video",
+          videoUrl: item.videoUrl,
+          videoMimeType: item.videoMimeType,
+          src: posterImage?.src, // portada opcional (miniatura del lightbox/grilla)
+          alt: item?.alt || `${post.title} ${index + 1}`,
+          key: item?._key || index,
+        };
+      }
+      const galleryImage = urlForImage(item);
+      return galleryImage?.src
+        ? { mediaType: "image", src: galleryImage.src, alt: item?.alt || `${post.title} ${index + 1}`, key: item?._key || index }
+        : null;
     })
     .filter(Boolean);
   const gallery =
     realGallery.length > 0
       ? realGallery
-      : PLACEHOLDER_GALLERY.map((src, index) => ({ src, alt: `${post?.title || "Get a Property"} ${index + 1}`, key: src }));
+      : PLACEHOLDER_GALLERY.map((src, index) => ({ mediaType: "image", src, alt: `${post?.title || "Get a Property"} ${index + 1}`, key: src }));
 
   return (
     <Container large alt className="py-10 md:py-16">
