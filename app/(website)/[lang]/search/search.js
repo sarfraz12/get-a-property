@@ -51,12 +51,12 @@ export default function Search(props) {
       <Container>
         {!query && (
           <div className="flex items-center justify-center h-40">
-            <span className="text-lg text-gray-500">NO QUERY</span>
+            <span className="text-lg text-gray-500 dark:text-gray-400">NO QUERY</span>
           </div>
         )}
         {query && data?.length === 0 && (
           <div className="flex items-center justify-center h-40">
-            <span className="text-lg text-gray-500">
+            <span className="text-lg text-gray-500 dark:text-gray-400">
               No posts found for {query}. Try again!
             </span>
           </div>
@@ -64,7 +64,7 @@ export default function Search(props) {
         {query && !data && (
           <div className="flex items-center justify-center h-40">
             <svg
-              className="w-6 h-6 text-gray-500 animate-spin"
+              className="w-6 h-6 text-gray-500 dark:text-gray-400 animate-spin"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24">

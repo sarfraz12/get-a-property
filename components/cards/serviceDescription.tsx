@@ -91,20 +91,20 @@ export default function ServiceDescription({
             <h2 className="text-3xl font-extrabold sm:text-4xl">{finalTitle}</h2>
 
             <div style={{ whiteSpace: "pre-line" }} className="space-y-4">
-              <p className="text-lg leading-relaxed text-black/60">{finalDescription}</p>
+              <p className="text-lg leading-relaxed text-black/60 dark:text-white/60">{finalDescription}</p>
 
               {points && points.length > 0 && (
-                <ul className="space-y-3 border-t border-black/10 pt-4">
+                <ul className="space-y-3 border-t border-black/10 dark:border-white/10 pt-4">
                   {points.map((item: Point, index: number) => (
                     <li key={index} className="flex items-start gap-3">
                       <CheckCircleIcon className="mt-0.5 h-5 w-5 flex-shrink-0 text-brand-gold" />
-                      <span className="text-black/70">{item?.contentCardItemDescription}</span>
+                      <span className="text-black/70 dark:text-white/70">{item?.contentCardItemDescription}</span>
                     </li>
                   ))}
                 </ul>
               )}
 
-              {description2 && <p className="text-lg leading-relaxed text-black/60">{description2}</p>}
+              {description2 && <p className="text-lg leading-relaxed text-black/60 dark:text-white/60">{description2}</p>}
             </div>
           </div>
 

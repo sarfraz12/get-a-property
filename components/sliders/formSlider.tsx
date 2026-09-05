@@ -56,19 +56,19 @@ export default function FormSlider({
             <input
               type="text"
               placeholder="Nombre"
-              className="w-full rounded-2xl border border-black/15 bg-white/90 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-dark"
+              className="w-full rounded-2xl border border-black/15 bg-white/90 px-4 py-3 text-black focus:outline-none focus:ring-2 focus:ring-brand-dark dark:border-white/15 dark:bg-black/40 dark:text-white"
               required
             />
             <input
               type="text"
               placeholder="Apellido"
-              className="w-full rounded-2xl border border-black/15 bg-white/90 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-dark"
+              className="w-full rounded-2xl border border-black/15 bg-white/90 px-4 py-3 text-black focus:outline-none focus:ring-2 focus:ring-brand-dark dark:border-white/15 dark:bg-black/40 dark:text-white"
               required
             />
             <input
               type="email"
               placeholder="Email"
-              className="w-full rounded-2xl border border-black/15 bg-white/90 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-dark"
+              className="w-full rounded-2xl border border-black/15 bg-white/90 px-4 py-3 text-black focus:outline-none focus:ring-2 focus:ring-brand-dark dark:border-white/15 dark:bg-black/40 dark:text-white"
               required
             />
 

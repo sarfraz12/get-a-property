@@ -106,7 +106,7 @@ export default function PostContactForm({ lang, postTitle, authorName, postCateg
   }
 
   const inputClass =
-    "w-full rounded-full border border-black/15 bg-white px-5 py-3 text-sm text-black placeholder:text-black/40 outline-none transition-colors focus:border-black";
+    "w-full rounded-full border border-black/15 bg-white px-5 py-3 text-sm text-black placeholder:text-black/40 outline-none transition-colors focus:border-black dark:border-white/15 dark:bg-black dark:text-white dark:placeholder:text-white/40 dark:focus:border-white";
 
   return (
     <form onSubmit={handleSubmit} className="mt-6 space-y-3">
@@ -123,13 +123,13 @@ export default function PostContactForm({ lang, postTitle, authorName, postCateg
         placeholder={t.message}
         value={form.message}
         onChange={update("message")}
-        className="w-full rounded-2xl border border-black/15 bg-white px-5 py-4 text-sm text-black placeholder:text-black/40 outline-none transition-colors focus:border-black"
+        className="w-full rounded-2xl border border-black/15 bg-white px-5 py-4 text-sm text-black placeholder:text-black/40 outline-none transition-colors focus:border-black dark:border-white/15 dark:bg-black dark:text-white dark:placeholder:text-white/40 dark:focus:border-white"
       />
 
       <button
         type="submit"
         disabled={status === "sending"}
-        className="w-full rounded-full bg-black px-6 py-3.5 text-sm font-bold text-white transition-opacity hover:opacity-85 disabled:opacity-50"
+        className="w-full rounded-full bg-black px-6 py-3.5 text-sm font-bold text-white transition-opacity hover:opacity-85 disabled:opacity-50 dark:bg-white dark:text-black"
       >
         {status === "sending" ? t.sending : t.send}
       </button>

@@ -165,7 +165,7 @@ export default function PostGallery({ mainImage, gallery = [] }: PostGalleryProp
           type="button"
           onClick={() => setOpenIndex(0)}
           aria-label={mainImage.alt || "Ampliar foto"}
-          className="group relative mt-12 aspect-[16/10] w-full cursor-zoom-in overflow-hidden rounded-3xl bg-gray-100 sm:aspect-[21/9]"
+          className="group relative mt-12 aspect-[16/10] w-full cursor-zoom-in overflow-hidden rounded-3xl bg-gray-100 dark:bg-white/10 sm:aspect-[21/9]"
         >
           <MediaThumb item={mainImage} className="object-cover transition-transform duration-300 group-hover:scale-[1.02]" />
         </button>
@@ -180,7 +180,7 @@ export default function PostGallery({ mainImage, gallery = [] }: PostGalleryProp
               key={img.key ?? index}
               onClick={() => setOpenIndex(index + (mainImage ? 1 : 0))}
               aria-label={img.alt || "Ampliar foto"}
-              className="group relative aspect-square cursor-zoom-in overflow-hidden rounded-2xl bg-gray-100"
+              className="group relative aspect-square cursor-zoom-in overflow-hidden rounded-2xl bg-gray-100 dark:bg-white/10"
             >
               <MediaThumb item={img} className="object-cover transition-transform duration-300 group-hover:scale-105" />
             </button>

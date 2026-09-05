@@ -143,8 +143,8 @@ function FooterLink({ href, label, lang, external, button }) {
       rel={external ? "noopener" : undefined}
       className={
         button
-          ? "inline-flex items-center gap-2 rounded-full bg-black px-5 py-2.5 text-sm font-bold text-white transition-opacity hover:opacity-85"
-          : "text-[15px] font-bold text-black transition-opacity hover:opacity-60"
+          ? "inline-flex items-center gap-2 rounded-full bg-black px-5 py-2.5 text-sm font-bold text-white transition-opacity hover:opacity-85 dark:bg-white dark:text-black"
+          : "text-[15px] font-bold text-black transition-opacity hover:opacity-60 dark:text-white"
       }
     >
       {label}
@@ -210,7 +210,7 @@ export default async function Footer(props) {
   const [col1, col2, col3] = buckets;
 
   return (
-    <footer className="bg-brand-light">
+    <footer className="bg-brand-light dark:bg-black">
       <Container large alt className="py-16 md:py-20">
         {/* Una sola fila con 5 secciones. `items-start` fuerza a que
             las 5 arranquen exactamente en el mismo borde superior sin
@@ -222,7 +222,7 @@ export default async function Footer(props) {
           {/* 1) Newsletter arriba, descripción, logo al final */}
           <div className="flex flex-col">
             <NewsletterForm lang={lang} />
-            <p className="mt-6 max-w-xs text-sm leading-relaxed text-black/50">
+            <p className="mt-6 max-w-xs text-sm leading-relaxed text-black/50 dark:text-white/50">
               {t.description}
             </p>
 
@@ -232,7 +232,7 @@ export default async function Footer(props) {
                 como cierre de marca del footer. */}
             <Link
               href={`/${lang}`}
-              className="mt-10 inline-flex items-center gap-2.5 text-black"
+              className="mt-10 inline-flex items-center gap-2.5 text-black dark:text-white"
             >
               {logoSrc?.src ? (
                 <Image
@@ -243,7 +243,7 @@ export default async function Footer(props) {
                   className="h-14 w-auto object-contain md:h-16"
                 />
               ) : (
-                <span className="text-3xl font-extrabold tracking-tight text-black md:text-4xl">
+                <span className="text-3xl font-extrabold tracking-tight text-black dark:text-white md:text-4xl">
                   {props?.title}
                 </span>
               )}
@@ -257,7 +257,7 @@ export default async function Footer(props) {
 
           {/* 5) Contacto: correo / teléfono / dirección + redes */}
           <div>
-            <ul className="space-y-4 text-[15px] font-semibold text-black">
+            <ul className="space-y-4 text-[15px] font-semibold text-black dark:text-white">
               {props?.email && (
                 <li>
                   <a href={`mailto:${props.email}`} className="transition-opacity hover:opacity-60">
@@ -277,7 +277,7 @@ export default async function Footer(props) {
                   una dirección corta; se recorta a 3 líneas para que
                   no rompa el layout de la columna. */}
               {props?.address && (
-                <li className="line-clamp-3 max-w-[220px] font-normal text-black/70">
+                <li className="line-clamp-3 max-w-[220px] font-normal text-black/70 dark:text-white/70">
                   {props.address}
                 </li>
               )}
@@ -286,7 +286,7 @@ export default async function Footer(props) {
                   <Link
                     href={props.googleLink}
                     target="_blank"
-                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-black/70 transition-colors hover:text-black"
+                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-black/70 transition-colors hover:text-black dark:text-white/70 dark:hover:text-white"
                   >
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                     {props?.location}
@@ -299,7 +299,7 @@ export default async function Footer(props) {
               <ul className="mt-6 flex gap-3">
                 {props.social.map((item, index) => (
                   <li key={item.id || `${item.media}-${index}`}>
-                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-black/5 text-black transition-colors hover:bg-black hover:text-white [&_svg]:h-[1.15rem] [&_svg]:w-[1.15rem]">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-black/5 text-black transition-colors hover:bg-black hover:text-white [&_svg]:h-[1.15rem] [&_svg]:w-[1.15rem] dark:bg-white/10 dark:text-white dark:hover:bg-white dark:hover:text-black">
                       <SocialLink platform={item.media} link={item.url} />
                     </div>
                   </li>

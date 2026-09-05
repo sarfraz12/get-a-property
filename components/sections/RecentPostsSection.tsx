@@ -41,9 +41,9 @@ export default function RecentPostsSection({ posts, lang, limit = 6, excludeId, 
       <div className="mb-10 flex items-end justify-between gap-4">
         <h2 className="text-4xl font-extrabold sm:text-5xl">{heading}</h2>
 
-        <Link href={`/${lang}/all`} className="group inline-flex flex-shrink-0 items-center gap-2 text-base font-bold text-black">
+        <Link href={`/${lang}/all`} className="group inline-flex flex-shrink-0 items-center gap-2 text-base font-bold text-black dark:text-white">
           {lang === "en" ? "View all" : "Ver todo"}
-          <span className="flex h-8 w-8 items-center justify-center rounded-full border border-black transition-colors group-hover:bg-black group-hover:text-white">
+          <span className="flex h-8 w-8 items-center justify-center rounded-full border border-black transition-colors group-hover:bg-black group-hover:text-white dark:border-white dark:group-hover:bg-white dark:group-hover:text-black">
             &rarr;
           </span>
         </Link>

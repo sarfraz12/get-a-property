@@ -58,12 +58,12 @@ export default function TestimonialSection({
         >
           {testimonials?.map((t, idx) => (
             <SwiperSlide key={idx}>
-              <div className="relative mx-auto max-w-3xl rounded-3xl bg-white p-8 shadow-xl md:p-10">
+              <div className="relative mx-auto max-w-3xl rounded-3xl bg-white dark:bg-neutral-900 p-8 shadow-xl md:p-10">
                 <span className="text-4xl text-brand-gold" aria-hidden>
                   &#10077;
                 </span>
-                <p className="-mt-2 text-lg leading-relaxed text-gray-700">{t.quote}</p>
-                {t.author && <p className="mt-4 text-sm font-bold text-gray-900">— {t.author}</p>}
+                <p className="-mt-2 text-lg leading-relaxed text-gray-700 dark:text-white/70">{t.quote}</p>
+                {t.author && <p className="mt-4 text-sm font-bold text-gray-900 dark:text-white">— {t.author}</p>}
               </div>
             </SwiperSlide>
           ))}

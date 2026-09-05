@@ -47,7 +47,7 @@ export default function ComparisonCard({ title, category, color = "blue", link, 
   return (
     <Link
       href={link || "/"}
-      className="group flex items-center justify-between gap-4 rounded-2xl border border-black/5 bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
+      className="group flex items-center justify-between gap-4 rounded-2xl border border-black/5 bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg dark:border-white/10 dark:bg-neutral-900"
     >
       <div className="flex items-center gap-4">
         {/* Barra de acento */}
@@ -55,14 +55,14 @@ export default function ComparisonCard({ title, category, color = "blue", link, 
 
         <div className="text-left">
           {category && (
-            <p className="text-xs font-bold uppercase tracking-wide text-black/40">{category}</p>
+            <p className="text-xs font-bold uppercase tracking-wide text-black/40 dark:text-white/40">{category}</p>
           )}
           <p className={cx("text-base font-bold", ACCENT_TEXT[color] || ACCENT_TEXT.blue)}>{finalTitle}</p>
         </div>
       </div>
 
       {/* Botón flecha, mismo estilo que el CTA del Hero */}
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-black/10 text-black transition-colors group-hover:bg-black group-hover:text-white">
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-black/10 text-black transition-colors group-hover:bg-black group-hover:text-white dark:border-white/20 dark:text-white dark:group-hover:bg-white dark:group-hover:text-black">
         &rarr;
       </span>
     </Link>

@@ -164,7 +164,7 @@ export default function TeamSection({ lang, title, description, team }: TeamSect
       <div className="mx-auto max-w-3xl text-center">
         <h2 className="text-4xl font-extrabold sm:text-5xl">{finalTitle}</h2>
         {finalDescription && (
-          <p className="mt-6 text-lg leading-relaxed text-black/50">{finalDescription}</p>
+          <p className="mt-6 text-lg leading-relaxed text-black/50 dark:text-white/50">{finalDescription}</p>
         )}
       </div>
 

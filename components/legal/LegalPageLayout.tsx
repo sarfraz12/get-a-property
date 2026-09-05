@@ -42,18 +42,18 @@ export default function LegalPageLayout({ h1, intro, lastUpdatedLabel, sections,
   return (
     <Container large alt className="pb-16 pt-28 md:pb-24 md:pt-36">
       <div className="mx-auto max-w-3xl">
-        <h1 className="text-4xl font-black tracking-tight text-black sm:text-5xl">{h1}</h1>
+        <h1 className="text-4xl font-black tracking-tight text-black dark:text-white sm:text-5xl">{h1}</h1>
         {lastUpdatedLabel && (
-          <p className="mt-4 text-sm font-semibold text-black/50">{lastUpdatedLabel}</p>
+          <p className="mt-4 text-sm font-semibold text-black/50 dark:text-white/50">{lastUpdatedLabel}</p>
         )}
         {intro && (
-          <p className="mt-6 text-lg leading-relaxed text-black/70">{intro}</p>
+          <p className="mt-6 text-lg leading-relaxed text-black/70 dark:text-white/70">{intro}</p>
         )}
 
         {(sections?.length || body) && (
           <div
             className="prose prose-lg mt-10 max-w-none
-              prose-headings:font-extrabold prose-headings:text-black
+              prose-headings:font-extrabold prose-headings:text-black dark:prose-invert
               prose-p:leading-relaxed prose-p:text-black/70
               prose-a:font-semibold prose-a:text-brand-gold prose-a:no-underline hover:prose-a:underline
               prose-strong:font-bold prose-strong:text-black

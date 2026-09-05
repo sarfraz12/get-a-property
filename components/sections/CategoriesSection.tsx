@@ -63,7 +63,7 @@ export default function CategoriesSection({ categories, lang, limit = 3, title, 
       {/* Encabezado centrado */}
       <div className="mx-auto max-w-2xl text-center">
         <h2 className="text-4xl font-extrabold sm:text-5xl">{title ?? copy.title}</h2>
-        <p className="mt-4 text-black/50">{description ?? copy.description}</p>
+        <p className="mt-4 text-black/50 dark:text-white/50">{description ?? copy.description}</p>
       </div>
 
       {/* Tarjetas de categoría.
@@ -94,7 +94,7 @@ export default function CategoriesSection({ categories, lang, limit = 3, title, 
             <Link
               key={category._id}
               href={slug ? `/${lang}/${slug}` : "#"}
-              className="group relative flex aspect-square flex-col justify-end overflow-hidden rounded-xl bg-gray-100 shadow-sm sm:aspect-[4/5] sm:rounded-3xl"
+              className="group relative flex aspect-square flex-col justify-end overflow-hidden rounded-xl bg-gray-100 dark:bg-white/10 shadow-sm sm:aspect-[4/5] sm:rounded-3xl"
             >
               <Image
                 src={imageSrc}
