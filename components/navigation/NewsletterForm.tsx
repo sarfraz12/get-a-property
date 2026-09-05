@@ -78,7 +78,7 @@ export default function NewsletterForm({ lang }: NewsletterFormProps) {
     <div className="w-full max-w-sm">
       <form
         onSubmit={handleSubmit}
-        className="flex items-center gap-1 rounded-full border border-black/15 bg-white p-1.5 shadow-sm"
+        className="flex items-center gap-1 rounded-full border border-black/15 bg-white p-1.5 shadow-sm dark:border-white/15 dark:bg-black"
       >
         <input
           type="email"
@@ -86,12 +86,12 @@ export default function NewsletterForm({ lang }: NewsletterFormProps) {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder={t.placeholder}
-          className="w-full min-w-0 flex-1 truncate bg-transparent px-4 py-2 text-sm text-black placeholder:text-black/40 focus:outline-none"
+          className="w-full min-w-0 flex-1 truncate bg-transparent px-4 py-2 text-sm text-black placeholder:text-black/40 focus:outline-none dark:text-white dark:placeholder:text-white/40"
         />
         <button
           type="submit"
           disabled={status === "sending"}
-          className="flex-shrink-0 rounded-full bg-black px-5 py-2.5 text-sm font-bold text-white transition-opacity hover:opacity-85 disabled:opacity-50"
+          className="flex-shrink-0 rounded-full bg-black px-5 py-2.5 text-sm font-bold text-white transition-opacity hover:opacity-85 disabled:opacity-50 dark:bg-white dark:text-black"
         >
           {status === "sending" ? t.sending : t.button}
         </button>

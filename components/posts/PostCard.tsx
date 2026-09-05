@@ -175,7 +175,7 @@ export default function PostCard({ post, lang, index = 0, pathPrefix = "all" }: 
       {/* La imagen ES la tarjeta completa (fondo a todo lo alto/ancho).
           aspect-[4/3] (antes 4/5) -- pedido del usuario: tarjeta más
           ancha, menos vertical. */}
-      <div className="relative aspect-[3/2] w-full bg-gray-100">
+      <div className="relative aspect-[3/2] w-full bg-gray-100 dark:bg-white/10">
         {image && (
           <Image
             src={image.src}
@@ -202,27 +202,27 @@ export default function PostCard({ post, lang, index = 0, pathPrefix = "all" }: 
         />
 
         {/* Caja blanca flotando ADENTRO de la imagen, pegada abajo */}
-        <div className="absolute inset-x-5 bottom-5 rounded-2xl bg-white p-6 shadow-xl sm:inset-x-6 sm:bottom-6 sm:p-8">
+        <div className="absolute inset-x-5 bottom-5 rounded-2xl bg-white dark:bg-neutral-900 p-6 shadow-xl sm:inset-x-6 sm:bottom-6 sm:p-8">
           {/* Fila superior: izquierda (título + ubicación) / derecha
               separada -- precio si el post lo tiene, si no la fecha
               (mismo criterio que el recuadro gris de la página del
               post individual, ver postHome.js). */}
           <div className="flex items-center justify-between gap-4">
             <div className="min-w-0 flex-1">
-              <h3 className="line-clamp-2 text-lg font-extrabold text-black transition-colors group-hover:text-brand-gold sm:text-2xl">
+              <h3 className="line-clamp-2 text-lg font-extrabold text-black dark:text-white transition-colors group-hover:text-brand-gold sm:text-2xl">
                 {post.title}
               </h3>
               {post?.location && (
-                <p className="mt-2 text-sm font-semibold leading-snug text-black/50 sm:text-base">{post.location}</p>
+                <p className="mt-2 text-sm font-semibold leading-snug text-black/50 dark:text-white/50 sm:text-base">{post.location}</p>
               )}
             </div>
 
             {(post?.price || dateLabel) && (
-              <div className="flex-shrink-0 border-l border-black/10 pl-5 text-right sm:pl-6">
+              <div className="flex-shrink-0 border-l border-black/10 dark:border-white/10 pl-5 text-right sm:pl-6">
                 {post?.price ? (
-                  <span className="text-2xl font-extrabold text-black sm:text-3xl">{post.price}</span>
+                  <span className="text-2xl font-extrabold text-black dark:text-white sm:text-3xl">{post.price}</span>
                 ) : (
-                  <span className="text-2xl font-extrabold text-black sm:text-3xl">{dateLabel}</span>
+                  <span className="text-2xl font-extrabold text-black dark:text-white sm:text-3xl">{dateLabel}</span>
                 )}
               </div>
             )}
@@ -231,7 +231,7 @@ export default function PostCard({ post, lang, index = 0, pathPrefix = "all" }: 
           {/* Fila inferior: 3 puntos clave reales (con su ícono real)
               si el post los tiene, o -- de respaldo -- categoría /
               tiempo de lectura / fotos. */}
-          <div className="mt-5 flex items-center gap-4 overflow-hidden border-t border-black/10 pt-5 text-sm font-semibold text-black/70 sm:gap-6 sm:pt-6 sm:text-base">
+          <div className="mt-5 flex items-center gap-4 overflow-hidden border-t border-black/10 dark:border-white/10 pt-5 text-sm font-semibold text-black/70 dark:text-white/70 sm:gap-6 sm:pt-6 sm:text-base">
             {hasKeyItems ? (
               keyItems.map((item, i) => (
                 <span key={i} className="flex min-w-0 flex-1 items-center gap-1.5">

@@ -158,11 +158,11 @@ export default function Navbar({ lang, data, logo, logoalt, faviconLight, favico
   return (
     // sticky + shadow-sm + borde inferior sutil = navbar "flotante" tipo
     // real-estate template, en vez del borde superior negro grueso.
-    <nav className="sticky top-0 z-50 w-full bg-white">
+    <nav className="sticky top-0 z-50 w-full bg-white dark:bg-black">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-20 items-center justify-between">
           {/* Logo */}
-          <Link href={`/${lang}`} className="flex flex-shrink-0 items-center gap-3 text-black">
+          <Link href={`/${lang}`} className="flex flex-shrink-0 items-center gap-3 text-black dark:text-white">
             {activeLogoImage ? (
               <Image
                 {...(urlForImage(activeLogoImage) as ImageProps)}
@@ -194,7 +194,7 @@ export default function Navbar({ lang, data, logo, logoalt, faviconLight, favico
                     <PinLogoIcon />
                   );
                 })()}
-                <span className="text-2xl font-extrabold tracking-tight text-black md:text-3xl">
+                <span className="text-2xl font-extrabold tracking-tight text-black dark:text-white md:text-3xl">
                   {title}
                 </span>
               </>
@@ -212,7 +212,7 @@ export default function Navbar({ lang, data, logo, logoalt, faviconLight, favico
                   href={`/${lang}${item.href}`}
                   className={cx(
                     "text-[15px] font-semibold tracking-tight transition-colors",
-                    isActive(item.href) ? "text-black" : "text-black/60 hover:text-black"
+                    isActive(item.href) ? "text-black dark:text-white" : "text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white"
                   )}
                 >
                   {item.label}
@@ -227,7 +227,7 @@ export default function Navbar({ lang, data, logo, logoalt, faviconLight, favico
             <SmartLink
               href={shopLink}
               lang={lang}
-              className="rounded-full bg-black px-6 py-2.5 text-[14px] font-bold text-white transition-opacity hover:opacity-85"
+              className="rounded-full bg-black px-6 py-2.5 text-[14px] font-bold text-white transition-opacity hover:opacity-85 dark:bg-white dark:text-black"
             >
               {shopText}
             </SmartLink>
@@ -239,7 +239,7 @@ export default function Navbar({ lang, data, logo, logoalt, faviconLight, favico
             aria-label={mobileOpen ? "Cerrar menú" : "Abrir menú"}
             aria-expanded={mobileOpen}
             onClick={() => setMobileOpen((v) => !v)}
-            className="inline-flex items-center justify-center rounded-full p-2 text-black focus:outline-none focus-visible:ring-2 focus-visible:ring-black md:hidden"
+            className="inline-flex items-center justify-center rounded-full p-2 text-black focus:outline-none focus-visible:ring-2 focus-visible:ring-black md:hidden dark:text-white dark:focus-visible:ring-white"
           >
             <MenuIcon open={mobileOpen} />
           </button>
@@ -248,7 +248,7 @@ export default function Navbar({ lang, data, logo, logoalt, faviconLight, favico
 
       {/* Panel móvil (accordion, misma lógica de antes) */}
       <div
-        className="grid overflow-hidden border-t border-black/10 bg-white transition-[grid-template-rows] duration-300 ease-in-out md:hidden"
+        className="grid overflow-hidden border-t border-black/10 bg-white transition-[grid-template-rows] duration-300 ease-in-out md:hidden dark:border-white/10 dark:bg-black"
         style={{ gridTemplateRows: mobileOpen ? "1fr" : "0fr" }}
       >
         <div className="min-h-0">
@@ -262,7 +262,7 @@ export default function Navbar({ lang, data, logo, logoalt, faviconLight, favico
                   href={`/${lang}${item.href}`}
                   className={cx(
                     "block py-2.5 text-[17px] font-bold tracking-tight transition-colors",
-                    isActive(item.href) ? "text-black" : "text-black/70 hover:text-black"
+                    isActive(item.href) ? "text-black dark:text-white" : "text-black/70 hover:text-black dark:text-white/70 dark:hover:text-white"
                   )}
                 >
                   {item.label}
@@ -277,7 +277,7 @@ export default function Navbar({ lang, data, logo, logoalt, faviconLight, favico
             <SmartLink
               href={shopLink}
               lang={lang}
-              className="mt-3 block w-full rounded-full bg-black px-6 py-3 text-center text-[15px] font-bold text-white transition-opacity hover:opacity-85"
+              className="mt-3 block w-full rounded-full bg-black px-6 py-3 text-center text-[15px] font-bold text-white transition-opacity hover:opacity-85 dark:bg-white dark:text-black"
             >
               {shopText}
             </SmartLink>
@@ -305,7 +305,7 @@ function DesktopDropdown({ item, lang, isActive }: any) {
         onClick={() => setOpen((v) => !v)}
         className={cx(
           "flex items-center gap-1 text-[15px] font-semibold tracking-tight transition-colors",
-          isActive(item.href) ? "text-black" : "text-black/60 hover:text-black"
+          isActive(item.href) ? "text-black dark:text-white" : "text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white"
         )}
       >
         {item.label}
@@ -315,7 +315,7 @@ function DesktopDropdown({ item, lang, isActive }: any) {
       <div
         role="menu"
         className={cx(
-          "absolute left-1/2 z-20 mt-3 w-44 -translate-x-1/2 rounded-2xl border border-black/10 bg-white p-1.5 shadow-xl transition-all duration-150",
+          "absolute left-1/2 z-20 mt-3 w-44 -translate-x-1/2 rounded-2xl border border-black/10 bg-white p-1.5 shadow-xl transition-all duration-150 dark:border-white/10 dark:bg-black",
           open ? "translate-y-0 scale-100 opacity-100" : "pointer-events-none -translate-y-1 scale-95 opacity-0"
         )}
       >
@@ -325,7 +325,7 @@ function DesktopDropdown({ item, lang, isActive }: any) {
             href={`/${lang}${child.path}`}
             role="menuitem"
             onClick={() => setOpen(false)}
-            className="block rounded-xl px-3 py-2 text-sm font-bold text-black/80 transition-colors hover:bg-black/5 hover:text-black"
+            className="block rounded-xl px-3 py-2 text-sm font-bold text-black/80 transition-colors hover:bg-black/5 hover:text-black dark:text-white/80 dark:hover:bg-white/10 dark:hover:text-white"
           >
             {child.title}
           </Link>
@@ -348,7 +348,7 @@ function MobileDropdown({ item, lang }: any) {
         type="button"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center justify-between py-2.5 text-[17px] font-bold tracking-tight text-black/80 transition-colors hover:text-black"
+        className="flex w-full items-center justify-between py-2.5 text-[17px] font-bold tracking-tight text-black/80 transition-colors hover:text-black dark:text-white/80 dark:hover:text-white"
       >
         {item.label}
         <ChevronIcon open={open} />
@@ -363,7 +363,7 @@ function MobileDropdown({ item, lang }: any) {
             <Link
               key={idx}
               href={`/${lang}${child.path}`}
-              className="block py-2 text-[16px] font-bold text-black/70 transition-colors hover:text-black"
+              className="block py-2 text-[16px] font-bold text-black/70 transition-colors hover:text-black dark:text-white/70 dark:hover:text-white"
             >
               {child.title}
             </Link>

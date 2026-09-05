@@ -37,7 +37,7 @@ export default function CardIcon({ data, lang }) {
   const description = data?.description || defaults.description;
 
   return (
-    <div className="group flex h-full flex-col rounded-2xl border border-black/5 bg-white p-6 shadow-sm transition-shadow duration-300 hover:shadow-lg dark:bg-slate-800">
+    <div className="group flex h-full flex-col rounded-2xl border border-black/5 bg-white p-6 shadow-sm transition-shadow duration-300 hover:shadow-lg dark:border-white/10 dark:bg-slate-800">
       {/* Ícono dentro de un círculo con el color de marca */}
       <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-brand-gold/15">
         <CardIconGraphic icon={data?.iconString} />
@@ -52,7 +52,7 @@ export default function CardIcon({ data, lang }) {
           <a
             href={data.link}
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-full bg-black/5 px-4 py-2 text-xs font-bold uppercase tracking-wide text-gray-900 transition-colors hover:bg-black/10 dark:text-white"
+            className="inline-flex items-center gap-2 rounded-full bg-black/5 px-4 py-2 text-xs font-bold uppercase tracking-wide text-gray-900 transition-colors hover:bg-black/10 dark:bg-white/10 dark:text-white dark:hover:bg-white/20"
           >
             {lang === "en" ? "Visit link" : "Visitar enlace"}
             <span aria-hidden>&rarr;</span>
@@ -64,7 +64,7 @@ export default function CardIcon({ data, lang }) {
             href={data.attachmentUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-full bg-black/5 px-4 py-2 text-xs font-bold uppercase tracking-wide text-gray-900 transition-colors hover:bg-black/10 dark:text-white"
+            className="inline-flex items-center gap-2 rounded-full bg-black/5 px-4 py-2 text-xs font-bold uppercase tracking-wide text-gray-900 transition-colors hover:bg-black/10 dark:bg-white/10 dark:text-white dark:hover:bg-white/20"
           >
             {lang === "en" ? "Download file" : "Descargar archivo"}
             <span aria-hidden>&rarr;</span>

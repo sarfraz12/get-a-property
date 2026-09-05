@@ -21,8 +21,8 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
           className={cx(
             "flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold transition-colors",
             page === currentPage
-              ? "bg-black text-white"
-              : "bg-black/5 text-black hover:bg-black/10"
+              ? "bg-black text-white dark:bg-white dark:text-black"
+              : "bg-black/5 text-black hover:bg-black/10 dark:bg-white/10 dark:text-white dark:hover:bg-white/20"
           )}
         >
           {page}

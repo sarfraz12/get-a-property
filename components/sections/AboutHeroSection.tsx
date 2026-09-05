@@ -70,15 +70,15 @@ export default function AboutHeroSection({ lang, title, description, stats, imag
       <div className="grid gap-12 lg:grid-cols-2 lg:items-start">
         {/* Título + cifras */}
         <div>
-          <h1 className="max-w-xl text-4xl font-black leading-[0.95] tracking-tight text-black sm:text-5xl md:text-6xl lg:text-7xl">
+          <h1 className="max-w-xl text-4xl font-black leading-[0.95] tracking-tight text-black dark:text-white sm:text-5xl md:text-6xl lg:text-7xl">
             {title || t.title}
           </h1>
 
           <div className="mt-10 flex flex-wrap gap-10">
             {finalStats.map((stat, index) => (
               <div key={stat.label || index}>
-                <p className="text-sm font-semibold text-black/50">{stat.label}</p>
-                <p className="mt-1 text-4xl font-extrabold text-black sm:text-5xl">{stat.value}</p>
+                <p className="text-sm font-semibold text-black/50 dark:text-white/50">{stat.label}</p>
+                <p className="mt-1 text-4xl font-extrabold text-black dark:text-white sm:text-5xl">{stat.value}</p>
               </div>
             ))}
           </div>
@@ -86,7 +86,7 @@ export default function AboutHeroSection({ lang, title, description, stats, imag
 
         {/* Descripción */}
         <div className="lg:pt-2">
-          <p className="max-w-lg text-base leading-relaxed text-black/60 sm:text-lg">
+          <p className="max-w-lg text-base leading-relaxed text-black/60 dark:text-white/60 sm:text-lg">
             {description || t.description}
           </p>
         </div>
@@ -94,7 +94,7 @@ export default function AboutHeroSection({ lang, title, description, stats, imag
 
       {/* Foto de banner: real de Sanity (aboutPage.heroImage) si se
           cargó una; si no, la foto de respaldo que ya tenía la página. */}
-      <div className="relative mt-14 aspect-[16/9] w-full overflow-hidden rounded-3xl bg-gray-100 sm:aspect-[21/9]">
+      <div className="relative mt-14 aspect-[16/9] w-full overflow-hidden rounded-3xl bg-gray-100 dark:bg-white/10 sm:aspect-[21/9]">
         <Image
           src={bannerImage?.src || "/images/lotes-frente-playa.webp"}
           alt={bannerAlt}

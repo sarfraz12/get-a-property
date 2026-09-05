@@ -86,10 +86,10 @@ function InfoItem({ icon: Icon, label, children }) {
   return (
     <div>
       <div className="flex items-center gap-3">
-        <Icon className="h-6 w-6 flex-shrink-0 text-black" />
-        <p className="text-xl font-extrabold text-black sm:text-2xl">{label}</p>
+        <Icon className="h-6 w-6 flex-shrink-0 text-black dark:text-white" />
+        <p className="text-xl font-extrabold text-black dark:text-white sm:text-2xl">{label}</p>
       </div>
-      <div className="mt-2 pl-9 text-[15px] text-black/60">{children}</div>
+      <div className="mt-2 pl-9 text-[15px] text-black/60 dark:text-white/60">{children}</div>
     </div>
   );
 }
@@ -121,10 +121,10 @@ export default function Contact({ settings, lang }) {
           formulario a la derecha. */}
       <div className="mt-16 grid gap-10 lg:grid-cols-2 lg:gap-16">
         <div>
-          <h2 className="text-3xl font-extrabold tracking-tight text-black sm:text-4xl">
+          <h2 className="text-3xl font-extrabold tracking-tight text-black dark:text-white sm:text-4xl">
             {t.sectionTitle}
           </h2>
-          <p className="mt-4 max-w-md text-black/60">{sectionDescription}</p>
+          <p className="mt-4 max-w-md text-black/60 dark:text-white/60">{sectionDescription}</p>
 
           <div className="mt-10 space-y-8">
             <InfoItem icon={EnvelopeIcon} label={t.emailLabel}>
@@ -154,7 +154,7 @@ export default function Contact({ settings, lang }) {
             <ul className="mt-10 flex gap-3">
               {settings.social.map((item, index) => (
                 <li key={item.id || `${item.media}-${index}`}>
-                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-black/5 text-black transition-colors hover:bg-black hover:text-white [&_svg]:h-[1.15rem] [&_svg]:w-[1.15rem]">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-black/5 text-black transition-colors hover:bg-black hover:text-white [&_svg]:h-[1.15rem] [&_svg]:w-[1.15rem] dark:bg-white/10 dark:text-white dark:hover:bg-white dark:hover:text-black">
                     <SocialLink platform={item.media} link={item.url} />
                   </div>
                 </li>
@@ -162,11 +162,11 @@ export default function Contact({ settings, lang }) {
             </ul>
           )}
 
-          <p className="mt-10 text-sm text-black/50">
+          <p className="mt-10 text-sm text-black/50 dark:text-white/50">
             {t.questionsText}{" "}
             <a
               href={`mailto:${email}`}
-              className="font-bold text-black underline decoration-black/20 underline-offset-4 hover:opacity-60"
+              className="font-bold text-black underline decoration-black/20 underline-offset-4 hover:opacity-60 dark:text-white dark:decoration-white/20"
             >
               {t.questionsLink}
             </a>
@@ -181,8 +181,8 @@ export default function Contact({ settings, lang }) {
           (settings.googleIframe), sólo con un contenedor nuevo. */}
       <div className="mt-16">
         <p className="text-xs font-bold uppercase tracking-widest text-brand-gold">{t.mapEyebrow}</p>
-        <h3 className="mt-2 text-2xl font-extrabold text-black sm:text-3xl">{t.mapTitle}</h3>
-        <div className="mt-6 overflow-hidden rounded-3xl border border-black/10">
+        <h3 className="mt-2 text-2xl font-extrabold text-black dark:text-white sm:text-3xl">{t.mapTitle}</h3>
+        <div className="mt-6 overflow-hidden rounded-3xl border border-black/10 dark:border-white/10">
           <iframe
             className="h-80 w-full sm:h-96"
             src={googleIframe}

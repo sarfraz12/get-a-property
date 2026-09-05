@@ -35,7 +35,7 @@ export default function CertificationLogosSection({ title, logos = [] }) {
           {logos.map((logo, index) => (
             <div
               key={logo?._key || index}
-              className="flex h-40 w-56 items-center justify-center rounded-2xl border border-black/5 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:bg-neutral-800"
+              className="flex h-40 w-56 items-center justify-center rounded-2xl border border-black/5 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-white/10 dark:bg-neutral-800"
             >
               <div className="relative h-full w-full">
                 <Image

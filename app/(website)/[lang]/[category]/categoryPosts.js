@@ -160,10 +160,10 @@ export default function CategoryPosts(props) {
                 <li key={item._id}>
                   <Link
                     href={`${!lang ? "" : "/" + lang}/${getCategorySlug(item)}`}
-                    className="group inline-flex items-center gap-2 rounded-full bg-black/5 px-4 py-2 text-sm font-bold text-black transition-colors hover:bg-black hover:text-white"
+                    className="group inline-flex items-center gap-2 rounded-full bg-black/5 px-4 py-2 text-sm font-bold text-black transition-colors hover:bg-black hover:text-white dark:bg-white/10 dark:text-white dark:hover:bg-white dark:hover:text-black"
                   >
                     {item.title}
-                    <span className="text-black/40 transition-colors group-hover:text-white/70">
+                    <span className="text-black/40 transition-colors group-hover:text-white/70 dark:text-white/40 dark:group-hover:text-black/70">
                       {item.count}
                     </span>
                   </Link>
@@ -178,14 +178,14 @@ export default function CategoryPosts(props) {
           múltiple con checkboxes, sincronizados con la URL. Sólo se
           muestra un grupo si hay al menos 1 categoría real con ese tipo. */}
       {activeGroups.length > 0 && (
-        <div className="mt-10 rounded-3xl border border-black/10 p-6">
+        <div className="mt-10 rounded-3xl border border-black/10 dark:border-white/10 p-6">
           <div className="flex items-center justify-between">
             <p className="text-xs font-bold uppercase tracking-widest text-brand-gold">{t.filters}</p>
             {filtersActive && (
               <button
                 type="button"
                 onClick={clearFilters}
-                className="text-xs font-bold text-black/50 underline-offset-2 hover:text-black hover:underline"
+                className="text-xs font-bold text-black/50 underline-offset-2 hover:text-black hover:underline dark:text-white/50 dark:hover:text-white"
               >
                 {t.clearFilters}
               </button>
@@ -198,7 +198,7 @@ export default function CategoryPosts(props) {
               const options = categoryGroups[key];
               return (
                 <div key={key}>
-                  <p className="text-sm font-bold text-black">{meta.label[lang === "en" ? "en" : "es"]}</p>
+                  <p className="text-sm font-bold text-black dark:text-white">{meta.label[lang === "en" ? "en" : "es"]}</p>
                   <ul className="mt-2 flex flex-wrap gap-2">
                     {options.map((category) => {
                       const slug = getCategorySlug(category);
@@ -212,7 +212,7 @@ export default function CategoryPosts(props) {
                             aria-pressed={checked}
                             className={
                               "inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold transition-colors " +
-                              (checked ? "bg-black text-white" : "bg-black/5 text-black hover:bg-black/10")
+                              (checked ? "bg-black text-white dark:bg-white dark:text-black" : "bg-black/5 text-black hover:bg-black/10 dark:bg-white/10 dark:text-white dark:hover:bg-white/20")
                             }
                           >
                             {category.title || slug}
@@ -229,7 +229,7 @@ export default function CategoryPosts(props) {
       )}
 
       {/* Contador */}
-      <p className="mt-12 text-sm font-semibold text-black/50">
+      <p className="mt-12 text-sm font-semibold text-black/50 dark:text-white/50">
         {filteredPosts.length} {t.posts}
       </p>
 

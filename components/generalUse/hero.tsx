@@ -703,26 +703,26 @@ export default function Hero({
   }
 
   return (
-    <section className="w-full bg-white">
+    <section className="w-full bg-white dark:bg-black">
       <Container alt className="pb-8 pt-14 md:pt-20">
         {/* Encabezado: título grande a la izquierda, descripción + CTA a la derecha */}
         <div className="mb-8 flex flex-col gap-6 md:mb-10 md:flex-row md:items-end md:justify-between md:gap-10">
           <h1
             style={{ whiteSpace: "pre-line" }}
-            className="max-w-3xl text-[2.75rem] font-light leading-[0.95] tracking-tight text-black sm:text-6xl md:text-7xl lg:text-8xl"
+            className="max-w-3xl text-[2.75rem] font-light leading-[0.95] tracking-tight text-black dark:text-white sm:text-6xl md:text-7xl lg:text-8xl"
           >
             {finalTitle}
           </h1>
 
           <div className="flex max-w-sm flex-col items-start gap-4 text-left">
-            <p className="line-clamp-3 font-bold text-base leading-relaxed text-black/50 sm:text-lg">{finalDescription}</p>
+            <p className="line-clamp-3 font-bold text-base leading-relaxed text-black/50 dark:text-white/60 sm:text-lg">{finalDescription}</p>
             {finalButtonText && (
               <Link
                 href={finalButtonLink}
-                className="group inline-flex items-center gap-2 text-base font-bold text-black"
+                className="group inline-flex items-center gap-2 text-base font-bold text-black dark:text-white"
               >
                 {finalButtonText}
-                <span className="flex h-7 w-7 items-center justify-center rounded-full border border-black transition-colors group-hover:bg-black group-hover:text-white">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full border border-black transition-colors group-hover:bg-black group-hover:text-white dark:border-white dark:group-hover:bg-white dark:group-hover:text-black">
                   <ArrowRightIcon className="h-3.5 w-3.5" />
                 </span>
               </Link>

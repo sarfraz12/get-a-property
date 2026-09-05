@@ -56,12 +56,12 @@ export default function ComparisonSection({ data, lang }: Props) {
           {lang === "en" ? "What we offer" : "Lo que ofrecemos"}
         </span>
         <h2 className="mt-3 text-2xl font-extrabold md:text-4xl">{data?.title || defaults.title}</h2>
-        <p className="mt-4 text-black/50 md:text-lg">{data?.description || defaults.description}</p>
+        <p className="mt-4 text-black/50 dark:text-white/50 md:text-lg">{data?.description || defaults.description}</p>
 
         {data?.linkPath && (
           <Link
             href={data.linkPath}
-            className="mt-6 inline-flex items-center gap-2 rounded-full border border-black px-5 py-2.5 text-sm font-bold text-black transition-colors hover:bg-black hover:text-white"
+            className="mt-6 inline-flex items-center gap-2 rounded-full border border-black px-5 py-2.5 text-sm font-bold text-black transition-colors hover:bg-black hover:text-white dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-black"
           >
             {data?.linkText} <span aria-hidden>&rarr;</span>
           </Link>
@@ -84,7 +84,7 @@ export default function ComparisonSection({ data, lang }: Props) {
         {data?.items?.length > 3 && (
           <button
             onClick={() => setShowAll(!showAll)}
-            className="mt-2 inline-flex items-center gap-2 rounded-full bg-black/5 px-5 py-2.5 text-sm font-bold text-black transition-colors hover:bg-black/10"
+            className="mt-2 inline-flex items-center gap-2 rounded-full bg-black/5 px-5 py-2.5 text-sm font-bold text-black transition-colors hover:bg-black/10 dark:bg-white/10 dark:text-white dark:hover:bg-white/20"
           >
             {showAll
               ? lang === "en" ? "Show less" : "Mostrar menos"

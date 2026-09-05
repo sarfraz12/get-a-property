@@ -72,7 +72,7 @@ export default function ProcessSection({ lang, heading, description, items, imag
       <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
         {/* Foto: real de Sanity (aboutPage.processImage) si se cargó
             una; si no, la foto de respaldo que ya tenía la página. */}
-        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-gray-100">
+        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-gray-100 dark:bg-white/10">
           <Image
             src={processImage?.src || "/images/asset.jpg"}
             alt={image?.alt || "Get a Property"}
@@ -83,17 +83,17 @@ export default function ProcessSection({ lang, heading, description, items, imag
         </div>
 
         <div>
-          <h2 className="max-w-md text-3xl font-extrabold leading-tight tracking-tight text-black sm:text-4xl md:text-5xl">
+          <h2 className="max-w-md text-3xl font-extrabold leading-tight tracking-tight text-black dark:text-white sm:text-4xl md:text-5xl">
             {finalHeading}
           </h2>
-          <p className="mt-5 max-w-lg text-base leading-relaxed text-black/60 sm:text-lg">{finalDescription}</p>
+          <p className="mt-5 max-w-lg text-base leading-relaxed text-black/60 dark:text-white/60 sm:text-lg">{finalDescription}</p>
 
           <div className="mt-8 grid grid-cols-1 gap-x-10 gap-y-3 sm:grid-cols-2">
             {columns.map((column, colIndex) => (
               <ul key={colIndex} className="space-y-3">
                 {column.map((item, itemIndex) => (
-                  <li key={itemIndex} className="flex items-center gap-3 text-sm font-semibold text-black sm:text-base">
-                    <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-black text-white">
+                  <li key={itemIndex} className="flex items-center gap-3 text-sm font-semibold text-black dark:text-white sm:text-base">
+                    <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-black text-white dark:bg-white dark:text-black">
                       <CheckIcon />
                     </span>
                     {item}

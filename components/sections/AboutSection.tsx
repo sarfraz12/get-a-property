@@ -113,7 +113,7 @@ export default function AboutSection({
         <div>
           {title && <h2 className="text-4xl font-extrabold sm:text-5xl">{title}</h2>}
           {finalParagraphs.length > 0 && (
-            <div className="mt-5 max-w-xl space-y-4 text-black/50">
+            <div className="mt-5 max-w-xl space-y-4 text-black/50 dark:text-white/50">
               {finalParagraphs.map((paragraph, index) => (
                 <p key={index}>{paragraph}</p>
               ))}
@@ -126,7 +126,7 @@ export default function AboutSection({
             <div className="grid grid-cols-3 gap-6 sm:gap-10">
               {finalStats.map((stat, index) => (
                 <div key={index}>
-                  <p className="text-sm font-semibold text-black/40">{stat.label}</p>
+                  <p className="text-sm font-semibold text-black/40 dark:text-white/40">{stat.label}</p>
                   <p className="mt-2 text-4xl font-extrabold sm:text-6xl">{stat.value}</p>
                 </div>
               ))}
@@ -136,7 +136,7 @@ export default function AboutSection({
           {buttonText && (
             <Link
               href={finalButtonLink}
-              className="mt-6 inline-flex items-center rounded-full bg-black px-6 py-3 text-sm font-bold text-white transition-opacity hover:opacity-85"
+              className="mt-6 inline-flex items-center rounded-full bg-black px-6 py-3 text-sm font-bold text-white transition-opacity hover:opacity-85 dark:bg-white dark:text-black"
             >
               {buttonText}
             </Link>

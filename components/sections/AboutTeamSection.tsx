@@ -41,7 +41,7 @@ interface AboutTeamSectionProps {
 const ACCENTS = [
   { ring: "border-brand-dark/25", bg: "bg-brand-dark/5", text: "text-brand-dark" },
   { ring: "border-brand-gold/50", bg: "bg-brand-gold/10", text: "text-brand-gold" },
-  { ring: "border-black/20", bg: "bg-black/5", text: "text-black" },
+  { ring: "border-black/20 dark:border-white/30", bg: "bg-black/5 dark:bg-white/10", text: "text-black dark:text-white" },
   { ring: "border-brand-dark/25", bg: "bg-brand-dark/5", text: "text-brand-dark" },
 ];
 
@@ -142,8 +142,8 @@ export default function AboutTeamSection({ lang, authors = [], heading, descript
   return (
     <Container large alt className="pb-20 md:pb-28">
       <div className="text-center">
-        <h2 className="text-3xl font-extrabold tracking-tight text-black sm:text-4xl md:text-5xl">{finalHeading}</h2>
-        <p className="mt-3 text-base text-black/50">{finalDescription}</p>
+        <h2 className="text-3xl font-extrabold tracking-tight text-black dark:text-white sm:text-4xl md:text-5xl">{finalHeading}</h2>
+        <p className="mt-3 text-base text-black/50 dark:text-white/50">{finalDescription}</p>
       </div>
 
       <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -152,7 +152,7 @@ export default function AboutTeamSection({ lang, authors = [], heading, descript
           return (
             <div
               key={author._id}
-              className="rounded-2xl border border-black/10 bg-white p-7 transition-shadow hover:shadow-lg"
+              className="rounded-2xl border border-black/10 bg-white p-7 transition-shadow hover:shadow-lg dark:border-white/10 dark:bg-neutral-900"
             >
               {/* Distintivo: círculo con las iniciales, no una foto */}
               <div
@@ -161,15 +161,15 @@ export default function AboutTeamSection({ lang, authors = [], heading, descript
                 {initialsOf(author.name)}
               </div>
 
-              <p className="mt-5 truncate text-lg font-bold text-black">{author.name}</p>
-              {author.role && <p className="text-sm text-black/50">{author.role}</p>}
+              <p className="mt-5 truncate text-lg font-bold text-black dark:text-white">{author.name}</p>
+              {author.role && <p className="text-sm text-black/50 dark:text-white/50">{author.role}</p>}
 
               {(author.email || author.phone) && (
-                <div className="mt-4 space-y-1.5 border-t border-black/10 pt-4">
+                <div className="mt-4 space-y-1.5 border-t border-black/10 dark:border-white/10 pt-4">
                   {author.email && (
                     <a
                       href={`mailto:${author.email}`}
-                      className="flex items-center gap-1.5 truncate text-xs text-black/50 transition-colors hover:text-black"
+                      className="flex items-center gap-1.5 truncate text-xs text-black/50 transition-colors hover:text-black dark:text-white/50 dark:hover:text-white"
                     >
                       <MailIcon />
                       {author.email}
@@ -178,7 +178,7 @@ export default function AboutTeamSection({ lang, authors = [], heading, descript
                   {author.phone && (
                     <a
                       href={`tel:${author.phone}`}
-                      className="flex items-center gap-1.5 text-xs text-black/50 transition-colors hover:text-black"
+                      className="flex items-center gap-1.5 text-xs text-black/50 transition-colors hover:text-black dark:text-white/50 dark:hover:text-white"
                     >
                       <PhoneIcon />
                       {author.phone}

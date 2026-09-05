@@ -21,10 +21,10 @@ export default function SearchInput({
         placeholder={placeholder}
         name="q"
         id="q"
-        className="w-full rounded-full border border-black/15 bg-white py-3 pl-5 pr-11 text-sm text-black placeholder:text-black/40 outline-none transition-colors focus:border-black"
+        className="w-full rounded-full border border-black/15 bg-white py-3 pl-5 pr-11 text-sm text-black placeholder:text-black/40 outline-none transition-colors focus:border-black dark:border-white/15 dark:bg-black dark:text-white dark:placeholder:text-white/40 dark:focus:border-white"
       />
       <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-        <MagnifyingGlassIcon className="w-4 h-4 text-black/40" />
+        <MagnifyingGlassIcon className="w-4 h-4 text-black/40 dark:text-white/40" />
       </div>
     </div>
   );

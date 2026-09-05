@@ -71,7 +71,7 @@ export default function CtaCard({
   const finalImage = image || DEFAULT_IMAGE;
 
   return (
-    <div className="mx-auto max-w-2xl overflow-hidden rounded-3xl border border-black/5 bg-white shadow-sm transition-shadow duration-300 hover:shadow-xl dark:bg-gray-900">
+    <div className="mx-auto max-w-2xl overflow-hidden rounded-3xl border border-black/5 bg-white shadow-sm transition-shadow duration-300 hover:shadow-xl dark:border-white/10 dark:bg-gray-900">
       <div className="md:flex">
         {/* Imagen */}
         <div className="relative h-48 md:h-auto md:w-56 md:flex-shrink-0">
@@ -87,11 +87,11 @@ export default function CtaCard({
           >
             {finalSubTitle}
           </Link>
-          <p className="mt-2 text-sm text-gray-500">{finalDescription}</p>
+          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">{finalDescription}</p>
 
           <Link
             href={buttonLink || "#"}
-            className="mt-4 inline-flex items-center gap-2 rounded-full bg-black px-5 py-2.5 text-sm font-bold text-white transition-opacity hover:opacity-85"
+            className="mt-4 inline-flex items-center gap-2 rounded-full bg-black px-5 py-2.5 text-sm font-bold text-white transition-opacity hover:opacity-85 dark:bg-white dark:text-black"
           >
             {finalButtonMessage}
             <ArrowRightIcon className="h-4 w-4" />

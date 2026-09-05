@@ -148,7 +148,7 @@ function DownloadIcon() {
 function StatRow({ icon, label }) {
   if (!label) return null;
   return (
-    <div className="flex items-center gap-3 text-sm font-semibold text-black/70">
+    <div className="flex items-center gap-3 text-sm font-semibold text-black/70 dark:text-white/70">
       {icon}
       <span className="truncate">{label}</span>
     </div>
@@ -236,7 +236,7 @@ export default function Post(props) {
       {/* Volver (misma función que el link "← Ver todos" de antes) */}
       <Link
         href={`/${lang}/all`}
-        className="inline-flex items-center gap-2 text-sm font-bold text-black/50 transition-colors hover:text-black"
+        className="inline-flex items-center gap-2 text-sm font-bold text-black/50 transition-colors hover:text-black dark:text-white/50 dark:hover:text-white"
       >
         <ArrowLeftIcon />
         {t.back}
@@ -256,12 +256,12 @@ export default function Post(props) {
               negra sin importar el color elegido en Sanity. */}
           <CategoryBadge categories={post?.categories} lang={lang} limit={3} />
 
-          <h1 className="mt-5 text-4xl font-extrabold leading-tight tracking-tight text-black sm:text-5xl md:text-6xl">
+          <h1 className="mt-5 text-4xl font-extrabold leading-tight tracking-tight text-black dark:text-white sm:text-5xl md:text-6xl">
             {post.title}
           </h1>
 
           {post.excerpt && (
-            <p className="mt-5 max-w-xl text-base leading-relaxed text-black/60 sm:text-lg">
+            <p className="mt-5 max-w-xl text-base leading-relaxed text-black/60 dark:text-white/60 sm:text-lg">
               {post.excerpt}
             </p>
           )}
@@ -276,20 +276,20 @@ export default function Post(props) {
               (categoría / autor / tiempo de lectura o fecha) se
               acomodan como fila horizontal, separados por una línea
               vertical. */}
-          <div className="mt-8 w-full rounded-2xl bg-gray-50 p-6 sm:p-8">
+          <div className="mt-8 w-full rounded-2xl bg-gray-50 dark:bg-neutral-900 p-6 sm:p-8">
             <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
               {post?.price ? (
                 <div className="min-w-0">
-                  <p className="text-3xl font-extrabold text-black sm:text-4xl">{post.price}</p>
-                  {post?.location && <p className="mt-1 text-sm text-black/50">{post.location}</p>}
+                  <p className="text-3xl font-extrabold text-black dark:text-white sm:text-4xl">{post.price}</p>
+                  {post?.location && <p className="mt-1 text-sm text-black/50 dark:text-white/50">{post.location}</p>}
                 </div>
               ) : (
                 <div>
-                  <p className="text-3xl font-extrabold text-black sm:text-4xl">
+                  <p className="text-3xl font-extrabold text-black dark:text-white sm:text-4xl">
                     {readTime} min{" "}
-                    <span className="text-base font-semibold text-black/40">{t.readTime}</span>
+                    <span className="text-base font-semibold text-black/40 dark:text-white/40">{t.readTime}</span>
                   </p>
-                  {dateLabel && <p className="mt-1 text-sm text-black/50">{dateLabel}</p>}
+                  {dateLabel && <p className="mt-1 text-sm text-black/50 dark:text-white/50">{dateLabel}</p>}
                 </div>
               )}
 
@@ -301,7 +301,7 @@ export default function Post(props) {
                   categoría/autor/fecha. Si el post todavía no tiene
                   ningún punto clave cargado, se mantiene esa fila de
                   respaldo para no dejar el recuadro vacío. */}
-              <div className="flex flex-col gap-4 border-t border-black/10 pt-4 sm:flex-row sm:items-center sm:gap-8 sm:border-l sm:border-t-0 sm:pl-8 sm:pt-0">
+              <div className="flex flex-col gap-4 border-t border-black/10 dark:border-white/10 pt-4 sm:flex-row sm:items-center sm:gap-8 sm:border-l sm:border-t-0 sm:pl-8 sm:pt-0">
                 {realHighlights.length > 0 ? (
                   realHighlights.slice(0, 3).map((item, i) => (
                     <StatRow
@@ -372,7 +372,7 @@ export default function Post(props) {
           del autor y formulario de contacto */}
       <div className="mt-16 grid gap-14 lg:grid-cols-[1.6fr_1fr] lg:items-start">
         <div>
-          <h2 className="text-3xl font-extrabold tracking-tight text-black sm:text-4xl">{t.about}</h2>
+          <h2 className="text-3xl font-extrabold tracking-tight text-black dark:text-white sm:text-4xl">{t.about}</h2>
 
           {/* Acá se renderiza post.body: en Sanity Studio ese campo
               admite negrita, cursiva, subrayado, tachado, código,
@@ -383,7 +383,7 @@ export default function Post(props) {
               negritas, espaciado de listas, etc.), ajustadas a los
               colores/fuente de la marca. */}
           <div
-            className="prose prose-lg mt-6 max-w-none
+            className="prose prose-lg dark:prose-invert mt-6 max-w-none
               prose-headings:font-extrabold prose-headings:tracking-tight prose-headings:text-black
               prose-p:leading-relaxed prose-p:text-black/70
               prose-a:font-semibold prose-a:text-brand-gold prose-a:no-underline hover:prose-a:underline
@@ -399,7 +399,7 @@ export default function Post(props) {
               tiene ningún archivo cargado, esta sección no aparece. */}
           {post?.attachments?.length > 0 && (
             <div className="mt-10">
-              <h3 className="text-lg font-extrabold text-black">{t.documents}</h3>
+              <h3 className="text-lg font-extrabold text-black dark:text-white">{t.documents}</h3>
               <ul className="mt-4 space-y-3">
                 {post.attachments.map((doc, index) => (
                   doc?.url && (
@@ -409,13 +409,13 @@ export default function Post(props) {
                         target="_blank"
                         rel="noopener noreferrer"
                         download
-                        className="flex items-center justify-between gap-4 rounded-2xl border border-black/10 bg-white px-5 py-4 text-sm font-bold text-black transition-colors hover:border-black/30 hover:bg-gray-50"
+                        className="flex items-center justify-between gap-4 rounded-2xl border border-black/10 bg-white px-5 py-4 text-sm font-bold text-black transition-colors hover:border-black/30 hover:bg-gray-50 dark:border-white/10 dark:bg-neutral-900 dark:text-white dark:hover:border-white/30 dark:hover:bg-white/5"
                       >
                         <span className="flex min-w-0 items-center gap-3">
                           <DownloadIcon />
                           <span className="truncate">{doc.title || doc.filename}</span>
                         </span>
-                        <span className="flex-shrink-0 text-xs font-bold uppercase tracking-wide text-black/40">
+                        <span className="flex-shrink-0 text-xs font-bold uppercase tracking-wide text-black/40 dark:text-white/40">
                           {t.download}
                         </span>
                       </a>
@@ -428,10 +428,10 @@ export default function Post(props) {
         </div>
 
         <div className="lg:sticky lg:top-24">
-          <div className="rounded-2xl bg-gray-50 p-8">
+          <div className="rounded-2xl bg-gray-50 dark:bg-neutral-900 p-8">
             {post.author ? (
               <div className="flex items-center gap-4">
-                <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-full bg-black/5">
+                <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-full bg-black/5 dark:bg-white/10">
                   {authorImageProps?.src && (
                     <Image
                       src={authorImageProps.src}
@@ -443,21 +443,21 @@ export default function Post(props) {
                   )}
                 </div>
                 <div className="min-w-0">
-                  <p className="truncate text-lg font-bold text-black">{post.author.name}</p>
+                  <p className="truncate text-lg font-bold text-black dark:text-white">{post.author.name}</p>
                   {post.author.email && (
-                    <a href={`mailto:${post.author.email}`} className="block truncate text-sm text-black/60 hover:text-black">
+                    <a href={`mailto:${post.author.email}`} className="block truncate text-sm text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white">
                       {post.author.email}
                     </a>
                   )}
                   {post.author.phone && (
-                    <a href={`tel:${post.author.phone}`} className="block text-sm text-black/60 hover:text-black">
+                    <a href={`tel:${post.author.phone}`} className="block text-sm text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white">
                       {post.author.phone}
                     </a>
                   )}
                 </div>
               </div>
             ) : (
-              <p className="text-lg font-bold text-black">{t.questions}</p>
+              <p className="text-lg font-bold text-black dark:text-white">{t.questions}</p>
             )}
 
             <PostContactForm
@@ -478,10 +478,10 @@ export default function Post(props) {
       {related.length > 0 && (
         <div className="mt-24">
           <div className="mb-10 flex items-end justify-between gap-4">
-            <h2 className="text-3xl font-extrabold tracking-tight text-black sm:text-4xl">{t.more}</h2>
-            <Link href={`/${lang}/all`} className="group inline-flex flex-shrink-0 items-center gap-2 text-base font-bold text-black">
+            <h2 className="text-3xl font-extrabold tracking-tight text-black dark:text-white sm:text-4xl">{t.more}</h2>
+            <Link href={`/${lang}/all`} className="group inline-flex flex-shrink-0 items-center gap-2 text-base font-bold text-black dark:text-white">
               {t.viewAll}
-              <span className="flex h-8 w-8 items-center justify-center rounded-full border border-black transition-colors group-hover:bg-black group-hover:text-white">
+              <span className="flex h-8 w-8 items-center justify-center rounded-full border border-black transition-colors group-hover:bg-black group-hover:text-white dark:border-white dark:group-hover:bg-white dark:group-hover:text-black">
                 &rarr;
               </span>
             </Link>

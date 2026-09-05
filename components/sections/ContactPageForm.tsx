@@ -94,12 +94,12 @@ export default function ContactPageForm({ lang }: ContactPageFormProps) {
     }
   }
 
-  const labelClass = "mb-2 block text-sm font-semibold text-black/50";
+  const labelClass = "mb-2 block text-sm font-semibold text-black/50 dark:text-white/50";
   const inputClass =
-    "w-full rounded-full border border-black/15 bg-white px-5 py-3.5 text-sm text-black placeholder:text-black/30 outline-none transition-colors focus:border-black";
+    "w-full rounded-full border border-black/15 bg-white px-5 py-3.5 text-sm text-black placeholder:text-black/30 outline-none transition-colors focus:border-black dark:border-white/15 dark:bg-black dark:text-white dark:placeholder:text-white/30 dark:focus:border-white";
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-3xl bg-gray-50 p-6 sm:p-8">
+    <form onSubmit={handleSubmit} className="rounded-3xl bg-gray-50 p-6 sm:p-8 dark:bg-white/5">
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <div>
           <label className={labelClass}>{t.name}</label>
@@ -124,14 +124,14 @@ export default function ContactPageForm({ lang }: ContactPageFormProps) {
           placeholder={t.messagePlaceholder}
           value={form.message}
           onChange={update("message")}
-          className="w-full rounded-2xl border border-black/15 bg-white px-5 py-4 text-sm text-black placeholder:text-black/30 outline-none transition-colors focus:border-black"
+          className="w-full rounded-2xl border border-black/15 bg-white px-5 py-4 text-sm text-black placeholder:text-black/30 outline-none transition-colors focus:border-black dark:border-white/15 dark:bg-black dark:text-white dark:placeholder:text-white/30 dark:focus:border-white"
         />
       </div>
 
       <button
         type="submit"
         disabled={status === "sending"}
-        className="mt-6 w-full rounded-full bg-black px-6 py-4 text-sm font-bold text-white transition-opacity hover:opacity-85 disabled:opacity-50"
+        className="mt-6 w-full rounded-full bg-black px-6 py-4 text-sm font-bold text-white transition-opacity hover:opacity-85 disabled:opacity-50 dark:bg-white dark:text-black"
       >
         {status === "sending" ? t.sending : t.send}
       </button>

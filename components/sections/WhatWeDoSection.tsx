@@ -76,18 +76,18 @@ export default function WhatWeDoSection({ lang, heading, items }: WhatWeDoSectio
 
   return (
     <Container large alt className="py-16 md:py-24">
-      <h2 className="text-center text-3xl font-extrabold tracking-tight text-black sm:text-4xl md:text-5xl">
+      <h2 className="text-center text-3xl font-extrabold tracking-tight text-black dark:text-white sm:text-4xl md:text-5xl">
         {finalHeading}
       </h2>
 
       <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-3">
         {finalItems.map((item, index) => (
-          <div key={index} className="rounded-2xl bg-gray-50 p-8 text-center">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center text-black">
+          <div key={index} className="rounded-2xl bg-gray-50 p-8 text-center dark:bg-white/5">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center text-black dark:text-white">
               {renderWhatWeDoIcon(item.icon, index)}
             </div>
-            <h3 className="mt-5 text-xl font-extrabold text-black">{item.title}</h3>
-            <p className="mt-2 text-sm leading-relaxed text-black/60">{item.description}</p>
+            <h3 className="mt-5 text-xl font-extrabold text-black dark:text-white">{item.title}</h3>
+            <p className="mt-2 text-sm leading-relaxed text-black/60 dark:text-white/60">{item.description}</p>
           </div>
         ))}
       </div>

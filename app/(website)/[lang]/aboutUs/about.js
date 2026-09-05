@@ -53,7 +53,7 @@ export default function About({ authors, data, lang }) {
         <Container large alt className="pb-16 md:pb-24">
           <div
             className="prose prose-lg mx-auto max-w-3xl
-              prose-headings:font-extrabold prose-headings:text-black
+              prose-headings:font-extrabold prose-headings:text-black dark:prose-invert
               prose-p:leading-relaxed prose-p:text-black/70
               prose-a:font-semibold prose-a:text-brand-gold prose-a:no-underline hover:prose-a:underline
               prose-strong:font-bold prose-strong:text-black
@@ -80,7 +80,7 @@ export default function About({ authors, data, lang }) {
       <Container large alt className="pb-20 text-center md:pb-28">
         <Link
           href={`/${lang}/contact`}
-          className="inline-flex items-center gap-2 rounded-full bg-black px-8 py-3.5 text-sm font-bold text-white transition-opacity hover:opacity-85"
+          className="inline-flex items-center gap-2 rounded-full bg-black px-8 py-3.5 text-sm font-bold text-white transition-opacity hover:opacity-85 dark:bg-white dark:text-black"
         >
           {ctaText}
         </Link>
