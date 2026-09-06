@@ -57,7 +57,7 @@ const COPY: Record<
   },
 };
 
-const emptyForm = { name: "", email: "", phone: "", message: "" };
+const emptyForm = { name: "", email: "", phone: "", message: "", company: "" };
 
 export default function ContactPageForm({ lang }: ContactPageFormProps) {
   const t = COPY[lang] || COPY.es;
@@ -84,6 +84,7 @@ export default function ContactPageForm({ lang }: ContactPageFormProps) {
           email: form.email,
           phone: form.phone,
           message: `Nuevo mensaje desde la página de contacto.\n\n${form.message}`,
+          company: form.company,
         }),
       });
       if (!res.ok) throw new Error("request failed");
@@ -115,6 +116,20 @@ export default function ContactPageForm({ lang }: ContactPageFormProps) {
         <label className={labelClass}>{t.phone}</label>
         <input type="tel" value={form.phone} onChange={update("phone")} className={inputClass} />
       </div>
+
+        {/* Campo trampa (honeypot) contra bots -- invisible y no alcanzable
+            por teclado para una persona real. Ver pages/api/emailJs.js:
+            si llega lleno, el servidor descarta el envio sin mandar nada. */}
+        <input
+          type="text"
+          name="company"
+          value={form.company}
+          onChange={update("company")}
+          tabIndex={-1}
+          autoComplete="off"
+          aria-hidden="true"
+          className="absolute -left-[9999px] top-0 h-0 w-0 overflow-hidden opacity-0"
+        />
 
       <div className="mt-5">
         <label className={labelClass}>{t.message}</label>

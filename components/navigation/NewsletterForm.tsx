@@ -44,6 +44,7 @@ const COPY: Record<string, { placeholder: string; button: string; sending: strin
 export default function NewsletterForm({ lang }: NewsletterFormProps) {
   const t = COPY[lang] || COPY.es;
   const [email, setEmail] = useState("");
+  const [company, setCompany] = useState(""); // honeypot -- ver pages/api/emailJs.js
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
 
   async function handleSubmit(e: React.FormEvent) {
@@ -57,6 +58,7 @@ export default function NewsletterForm({ lang }: NewsletterFormProps) {
         body: JSON.stringify({
           name: "Newsletter",
           email,
+          company,
           // Mensaje default pedido por el cliente: dice explícitamente
           // cuál es el correo del visitante que se quiere suscribir
           // (antes era un texto genérico sin el correo incluido).
@@ -80,6 +82,19 @@ export default function NewsletterForm({ lang }: NewsletterFormProps) {
         onSubmit={handleSubmit}
         className="flex items-center gap-1 rounded-full border border-black/15 bg-white p-1.5 shadow-sm dark:border-white/15 dark:bg-black"
       >
+        {/* Campo trampa (honeypot) contra bots -- invisible y no alcanzable
+            por teclado para una persona real. Ver pages/api/emailJs.js:
+            si llega lleno, el servidor descarta el envio sin mandar nada. */}
+        <input
+          type="text"
+          name="company"
+          value={company}
+          onChange={(e) => setCompany(e.target.value)}
+          tabIndex={-1}
+          autoComplete="off"
+          aria-hidden="true"
+          className="absolute -left-[9999px] top-0 h-0 w-0 overflow-hidden opacity-0"
+        />
         <input
           type="email"
           required

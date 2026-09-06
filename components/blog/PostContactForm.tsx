@@ -55,7 +55,7 @@ const COPY: Record<
 export default function PostContactForm({ lang, postTitle, authorName, postCategory, postDate, postSlug }: PostContactFormProps) {
   const t = COPY[lang] || COPY.es;
 
-  const [form, setForm] = useState({ name: "", email: "", phone: "", subject: "", message: "" });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", subject: "", message: "", company: "" });
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
 
   function update(field: keyof typeof form) {
@@ -95,11 +95,12 @@ export default function PostContactForm({ lang, postTitle, authorName, postCateg
           email: form.email,
           phone: form.phone,
           message: postContext ? `Solicitud de cotización\n${postContext}\n\n${form.message}` : form.message,
+          company: form.company,
         }),
       });
       if (!res.ok) throw new Error("request failed");
       setStatus("success");
-      setForm({ name: "", email: "", phone: "", subject: "", message: "" });
+      setForm({ name: "", email: "", phone: "", subject: "", message: "", company: "" });
     } catch {
       setStatus("error");
     }
@@ -116,6 +117,20 @@ export default function PostContactForm({ lang, postTitle, authorName, postCateg
         <input placeholder={t.phone} value={form.phone} onChange={update("phone")} className={inputClass} />
         <input placeholder={t.subject} value={form.subject} onChange={update("subject")} className={inputClass} />
       </div>
+
+        {/* Campo trampa (honeypot) contra bots -- invisible y no alcanzable
+            por teclado para una persona real. Ver pages/api/emailJs.js:
+            si llega lleno, el servidor descarta el envio sin mandar nada. */}
+      <input
+        type="text"
+        name="company"
+        value={form.company}
+        onChange={update("company")}
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        className="absolute -left-[9999px] top-0 h-0 w-0 overflow-hidden opacity-0"
+      />
 
       <textarea
         required

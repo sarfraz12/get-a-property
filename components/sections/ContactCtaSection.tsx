@@ -121,7 +121,7 @@ function TeaserCard({
 /*  Tarjeta derecha: formulario de contacto rápido                     */
 /* ------------------------------------------------------------------ */
 
-type FormValues = { name: string; email: string; phone: string };
+type FormValues = { name: string; email: string; phone: string; company?: string };
 type SubmitStatus = "idle" | "success" | "error";
 
 function QuickContactForm({ lang, buttonText }: { lang: string; buttonText: string }) {
@@ -152,6 +152,7 @@ function QuickContactForm({ lang, buttonText }: { lang: string; buttonText: stri
           email: data.email,
           phone: data.phone,
           message: `Nuevo contacto desde la sección "¿Tienes una pregunta?" de la home.\nTeléfono: ${data.phone}`,
+          company: data.company,
         }),
       });
 
@@ -167,6 +168,18 @@ function QuickContactForm({ lang, buttonText }: { lang: string; buttonText: stri
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="mt-10 space-y-4">
+      {/* Campo trampa (honeypot) contra bots -- invisible y no alcanzable
+          por teclado para una persona real. Ver pages/api/emailJs.js:
+          si llega lleno, el servidor descarta el envio sin mandar nada. */}
+      <input
+        type="text"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        className="absolute -left-[9999px] top-0 h-0 w-0 overflow-hidden opacity-0"
+        {...register("company")}
+      />
+
       <div>
         <input
           type="text"
