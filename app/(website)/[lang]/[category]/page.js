@@ -203,8 +203,14 @@ async function getCategoryPosts(category, lang) {
 
 export default async function SearchPage(props) {
   const params = await props.params;
-  const data = await getCategoryPosts(params.category, params.lang);
-  const categories = await getAllCategoriesCount(params.lang)
+  const [data, categories, settings] = await Promise.all([
+    getCategoryPosts(params.category, params.lang),
+    getAllCategoriesCount(params.lang),
+    // Título editable del listado "/all" (Settings -> Textos del
+    // sitio -> Título del listado "Todos los Posts"), ver
+    // lib/sanity/schemas/settings.js.
+    getSettings(),
+  ]);
   const { title, posts } = data;
   const jsonLd = await buildCategoryJsonLd(params.category, params.lang);
 
@@ -212,7 +218,13 @@ export default async function SearchPage(props) {
     <Suspense fallback={<Loading />}>
       <JsonLd data={jsonLd} />
       <Container>
-        <CategoryPosts internalPosts={posts} title={title} categories={categories} lang={params.lang} />
+        <CategoryPosts
+          internalPosts={posts}
+          title={title}
+          categories={categories}
+          lang={params.lang}
+          allPostsTitle={settings?.allPostsTitle}
+        />
       </Container>
     </Suspense>
   );

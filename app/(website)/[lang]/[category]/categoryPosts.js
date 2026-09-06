@@ -67,7 +67,7 @@ const COPY = {
 };
 
 export default function CategoryPosts(props) {
-  const { internalPosts, title, categories, lang } = props;
+  const { internalPosts, title, categories, lang, allPostsTitle } = props;
   const t = COPY[lang] || COPY.es;
   const router = useRouter();
   const pathname = usePathname();
@@ -80,7 +80,10 @@ export default function CategoryPosts(props) {
   // "ALL" es el título centinela que arma app/(website)/[lang]/[category]/page.js
   // cuando category === "all" (no viene de Sanity); el resto de los
   // títulos sí son categorías reales y se muestran tal cual.
-  const heading = title === "ALL" ? t.allTitle : title;
+  // Si el vendedor cargó un título editable en Settings -> Textos del
+  // sitio (allPostsTitle, ver lib/sanity/schemas/settings.js) se usa
+  // ese (ej. "Propiedades"); si no, se mantiene el texto por defecto.
+  const heading = title === "ALL" ? (allPostsTitle?.[lang] || t.allTitle) : title;
 
   // Categorías reales agrupadas por tipo (Ubicación / Propiedad / Oferta)
   // + las que no tienen tipo asignado (siguen como links simples).

@@ -13,11 +13,12 @@
 // así el resto de la página sigue renderizando en el servidor igual
 // que antes, y sólo esta pieza puntual necesita interactividad.
 //
-// Mantiene EXACTAMENTE el mismo layout/estilos que ya tenía esta
-// sección (foto principal aspect-[16/10] sm:aspect-[21/9] con esquinas
-// grandes, galería grid-cols-3 sm:grid-cols-6 con miniaturas
-// cuadradas) -- lo único nuevo es que ahora son clickeables y abren el
-// lightbox.
+// Mantiene el mismo layout general (galería grid-cols-3 sm:grid-cols-6
+// con miniaturas cuadradas) -- ahora son clickeables y abren el
+// lightbox. La foto principal se ajustó a 16/9 fijo (antes 16/10 en
+// celular y 21/9 desde sm:) y ya no comparte el "sizes" pensado para
+// las miniaturas chicas (esa era la causa de que se viera pixelada:
+// ver MediaThumb más abajo).
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
@@ -65,14 +66,31 @@ function PlayIcon() {
 // cargada usa el video mismo como miniatura (pausado, silencioso,
 // primer frame) en vez de quedar sin imagen -- siempre con el ícono
 // de "play" encima para que quede claro que es un video y no una foto.
-function MediaThumb({ item, className }: { item: GalleryImage; className: string }) {
+function MediaThumb({
+  item,
+  className,
+  // Por defecto, el tamaño real de las MINIATURAS chicas (fila de
+  // galería: 3 columnas en celular, 6 en desktop). La foto principal
+  // pasa sus propios valores, más grandes, al llamar a este mismo
+  // componente más abajo -- ver <MediaThumb ... sizes="..." priority
+  // quality={90} /> en la foto principal.
+  sizes = "(max-width: 640px) 33vw, 16vw",
+  priority = false,
+  quality,
+}: {
+  item: GalleryImage;
+  className: string;
+  sizes?: string;
+  priority?: boolean;
+  quality?: number;
+}) {
   const isVideo = item.mediaType === "video";
 
   if (isVideo) {
     return (
       <>
         {item.src ? (
-          <Image src={item.src} alt={item.alt || "Video"} fill sizes="(max-width: 640px) 33vw, 16vw" className={className} />
+          <Image src={item.src} alt={item.alt || "Video"} fill sizes={sizes} quality={quality} priority={priority} className={className} />
         ) : item.videoUrl ? (
           <video
             src={item.videoUrl}
@@ -92,7 +110,7 @@ function MediaThumb({ item, className }: { item: GalleryImage; className: string
   }
 
   return item.src ? (
-    <Image src={item.src} alt={item.alt || ""} fill sizes="(max-width: 640px) 33vw, 16vw" className={className} />
+    <Image src={item.src} alt={item.alt || ""} fill sizes={sizes} quality={quality} priority={priority} className={className} />
   ) : null;
 }
 
@@ -159,15 +177,26 @@ export default function PostGallery({ mainImage, gallery = [] }: PostGalleryProp
 
   return (
     <>
-      {/* Foto principal -- mismo tamaño/estilo de siempre, ahora clickeable */}
+      {/* Foto principal -- 16/9 fijo (antes 16/10 en celular y 21/9
+          desde sm:, y usaba el mismo "sizes" de las miniaturas chicas
+          -- por eso se veía pixelada: pedía una imagen de ~16vw de
+          ancho y la estiraba a todo el contenedor). Ahora pide el
+          tamaño real (sizes + quality 90) y carga con priority por
+          ser la imagen más grande y arriba de todo en la página. */}
       {mainImage && (
         <button
           type="button"
           onClick={() => setOpenIndex(0)}
           aria-label={mainImage.alt || "Ampliar foto"}
-          className="group relative mt-12 aspect-[16/10] w-full cursor-zoom-in overflow-hidden rounded-3xl bg-gray-100 dark:bg-white/10 sm:aspect-[21/9]"
+          className="group relative mt-12 aspect-[16/9] w-full cursor-zoom-in overflow-hidden rounded-3xl bg-gray-100 dark:bg-white/10"
         >
-          <MediaThumb item={mainImage} className="object-cover transition-transform duration-300 group-hover:scale-[1.02]" />
+          <MediaThumb
+            item={mainImage}
+            className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+            sizes="(min-width: 1440px) 1440px, 100vw"
+            quality={90}
+            priority
+          />
         </button>
       )}
 
