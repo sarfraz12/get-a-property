@@ -94,11 +94,36 @@
 //   EMAILJS_TEMPLATE_ID=template_7frcfrh
 //   EMAILJS_PUBLIC_KEY=etnkFFSzzkczK63iL
 //   EMAILJS_PRIVATE_KEY=          (opcional, ver párrafo de arriba)
+//   EMAILJS_TO_EMAIL=             (ver bloque "DESTINATARIO" abajo)
 //
 // (Los valores de arriba son los mismos IDs que ya estaban
 // funcionando -- sólo se movieron del código a variables de entorno.
 // Si el Public Key algún día deja de servir, dashboard.emailjs.com ->
 // Account -> General tiene el actual.)
+//
+// ================================================================
+// DESTINATARIO -- por qué se agregó EMAILJS_TO_EMAIL
+// ================================================================
+// La plantilla de EmailJS tenía el campo "To Email" escrito fijo en
+// SU panel (no en este código) -- y apuntaba a la dirección de otro
+// negocio, no a la de Get a Property. Para poder controlar el
+// destinatario desde acá (y que sea fácil de corregir sin entrar a
+// EmailJS cada vez), este archivo ahora manda una variable nueva,
+// `to_email`, con el valor de EMAILJS_TO_EMAIL.
+//
+// PASO PENDIENTE EN EMAILJS (no es código, es su panel): en
+// dashboard.emailjs.com -> Email Templates -> tu plantilla -> pestaña
+// Content, el campo "To Email" (columna derecha) hay que cambiarlo de
+// la dirección fija actual a la variable `{{to_email}}` y guardar.
+// Mientras ese campo siga fijo en el panel de EmailJS, esta variable
+// nueva no tiene efecto (EmailJS simplemente la ignora y sigue usando
+// la dirección fija de su plantilla).
+//
+// A propósito, esta dirección NUNCA se toma de lo que manda el
+// visitante en el formulario (sería un hueco de seguridad: cualquiera
+// podría usar tu cuenta de EmailJS para mandar correos a la dirección
+// que quisiera) -- sale siempre de esta variable de entorno, fija del
+// lado del servidor.
 //
 // Body esperado: { name, email, phone?, message, company? }
 // `phone` es opcional. `company` es el campo trampa (ver punto 4) --
@@ -218,25 +243,30 @@ export default async function Handler(req, res) {
     // texto libre multilínea), así que no se le aplica sanitizeSingleLine.
     const cleanMessage = String(message).trim();
 
+    const serviceID = process.env.EMAILJS_SERVICE_ID;
+    const templateID = process.env.EMAILJS_TEMPLATE_ID;
+    const publicKey = process.env.EMAILJS_PUBLIC_KEY;
+    const privateKey = process.env.EMAILJS_PRIVATE_KEY; // opcional, ver comentario grande arriba
+    const toEmail = process.env.EMAILJS_TO_EMAIL; // ver bloque "DESTINATARIO" arriba
+
+    if (!serviceID || !templateID || !publicKey || !toEmail) {
+        // Esto SOLO puede pasar si todavía no agregaste las variables de
+        // entorno (ver instrucciones arriba) -- se loguea bien claro en
+        // vez de fallar de forma confusa más abajo.
+        console.error('emailJs: faltan variables de entorno EMAILJS_SERVICE_ID / EMAILJS_TEMPLATE_ID / EMAILJS_PUBLIC_KEY / EMAILJS_TO_EMAIL.');
+        return res.status(500).json({ message: 'Email service is not configured' });
+    }
+
     const templateParams = {
         from_name: cleanName,
         from_email: cleanEmail,
         phone: cleanPhone,
         message: cleanPhone ? `${cleanMessage}\n\nTeléfono: ${cleanPhone}` : cleanMessage,
+        // Destinatario real -- ver bloque "DESTINATARIO" arriba. Sale
+        // siempre de la variable de entorno, nunca de lo que manda el
+        // visitante en el formulario.
+        to_email: toEmail,
     };
-
-    const serviceID = process.env.EMAILJS_SERVICE_ID;
-    const templateID = process.env.EMAILJS_TEMPLATE_ID;
-    const publicKey = process.env.EMAILJS_PUBLIC_KEY;
-    const privateKey = process.env.EMAILJS_PRIVATE_KEY; // opcional, ver comentario grande arriba
-
-    if (!serviceID || !templateID || !publicKey) {
-        // Esto SOLO puede pasar si todavía no agregaste las variables de
-        // entorno (ver instrucciones arriba) -- se loguea bien claro en
-        // vez de fallar de forma confusa más abajo.
-        console.error('emailJs: faltan variables de entorno EMAILJS_SERVICE_ID / EMAILJS_TEMPLATE_ID / EMAILJS_PUBLIC_KEY.');
-        return res.status(500).json({ message: 'Email service is not configured' });
-    }
 
     const payload = {
         service_id: serviceID,
