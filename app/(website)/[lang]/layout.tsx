@@ -141,13 +141,29 @@ export async function sharedMetaData(lang: string) {
         "max-video-preview": -1,
       },
     },
-    // Verificación de Google Search Console por "etiqueta HTML"
-    // (Settings -> "Código de verificación de Google Search Console"
+    // Verificación de sitio por "etiqueta HTML" (Google Search Console,
+    // Semrush, OpenRush -- Settings -> cada uno tiene su propia sección
     // en Sanity). Si se deja vacío, Next simplemente no renderiza la
-    // etiqueta -- no hace falta tocar código para conectar Search
-    // Console, sólo pegar el código en Sanity.
-    ...(settings?.googleSiteVerification
-      ? { verification: { google: settings.googleSiteVerification } }
+    // etiqueta -- no hace falta tocar código para conectar estos
+    // servicios, sólo pegar el código en Sanity. "other" es la forma
+    // que da Next.js para etiquetas meta de verificación que no son de
+    // un proveedor con soporte nativo (google/yahoo/yandex/me) -- ahí
+    // el NOMBRE de la etiqueta también viene de Sanity porque cada
+    // servicio pide un name distinto.
+    ...((settings?.googleSiteVerification || (settings?.semrushVerificationMetaName && settings?.semrushVerificationCode) || (settings?.openrushVerificationMetaName && settings?.openrushVerificationCode))
+      ? {
+          verification: {
+            ...(settings?.googleSiteVerification ? { google: settings.googleSiteVerification } : {}),
+            other: {
+              ...(settings?.semrushVerificationMetaName && settings?.semrushVerificationCode
+                ? { [settings.semrushVerificationMetaName]: settings.semrushVerificationCode }
+                : {}),
+              ...(settings?.openrushVerificationMetaName && settings?.openrushVerificationCode
+                ? { [settings.openrushVerificationMetaName]: settings.openrushVerificationCode }
+                : {}),
+            },
+          },
+        }
       : {}),
     icons: iconsMeta,
     category: "Real Estate",
@@ -206,6 +222,16 @@ export default async function RootLayout(
   const organizationJsonLd = buildOrganizationJsonLd({ settings, profile, baseUrl, image });
   const websiteJsonLd = buildWebsiteJsonLd({ baseUrl, siteName: profile.siteName, lang: params.lang });
 
+  // Google Tag Manager / Google Analytics: el ID y el interruptor de
+  // encendido/apagado ahora viven en Sanity (Settings -> "Google Tag
+  // Manager" / "Google Analytics (GA4)"), no hardcodeados acá. Si no
+  // hay ID cargado en Sanity, o el interruptor está apagado, el
+  // contenedor/script simplemente no se renderiza -- no rompe nada.
+  const gtmId = settings?.gtmContainerId;
+  const gtmActive = Boolean(gtmId) && settings?.gtmEnabled !== false;
+  const gaId = settings?.gaMeasurementId;
+  const gaActive = Boolean(gaId) && settings?.gaEnabled !== false;
+
   return (
     <html
       suppressHydrationWarning
@@ -213,14 +239,19 @@ export default async function RootLayout(
       className={poppins.variable}
     >
       <head>
-        {/* Google Tag Manager */}
-        <Script id="google-tag-manager" strategy="afterInteractive">
-          {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-          'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-          })(window,document,'script','dataLayer','GTM-T2XGGLLP');`}
-        </Script>
+        {/* Google Tag Manager -- ID configurable desde Sanity (Settings
+            -> "Google Tag Manager"). Si no hay ID cargado o el
+            interruptor "Contenedor GTM activo" está apagado, este
+            <Script> no se renderiza. */}
+        {gtmActive && (
+          <Script id="google-tag-manager" strategy="afterInteractive">
+            {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','${gtmId}');`}
+          </Script>
+        )}
         <meta charSet="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         {/* Datos estructurados sitewide -- ver lib/seo/jsonld.js y
@@ -229,27 +260,36 @@ export default async function RootLayout(
         <JsonLd data={[organizationJsonLd, websiteJsonLd]} />
       </head>
       <body className={cx("font-sans","bg-white text-black dark:bg-black dark:text-white")} >
-        <noscript>
-          <iframe
-            src="https://www.googletagmanager.com/ns.html?id=GTM-T2XGGLLP"
-            height="0"
-            width="0"
-            style={{ display: "none", visibility: "hidden" }}
-          ></iframe>
-        </noscript>
+        {gtmActive && (
+          <noscript>
+            <iframe
+              src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
+              height="0"
+              width="0"
+              style={{ display: "none", visibility: "hidden" }}
+            ></iframe>
+          </noscript>
+        )}
 
-        {/* Google Analytics */}
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-SM5ZZYG685"></script>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-SM5ZZYG685');
-            `,
-          }}
-        ></script>
+        {/* Google Analytics -- ID configurable desde Sanity (Settings
+            -> "Google Analytics (GA4)"). Si no hay ID cargado o el
+            interruptor "Google Analytics activo" está apagado, estos
+            dos <script> no se renderizan. */}
+        {gaActive && (
+          <>
+            <script async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}></script>
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', '${gaId}');
+                `,
+              }}
+            ></script>
+          </>
+        )}
 
         <Analytics />
 
