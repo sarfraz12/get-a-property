@@ -52,12 +52,12 @@ export default function LegalPageLayout({ h1, intro, lastUpdatedLabel, sections,
 
         {(sections?.length || body) && (
           <div
-            className="prose prose-lg mt-10 max-w-none
-              prose-headings:font-extrabold prose-headings:text-black dark:prose-invert
-              prose-p:leading-relaxed prose-p:text-black/70
+            className="prose prose-lg dark:prose-invert mt-10 max-w-none
+              prose-headings:font-extrabold prose-headings:text-black dark:prose-headings:text-white
+              prose-p:leading-relaxed prose-p:text-black/70 dark:prose-p:text-white/70
               prose-a:font-semibold prose-a:text-brand-gold prose-a:no-underline hover:prose-a:underline
-              prose-strong:font-bold prose-strong:text-black
-              prose-li:text-black/70 prose-ul:list-disc prose-ol:list-decimal"
+              prose-strong:font-bold prose-strong:text-black dark:prose-strong:text-white
+              prose-li:text-black/70 dark:prose-li:text-white/70 prose-ul:list-disc prose-ol:list-decimal"
           >
             {sections?.length ? (
               sections.map((section, index) => (

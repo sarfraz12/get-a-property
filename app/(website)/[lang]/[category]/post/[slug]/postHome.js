@@ -384,12 +384,12 @@ export default function Post(props) {
               colores/fuente de la marca. */}
           <div
             className="prose prose-lg dark:prose-invert mt-6 max-w-none
-              prose-headings:font-extrabold prose-headings:tracking-tight prose-headings:text-black
-              prose-p:leading-relaxed prose-p:text-black/70
+              prose-headings:font-extrabold prose-headings:tracking-tight prose-headings:text-black dark:prose-headings:text-white
+              prose-p:leading-relaxed prose-p:text-black/70 dark:prose-p:text-white/70
               prose-a:font-semibold prose-a:text-brand-gold prose-a:no-underline hover:prose-a:underline
-              prose-strong:font-bold prose-strong:text-black
-              prose-blockquote:border-black prose-blockquote:text-black/70
-              prose-li:text-black/70 prose-img:rounded-2xl"
+              prose-strong:font-bold prose-strong:text-black dark:prose-strong:text-white
+              prose-blockquote:border-black prose-blockquote:text-black/70 dark:prose-blockquote:border-white dark:prose-blockquote:text-white/70
+              prose-li:text-black/70 dark:prose-li:text-white/70 prose-img:rounded-2xl"
           >
             {post.body && <PortableText value={post.body} />}
           </div>

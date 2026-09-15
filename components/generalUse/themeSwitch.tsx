@@ -54,10 +54,17 @@ const ThemeSwitch = () => {
   return (
     <div className="inline-flex items-center">
       <SunIcon className="w-4 h-4 mr-2" />
+      {/* Colores explícitos (no heredados): este selector vive en la
+          barra inferior del footer, que siempre es negra (bg-black),
+          tanto en modo claro como oscuro del sitio -- así que el
+          control en sí necesita su propio estilo fijo (fondo oscuro,
+          texto blanco) en vez de depender de qué tan legible resulte
+          el <select> nativo del navegador/SO por defecto. */}
       <select
         name="themeSwitch"
         value={theme}
-        onChange={e => setTheme(e.target.value)}>
+        onChange={e => setTheme(e.target.value)}
+        className="rounded-md border border-white/20 bg-black px-2 py-1 text-sm text-white focus:outline-none focus:ring-1 focus:ring-white/40">
         <option value="system">System</option>
         <option value="dark">Dark</option>
         <option value="light">Light</option>

@@ -354,7 +354,13 @@ export default async function Footer(props) {
             <p className="text-center text-sm text-white">
               {new Date().getFullYear()} — {props?.copyright || props?.title}. {t.rights}
             </p>
-            <div className="absolute right-0 top-1/2 hidden -translate-y-1/2 text-white/60 sm:block">
+            {/* Antes estaba oculto en mobile (hidden sm:block) y sólo
+                aparecía desde el breakpoint sm en adelante -- pedido del
+                usuario: el selector de tema debe estar SIEMPRE visible en
+                el footer, en cualquier tamaño de pantalla. En mobile fluye
+                como un elemento más de la columna centrada; desde sm se
+                posiciona absoluto a la derecha, como antes. */}
+            <div className="text-white/60 sm:absolute sm:right-0 sm:top-1/2 sm:-translate-y-1/2">
               <ThemeSwitch />
             </div>
           </div>
