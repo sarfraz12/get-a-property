@@ -29,12 +29,27 @@ const config: Config = {
           '60%': { transform: 'scale(1.05)' },
           '100%': { transform: 'scale(1)' },
         },
+        heartbeat: {
+          '0%, 100%': { transform: 'scale(1)' },
+          '15%': { transform: 'scale(1.15)' },
+          '30%': { transform: 'scale(1)' },
+          '45%': { transform: 'scale(1.1)' },
+          '60%': { transform: 'scale(1)' },
+        },
+        scrollWiggle: {
+          '0%, 100%': { transform: 'translateY(0) rotate(0deg)' },
+          '25%': { transform: 'translateY(-4px) rotate(-8deg)' },
+          '50%': { transform: 'translateY(0) rotate(0deg)' },
+          '75%': { transform: 'translateY(4px) rotate(8deg)' },
+        },
       },
       animation: {
         fadeInScale: 'fadeInScale 1s ease-in-out forwards',
         slideInLeft: 'slideInLeft 1s ease-in-out forwards',
         slideInRight: 'slideInRight 1s ease-in-out forwards',
         staggeredBounce: 'staggeredBounce 0.6s ease-out forwards',
+        heartbeat: 'heartbeat 1.8s ease-in-out infinite',
+        scrollWiggle: 'scrollWiggle 0.4s ease-in-out infinite',
       },
 
       colors: {
