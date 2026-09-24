@@ -25,8 +25,7 @@ const LangSwitcher = ({locale}: {locale: string} ) => {
     return (    
         <Link
             className="font-semibold flex items-center gap-1 text-brand-black hover:text-brand-dark dark:text-brand-light dark:hover:text-brand-gold "
-            href={redirectTarget()}
-            locale={targetLanguage}>
+            href={redirectTarget()}>
             <span>{targetLanguage === 'es' ? '🇺🇸' : '🇵🇦'}</span>
             {locale.toLocaleUpperCase()}
         </Link>

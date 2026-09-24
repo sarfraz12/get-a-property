@@ -1,6 +1,9 @@
 import type { Config } from "tailwindcss";
-const colors = require("tailwindcss/colors");
-const defaultTheme = require("tailwindcss/defaultTheme");
+// "colors" y "defaultTheme" (tailwindcss/colors, tailwindcss/defaultTheme)
+// se importaban acá con require() pero no se usaban en ningún lado del
+// archivo -- se sacaron al renombrar este archivo a .mts (ver abajo)
+// para no mezclar require() (CommonJS) con import/export (ESM) en el
+// mismo archivo.
 
 const config: Config = {
   content: [
