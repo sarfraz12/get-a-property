@@ -202,7 +202,7 @@ export default function Navbar({ lang, data, logo, logoalt, faviconLight, favico
           </Link>
 
           {/* Menú de escritorio */}
-          <div className="hidden flex-1 items-center justify-center gap-9 md:flex">
+          <div className="hidden flex-1 items-center justify-center gap-6 lg:flex xl:gap-9">
             {data.map((item: any, index: number) =>
               item.children?.length > 0 ? (
                 <DesktopDropdown key={index} item={item} lang={lang} isActive={isActive} />
@@ -222,7 +222,7 @@ export default function Navbar({ lang, data, logo, logoalt, faviconLight, favico
           </div>
 
           {/* Acciones a la derecha */}
-          <div className="hidden items-center gap-6 md:flex">
+          <div className="hidden items-center gap-6 lg:flex">
             <LangSwitcher locale={lang} />
             <SmartLink
               href={shopLink}
@@ -239,7 +239,7 @@ export default function Navbar({ lang, data, logo, logoalt, faviconLight, favico
             aria-label={mobileOpen ? "Cerrar menú" : "Abrir menú"}
             aria-expanded={mobileOpen}
             onClick={() => setMobileOpen((v) => !v)}
-            className="inline-flex items-center justify-center rounded-full p-2 text-black focus:outline-none focus-visible:ring-2 focus-visible:ring-black md:hidden dark:text-white dark:focus-visible:ring-white"
+            className="inline-flex items-center justify-center rounded-full p-2 text-black focus:outline-none focus-visible:ring-2 focus-visible:ring-black lg:hidden dark:text-white dark:focus-visible:ring-white"
           >
             <MenuIcon open={mobileOpen} />
           </button>
@@ -248,7 +248,7 @@ export default function Navbar({ lang, data, logo, logoalt, faviconLight, favico
 
       {/* Panel móvil (accordion, misma lógica de antes) */}
       <div
-        className="grid overflow-hidden border-t border-black/10 bg-white transition-[grid-template-rows] duration-300 ease-in-out md:hidden dark:border-white/10 dark:bg-black"
+        className="grid overflow-hidden border-t border-black/10 bg-white transition-[grid-template-rows] duration-300 ease-in-out lg:hidden dark:border-white/10 dark:bg-black"
         style={{ gridTemplateRows: mobileOpen ? "1fr" : "0fr" }}
       >
         <div className="min-h-0">

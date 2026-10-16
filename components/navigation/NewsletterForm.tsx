@@ -87,7 +87,7 @@ export default function NewsletterForm({ lang }: NewsletterFormProps) {
             si llega lleno, el servidor descarta el envio sin mandar nada. */}
         <input
           type="text"
-          name="company"
+          name="hp_field"
           value={company}
           onChange={(e) => setCompany(e.target.value)}
           tabIndex={-1}

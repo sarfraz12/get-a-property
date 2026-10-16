@@ -58,7 +58,7 @@
 //    completan cualquier campo que encuentran en el HTML. Si llega
 //    lleno, se responde 200 (para no delatar el mecanismo) pero NO se
 //    manda ningún correo real.
-// 5) LÍMITE DE INTENTOS por IP (best-effort): máximo 5 envíos cada 10
+// 5) LÍMITE DE INTENTOS por IP (best-effort): máximo 10 envíos cada 10
 //    minutos por dirección IP. OJO: en un entorno serverless (Vercel)
 //    cada instancia de la función tiene su propia memoria, así que
 //    este límite no es 100% preciso (se reinicia si Vercel crea una
@@ -149,7 +149,7 @@ const MAX_LENGTHS = { name: 150, email: 200, phone: 40, message: 5000 };
 // Límite de intentos por IP -- ver punto (5) del comentario grande de
 // arriba sobre por qué esto es "best-effort" en serverless.
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 minutos
-const RATE_LIMIT_MAX = 5;
+const RATE_LIMIT_MAX = 10;
 const rateLimitStore = new Map();
 
 function isRateLimited(ip) {
@@ -180,7 +180,21 @@ function getClientIp(req) {
 function isAllowedOrigin(req) {
     const origin = req.headers.origin;
     if (!origin) return true; // ver comentario de ALLOWED_ORIGINS arriba
-    return ALLOWED_ORIGINS.some((allowed) => origin === allowed);
+    if (ALLOWED_ORIGINS.some((allowed) => origin === allowed)) return true;
+    // CORREGIDO (oct. 2026): antes sólo se aceptaban los 3 orígenes
+    // exactos de arriba, así que el formulario devolvía 403 (error) en
+    // cualquier otro dominio donde corre este MISMO sitio: previews de
+    // Vercel (*.vercel.app), localhost en otro puerto, etc. Ahora
+    // también se acepta cuando el Origin coincide con el host al que
+    // llegó la petición -- es decir, el formulario se envió desde la
+    // misma página que sirve este endpoint.
+    try {
+        const originHost = new URL(origin).host;
+        const requestHost = String(req.headers["x-forwarded-host"] || req.headers.host || "").split(",")[0].trim();
+        return Boolean(requestHost) && originHost === requestHost;
+    } catch {
+        return false;
+    }
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -200,12 +214,6 @@ export default async function Handler(req, res) {
     if (!isAllowedOrigin(req)) {
         console.warn('emailJs: bloqueado por origen no permitido:', req.headers.origin);
         return res.status(403).json({ message: 'Forbidden' });
-    }
-
-    const ip = getClientIp(req);
-    if (isRateLimited(ip)) {
-        console.warn('emailJs: límite de intentos alcanzado para IP:', ip);
-        return res.status(429).json({ message: 'Too many requests. Please try again later.' });
     }
 
     const body = req.body || {};
@@ -234,6 +242,18 @@ export default async function Handler(req, res) {
         String(message).length > MAX_LENGTHS.message
     ) {
         return res.status(400).json({ message: 'One or more fields exceed the allowed length' });
+    }
+
+    // CORREGIDO (oct. 2026): el límite de intentos ahora se revisa
+    // DESPUÉS de validar los datos, así que sólo cuentan los envíos
+    // reales -- antes contaba cualquier petición (incluso las inválidas)
+    // y con 5 intentos en 10 minutos una persona probando los
+    // formularios (newsletter + contacto) se quedaba bloqueada con
+    // error 429. Se subió también el máximo a 10 cada 10 minutos.
+    const ip = getClientIp(req);
+    if (isRateLimited(ip)) {
+        console.warn('emailJs: límite de intentos alcanzado para IP:', ip);
+        return res.status(429).json({ message: 'Too many requests. Please try again later.' });
     }
 
     const cleanName = sanitizeSingleLine(name);

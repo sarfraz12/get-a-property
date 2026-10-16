@@ -121,7 +121,7 @@ function TeaserCard({
 /*  Tarjeta derecha: formulario de contacto rápido                     */
 /* ------------------------------------------------------------------ */
 
-type FormValues = { name: string; email: string; phone: string; company?: string };
+type FormValues = { name: string; email: string; phone: string; hp_field?: string };
 type SubmitStatus = "idle" | "success" | "error";
 
 function QuickContactForm({ lang, buttonText }: { lang: string; buttonText: string }) {
@@ -152,7 +152,7 @@ function QuickContactForm({ lang, buttonText }: { lang: string; buttonText: stri
           email: data.email,
           phone: data.phone,
           message: `Nuevo contacto desde la sección "¿Tienes una pregunta?" de la home.\nTeléfono: ${data.phone}`,
-          company: data.company,
+          company: data.hp_field,
         }),
       });
 
@@ -177,7 +177,7 @@ function QuickContactForm({ lang, buttonText }: { lang: string; buttonText: stri
         autoComplete="off"
         aria-hidden="true"
         className="absolute -left-[9999px] top-0 h-0 w-0 overflow-hidden opacity-0"
-        {...register("company")}
+        {...register("hp_field")}
       />
 
       <div>

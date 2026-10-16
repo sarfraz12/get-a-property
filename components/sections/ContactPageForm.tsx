@@ -122,7 +122,7 @@ export default function ContactPageForm({ lang }: ContactPageFormProps) {
             si llega lleno, el servidor descarta el envio sin mandar nada. */}
         <input
           type="text"
-          name="company"
+          name="hp_field"
           value={form.company}
           onChange={update("company")}
           tabIndex={-1}
