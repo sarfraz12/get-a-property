@@ -218,9 +218,14 @@ export default async function Footer(props) {
             es corto, así que dejar que el grid "estire" las celdas
             como antes generaba espacios dispares y el logo terminaba
             en una altura distinta según la columna más larga). */}
-        <div className="grid items-start gap-10 lg:grid-cols-[1.3fr_1fr_1fr_1fr_1.1fr] lg:gap-8">
+        {/* Responsive: 1 columna en mobile, 2 desde sm y 3 en tablet
+            (md), y la fila de 5 secciones desde lg. En sm/md el bloque
+            de newsletter + logo ocupa toda la fila para que el form no
+            quede apretado, y debajo se reparten links y contacto en
+            columnas (antes en tablet todo caía en una sola lista). */}
+        <div className="grid items-start gap-10 sm:grid-cols-2 sm:gap-x-8 md:grid-cols-3 lg:grid-cols-[1.3fr_1fr_1fr_1fr_1.1fr] lg:gap-8">
           {/* 1) Newsletter arriba, descripción, logo al final */}
-          <div className="flex flex-col">
+          <div className="flex flex-col sm:col-span-2 md:col-span-3 lg:col-span-1">
             <NewsletterForm lang={lang} />
             <p className="mt-6 max-w-xs text-sm leading-relaxed text-black/50 dark:text-white/50">
               {t.description}
